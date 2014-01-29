@@ -1,0 +1,20 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'tw.skyarrow.daogenerator.Generator'
+
+dependencies {
+    compile 'de.greenrobot:greendao-generator:1.3.0'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+    }
+}
+
+task cleanDao(type: Delete) {
+    delete '../ehreader/src-gen'
+}

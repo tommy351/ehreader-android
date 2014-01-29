@@ -1,9 +1,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="tw.skyarrow.ehreader.MainActivity" >
-    
-    <item android:id="@+id/action_settings"
-        android:title="@string/action_settings"
-        android:orderInCategory="100"
+    tools:context="tw.skyarrow.ehreader.activity.MainActivity" >
+    <item
+        android:id="@+id/menu_search"
+        android:title="@string/menu_search"
+        android:icon="@drawable/ic_search"
+        android:showAsAction="always|collapseActionView"
+        android:actionViewClass="android.widget.SearchView"/>
+    <item
+        android:id="@+id/menu_file_search"
+        android:title="@string/menu_image_search"
+        android:showAsAction="never"/>
+    <item
+        android:id="@+id/menu_settings"
+        android:title="@string/menu_settings"
         android:showAsAction="never" />
 </menu>

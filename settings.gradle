@@ -1,1 +1,1 @@
-include ':ehreader'
+include 'ehreader', 'DaoGenerator'

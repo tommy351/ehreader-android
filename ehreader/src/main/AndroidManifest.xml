@@ -2,20 +2,51 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="tw.skyarrow.ehreader" >
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        android:name=".BaseApplication">
+        <meta-data
+            android:name="android.app.default_searchable"
+            android:value=".activity.SearchActivity"/>
         <activity
-            android:name="tw.skyarrow.ehreader.MainActivity"
-            android:label="@string/app_name" >
+            android:name=".activity.MainActivity"
+            android:label="@string/app_name"
+            android:configChanges="orientation|screenSize|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activity.GalleryActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"/>
+        <activity
+            android:name=".activity.SearchActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable"/>
+        </activity>
+        <activity
+            android:name=".activity.ImageSearchActivity"
+            android:label="@string/label_image_search"
+            android:configChanges="orientation|screenSize|keyboardHidden"/>
+        <activity
+            android:name=".activity.PrefActivity"
+            android:label="@string/label_settings"/>
+        <provider
+            android:name=".provider.SearchSuggestionProvider"
+            android:authorities="tw.skyarrow.ehreader.provider.SearchSuggestionProvider"/>
     </application>
 
 </manifest>

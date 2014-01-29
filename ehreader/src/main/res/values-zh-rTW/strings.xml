@@ -1,0 +1,55 @@
+<resources>
+    <string name="app_name">E-Hentai 閱讀器</string>
+
+    <string name="menu_search">搜尋</string>
+    <string name="menu_settings">設定</string>
+    <string name="menu_star">收藏</string>
+    <string name="menu_unstar">取消收藏</string>
+    <string name="menu_download">下載</string>
+    <string name="menu_image_search">圖片搜尋</string>
+    <string name="menu_share">分享</string>
+    <string name="menu_open_in_browser">以瀏覽器開啟</string>
+    <string name="menu_camera">相機</string>
+
+    <string name="label_image_search">圖片搜尋</string>
+    <string name="label_settings">設定</string>
+
+    <string name="search_hint">Search</string>
+
+    <string-array name="main_tabs">
+        <item>藝廊</item>
+        <item>收藏</item>
+        <item>下載</item>
+    </string-array>
+
+    <string name="category_doujinshi">同人誌</string>
+    <string name="category_manga">漫畫</string>
+    <string name="category_artistcg">作家 CG</string>
+    <string name="category_gamecg">遊戲 CG</string>
+    <string name="category_western">西方</string>
+    <string name="category_non_h">一般向</string>
+    <string name="category_imageset">畫集</string>
+    <string name="category_cosplay">角色扮演</string>
+    <string name="category_asianporn">亞洲色情</string>
+    <string name="category_misc">其他</string>
+
+    <string name="notification_starred">已收藏</string>
+    <string name="notification_unstarred">已取消收藏</string>
+
+    <string name="meta_tags">標籤：</string>
+    <string name="meta_uploader">上傳者：</string>
+    <string name="meta_created">建立時間：</string>
+    <string name="read">閱讀</string>
+
+    <string name="error_no_results">找不到相簿，請試試其他關鍵字。</string>
+    <string name="error_no_network">網路無法連線，請檢查您的網路連線。</string>
+    <string name="error_no_starred">您收藏的所有相簿都在這。</string>
+    <string name="error_no_more_results">找不到更多相簿了。</string>
+
+    <string name="image_search_hint">選擇圖片以搜尋擁有該圖片的相簿。</string>
+    <string name="image_search_select">選擇</string>
+    <string name="image_search_similar">搜尋相似圖片</string>
+    <string name="image_search_only_cover">僅搜尋封面</string>
+    <string name="uploading">上傳中...</string>
+    <string name="cancel">取消</string>
+</resources>
