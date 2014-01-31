@@ -1,0 +1,12 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_start_all"
+        android:icon="@drawable/ic_start_all"
+        android:title="@string/menu_start_all"
+        android:showAsAction="always"/>
+    <item
+        android:id="@+id/menu_pause_all"
+        android:icon="@drawable/ic_pause_all"
+        android:title="@string/menu_pause_all"
+        android:showAsAction="always"/>
+</menu>

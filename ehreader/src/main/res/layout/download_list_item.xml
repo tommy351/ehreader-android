@@ -1,6 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="90dp">
     <ImageView
         android:id="@+id/cover"
         android:layout_height="90dp"
@@ -13,10 +13,42 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:maxLines="2"
-        android:text="Title\nTitle"
+        android:text="Title"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_toRightOf="@+id/cover"
         android:layout_marginTop="8dp"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="48dp"
         android:ellipsize="end"/>
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/progress_text"
+        android:layout_toRightOf="@+id/cover"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="4dp"/>
+    <TextView
+        android:id="@+id/progress_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/cover"
+        android:text="Progress"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="?android:attr/textColorHint"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="8dp"/>
+    <ImageButton
+        android:id="@+id/feature"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/overflow_btn"
+        android:layout_alignParentRight="true"
+        android:scaleType="centerInside"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentBottom="true"
+        android:background="@android:drawable/divider_horizontal_bright"/>
 </RelativeLayout>

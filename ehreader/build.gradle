@@ -5,7 +5,7 @@ android {
     buildToolsVersion '19.0.0'
 
     defaultConfig {
-        minSdkVersion 15
+        minSdkVersion 14
         targetSdkVersion 19
         versionCode 1
         versionName "0.1"
@@ -33,7 +33,7 @@ android {
 }
 
 dependencies {
-    compile 'com.google.android:support-v4:r7'
+    compile 'com.android.support:support-v4:19.0.+'
     compile files('libs/libGoogleAnalyticsServices.jar')
     compile 'com.googlecode.android-query:android-query:0.25.9'
     compile 'com.github.chrisbanes.photoview:library:1.2.2'

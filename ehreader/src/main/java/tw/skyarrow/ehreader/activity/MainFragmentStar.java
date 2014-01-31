@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
@@ -32,19 +33,21 @@ import tw.skyarrow.ehreader.db.GalleryDao;
 /**
  * Created by SkyArrow on 2014/1/26.
  */
-public class MainFragmentStar extends Fragment implements AdapterView.OnItemClickListener {
+public class MainFragmentStar extends MainFragmentBase {
     @InjectView(R.id.list)
     ListView listView;
 
     @InjectView(R.id.error)
     TextView errorView;
 
+    @InjectView(R.id.loading)
+    ProgressBar loadingView;
+
     private SQLiteDatabase db;
     private DaoMaster daoMaster;
     private DaoSession daoSession;
     private GalleryDao galleryDao;
 
-    private AQuery aq;
     private List<Gallery> galleryList;
     private GalleryListAdapter adapter;
 
@@ -64,11 +67,10 @@ public class MainFragmentStar extends Fragment implements AdapterView.OnItemClic
         qb.where(GalleryDao.Properties.Starred.eq(true));
         qb.orderDesc(GalleryDao.Properties.Lastread);
 
-        aq = new AQuery(view);
         galleryList = qb.list();
         adapter = new GalleryListAdapter(context, galleryList);
 
-        aq.id(R.id.loading).gone();
+        loadingView.setVisibility(View.GONE);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(this);
 
@@ -88,16 +90,5 @@ public class MainFragmentStar extends Fragment implements AdapterView.OnItemClic
         super.onSaveInstanceState(outState);
 
         outState.putInt("position", listView.getSelectedItemPosition());
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Gallery gallery = galleryList.get(i);
-        Intent intent = new Intent(getActivity(), GalleryActivity.class);
-        Bundle args = new Bundle();
-
-        args.putLong("id", gallery.getId());
-        intent.putExtras(args);
-        startActivity(intent);
     }
 }

@@ -6,10 +6,11 @@
     <string name="menu_star">Star</string>
     <string name="menu_unstar">Unstar</string>
     <string name="menu_download">Download</string>
-    <string name="menu_image_search">Image Search</string>
+    <string name="menu_image_search">Image search</string>
     <string name="menu_share">Share</string>
-    <string name="menu_open_in_browser">Open in Browser</string>
-    <string name="menu_camera">Camera</string>
+    <string name="menu_open_in_browser">Open in browser</string>
+    <string name="menu_start_all">Start all</string>
+    <string name="menu_pause_all">Pause all</string>
 
     <string name="label_image_search">Image Search</string>
     <string name="label_settings">Settings</string>
@@ -45,6 +46,7 @@
     <string name="error_no_network">Can\'t connect to network. Please check your network connection.</string>
     <string name="error_no_starred">All galleries you starred will be here.</string>
     <string name="error_no_more_results">No more galleries found.</string>
+    <string name="error_no_download">The download queue is queue. Try to download some galleries.</string>
 
     <string name="image_search_hint">Select a image to find galleries including the selected photo.</string>
     <string name="image_search_select">Select</string>

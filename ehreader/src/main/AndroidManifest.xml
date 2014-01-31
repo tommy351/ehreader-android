@@ -26,7 +26,11 @@
         </activity>
         <activity
             android:name=".activity.GalleryActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"/>
+            android:configChanges="orientation|screenSize|keyboardHidden">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.MainActivity"/>
+        </activity>
         <activity
             android:name=".activity.SearchActivity"
             android:configChanges="orientation|screenSize|keyboardHidden">
@@ -34,19 +38,33 @@
                 <action android:name="android.intent.action.SEARCH"/>
             </intent-filter>
             <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.MainActivity"/>
+            <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable"/>
         </activity>
         <activity
             android:name=".activity.ImageSearchActivity"
             android:label="@string/label_image_search"
-            android:configChanges="orientation|screenSize|keyboardHidden"/>
+            android:configChanges="orientation|screenSize|keyboardHidden">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.MainActivity"/>
+        </activity>
         <activity
             android:name=".activity.PrefActivity"
-            android:label="@string/label_settings"/>
+            android:label="@string/label_settings">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.MainActivity"/>
+        </activity>
         <provider
             android:name=".provider.SearchSuggestionProvider"
             android:authorities="tw.skyarrow.ehreader.provider.SearchSuggestionProvider"/>
+        <service
+            android:name=".service.GalleryDownloadService"/>
+        <service
+            android:name=".service.PhotoInfoService"/>
     </application>
-
 </manifest>

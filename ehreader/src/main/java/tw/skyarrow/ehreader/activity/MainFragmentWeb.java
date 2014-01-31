@@ -6,7 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +21,6 @@ import com.androidquery.callback.AjaxStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,17 +37,16 @@ import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
-import tw.skyarrow.ehreader.util.CategoryHelper;
+import tw.skyarrow.ehreader.service.GalleryDownloadService;
 import tw.skyarrow.ehreader.util.GalleryAjaxCallback;
+import tw.skyarrow.ehreader.util.CategoryHelper;
 import tw.skyarrow.ehreader.util.InfiniteScrollListener;
 import tw.skyarrow.ehreader.util.L;
 
 /**
  * Created by SkyArrow on 2014/1/26.
  */
-public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.OnScrollToEndListener, AdapterView.OnItemClickListener {
-    private static final Pattern pGalleryURL = Constant.GALLERY_URL_PATTERN;
-
+public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollListener.OnScrollToEndListener {
     @InjectView(R.id.list)
     ListView listView;
 
@@ -58,6 +55,8 @@ public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.
 
     @InjectView(R.id.error)
     TextView errorView;
+
+    private static final Pattern pGalleryURL = Pattern.compile("<a href=\"http://(g.e-|ex)hentai.org/g/(\\d+)/(\\w+)/\" onmouseover");
 
     private SQLiteDatabase db;
     private DaoMaster daoMaster;
@@ -133,8 +132,8 @@ public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.
             Matcher matcher = pGalleryURL.matcher(html);
 
             while (matcher.find()) {
-                String id = matcher.group(1);
-                String token = matcher.group(2);
+                String id = matcher.group(2);
+                String token = matcher.group(3);
                 Gallery gallery = new Gallery();
 
                 gallery.setId(Long.parseLong(id));
@@ -187,7 +186,7 @@ public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.
                         gallery = new Gallery();
 
                         gallery.setStarred(false);
-                        gallery.setDownloaded(false);
+                        gallery.setDownloadStatus(GalleryDownloadService.STATUS_NOT_DOWNLOADED);
                         gallery.setProgress(0);
                     }
 
@@ -202,6 +201,7 @@ public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.
                     gallery.setUploader(data.getString("uploader"));
                     gallery.setTags(data.getJSONArray("tags").toString());
                     gallery.setCreated(new Date(data.getLong("posted") * 1000));
+                    gallery.setSize(Long.parseLong(data.getString("filesize")));
 
                     if (isNew) {
                         galleryDao.insertInTx(gallery);
@@ -232,7 +232,7 @@ public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.
 
     private String getGalleryListURL(int page) {
         Uri.Builder builder = Uri.parse(baseUrl).buildUpon();
-        builder.appendQueryParameter("page", page + "");
+        builder.appendQueryParameter("page", Integer.toString(page));
 
         return builder.build().toString();
     }
@@ -261,19 +261,5 @@ public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.
     @Override
     public void onScrollToEnd(int page) {
         getGalleryList(page);
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Gallery gallery = (Gallery) adapterView.getAdapter().getItem(i);
-
-        if (gallery == null) return;
-
-        Intent intent = new Intent(getActivity(), GalleryActivity.class);
-        Bundle args = new Bundle();
-
-        args.putLong("id", gallery.getId());
-        intent.putExtras(args);
-        startActivity(intent);
     }
 }

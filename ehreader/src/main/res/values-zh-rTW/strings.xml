@@ -9,7 +9,8 @@
     <string name="menu_image_search">圖片搜尋</string>
     <string name="menu_share">分享</string>
     <string name="menu_open_in_browser">以瀏覽器開啟</string>
-    <string name="menu_camera">相機</string>
+    <string name="menu_start_all">全部開始</string>
+    <string name="menu_pause_all">全部暫停</string>
 
     <string name="label_image_search">圖片搜尋</string>
     <string name="label_settings">設定</string>
@@ -45,6 +46,7 @@
     <string name="error_no_network">網路無法連線，請檢查您的網路連線。</string>
     <string name="error_no_starred">您收藏的所有相簿都在這。</string>
     <string name="error_no_more_results">找不到更多相簿了。</string>
+    <string name="error_no_download">下載佇列為空，試著下載一些相簿吧。</string>
 
     <string name="image_search_hint">選擇圖片以搜尋擁有該圖片的相簿。</string>
     <string name="image_search_select">選擇</string>

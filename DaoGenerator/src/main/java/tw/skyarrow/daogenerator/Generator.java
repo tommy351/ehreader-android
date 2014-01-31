@@ -29,6 +29,8 @@ public class Generator {
         photo.addStringProperty("filename");
         photo.addIntProperty("width");
         photo.addIntProperty("height");
+        photo.addStringProperty("src");
+        photo.addBooleanProperty("downloaded");
 
         // Recent Image Search
         Entity imageSearch = schema.addEntity("ImageSearch");
@@ -47,13 +49,16 @@ public class Generator {
         gallery.addIntProperty("count");
         gallery.addStringProperty("thumbnail");
         gallery.addBooleanProperty("starred");
-        gallery.addBooleanProperty("downloaded");
+        gallery.addIntProperty("downloadStatus");
         gallery.addFloatProperty("rating");
         gallery.addDateProperty("created");
         gallery.addDateProperty("lastread");
         gallery.addStringProperty("tags");
         gallery.addStringProperty("uploader");
         gallery.addIntProperty("progress");
+        gallery.addStringProperty("showkey");
+        gallery.addLongProperty("size");
+        gallery.addDateProperty("downloaded");
 
         Property photoProperty = photo.addLongProperty("galleryId").notNull().getProperty();
         ToMany galleryToPhotos = gallery.addToMany(photo, photoProperty);

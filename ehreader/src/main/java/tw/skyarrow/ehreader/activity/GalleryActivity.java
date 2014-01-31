@@ -44,9 +44,10 @@ import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
+import tw.skyarrow.ehreader.service.GalleryDownloadService;
 import tw.skyarrow.ehreader.util.BitmapHelper;
 import tw.skyarrow.ehreader.util.CategoryHelper;
-import tw.skyarrow.ehreader.util.GalleryHelper;
+import tw.skyarrow.ehreader.util.UriHelper;
 
 /**
  * Created by SkyArrow on 2014/1/27.
@@ -152,7 +153,7 @@ public class GalleryActivity extends Activity {
     private Intent getShareIntent() {
         Intent intent = new Intent(Intent.ACTION_SEND);
 
-        intent.putExtra(Intent.EXTRA_TEXT, gallery.getTitle() + " " + GalleryHelper.getUrlString(gallery));
+        intent.putExtra(Intent.EXTRA_TEXT, gallery.getTitle() + " " + UriHelper.getGalleryUrlString(gallery));
         intent.setType("text/plain");
 
         return intent;
@@ -346,13 +347,22 @@ public class GalleryActivity extends Activity {
     }
 
     private void downloadGallery() {
-        //
+        Intent intent = new Intent(this, GalleryDownloadService.class);
+
+        if (gallery.getDownloadStatus() == GalleryDownloadService.STATUS_NOT_DOWNLOADED) {
+            gallery.setDownloadStatus(GalleryDownloadService.STATUS_DOWNLOADING);
+            gallery.setStarred(true);
+            galleryDao.update(gallery);
+        }
+
+        intent.putExtra(GalleryDownloadService.GALLERY_ID, gallery.getId());
+        startService(intent);
     }
 
     private void openInBrowser() {
         Intent intent = new Intent(Intent.ACTION_VIEW);
 
-        intent.setData(GalleryHelper.getUri(gallery));
+        intent.setData(UriHelper.getGalleryUri(gallery));
         startActivity(intent);
     }
 }

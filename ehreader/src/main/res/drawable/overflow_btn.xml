@@ -1,0 +1,7 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/ic_overflow"/>
+    <item android:state_pressed="true"
+        android:drawable="@drawable/ic_overflow_active"/>
+    <item android:state_hovered="true"
+        android:drawable="@drawable/ic_overflow_active"/>
+</selector>

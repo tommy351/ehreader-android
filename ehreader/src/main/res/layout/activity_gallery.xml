@@ -52,7 +52,8 @@
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_marginTop="8dp"
-            android:textAppearance="?android:attr/textAppearanceMedium"/>
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textIsSelectable="true"/>
         <TextView
             android:id="@+id/subtitle"
             android:layout_below="@+id/title"
@@ -62,7 +63,8 @@
             android:layout_marginTop="8dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"/>
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textIsSelectable="true"/>
         <Button
             android:id="@+id/read"
             android:layout_width="match_parent"
