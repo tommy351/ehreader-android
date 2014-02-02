@@ -1,6 +1,6 @@
 package tw.skyarrow.ehreader.adapter;
 
-import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
@@ -21,6 +21,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.activity.DownloadContextMenu;
+import tw.skyarrow.ehreader.activity.GalleryActivity;
 import tw.skyarrow.ehreader.db.Download;
 import tw.skyarrow.ehreader.db.Gallery;
 
@@ -66,6 +67,9 @@ public class DownloadListAdapter extends BaseAdapter {
             view = inflater.inflate(R.layout.download_list_item, null);
             holder = new ViewHolder(view);
             view.setTag(holder);
+            view.setClickable(true);
+            view.setOnClickListener(new OnClickListener(download));
+            view.setOnLongClickListener(new OnLongClickListener(download));
         } else {
             holder = (ViewHolder) view.getTag();
         }
@@ -127,6 +131,38 @@ public class DownloadListAdapter extends BaseAdapter {
         }
     }
 
+    private class OnClickListener implements View.OnClickListener {
+        private Download download;
+
+        public OnClickListener(Download download) {
+            this.download = download;
+        }
+
+        @Override
+        public void onClick(View view) {
+            Intent intent = new Intent(activity, GalleryActivity.class);
+            Bundle args = new Bundle();
+
+            args.putLong("id", download.getId());
+            intent.putExtras(args);
+            activity.startActivity(intent);
+        }
+    }
+
+    private class OnLongClickListener implements View.OnLongClickListener {
+        private Download download;
+
+        public OnLongClickListener(Download download) {
+            this.download = download;
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            showContextMenu(download);
+            return true;
+        }
+    }
+
     private class OnFeatureClickListener implements View.OnClickListener {
         private Download download;
 
@@ -136,14 +172,18 @@ public class DownloadListAdapter extends BaseAdapter {
 
         @Override
         public void onClick(View view) {
-            DialogFragment dialog = new DownloadContextMenu();
-            Bundle args = new Bundle();
-
-            args.putLong("id", download.getId());
-            args.putString("title", download.getGallery().getTitle());
-
-            dialog.setArguments(args);
-            dialog.show(activity.getSupportFragmentManager(), "context");
+            showContextMenu(download);
         }
+    }
+
+    private void showContextMenu(Download download) {
+        DialogFragment dialog = new DownloadContextMenu();
+        Bundle args = new Bundle();
+
+        args.putLong("id", download.getId());
+        args.putString("title", download.getGallery().getTitle());
+
+        dialog.setArguments(args);
+        dialog.show(activity.getSupportFragmentManager(), "context");
     }
 }

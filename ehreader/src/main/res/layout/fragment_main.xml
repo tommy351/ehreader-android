@@ -27,5 +27,6 @@
         tools:listitem="@layout/gallery_list_item"
         android:footerDividersEnabled="false"
         android:divider="@null"
-        android:dividerHeight="0dp"/>
+        android:dividerHeight="0dp"
+        android:listSelector="@drawable/listitem_bg"/>
 </RelativeLayout>

@@ -70,7 +70,7 @@
 
     <string-array name="download_context_menu">
         <item>開啟</item>
-        <item>再次下載</item>
+        <item>重新下載</item>
         <item>刪除</item>
     </string-array>
 

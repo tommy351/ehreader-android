@@ -22,6 +22,8 @@ import android.text.style.StyleSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.SeekBar;
@@ -66,6 +68,7 @@ public class PhotoActivity extends ActionBarActivity {
     private PagerAdapter pagerAdapter;
     private EventBus bus;
     private View decorView;
+    private boolean isUiVisible = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +78,6 @@ public class PhotoActivity extends ActionBarActivity {
         ButterKnife.inject(this);
 
         decorView = getWindow().getDecorView();
-        decorView.setOnSystemUiVisibilityChangeListener(onSystemUiVisibilityChangeListener);
         showSystemUI();
 
         bus = EventBus.getDefault();
@@ -249,47 +251,55 @@ public class PhotoActivity extends ActionBarActivity {
         hintText.setText(sp);
     }
 
-    private View.OnSystemUiVisibilityChangeListener onSystemUiVisibilityChangeListener = new View.OnSystemUiVisibilityChangeListener() {
-        @Override
-        public void onSystemUiVisibilityChange(int visibility) {
-            if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
-                // visible
-                Animation fadeIn = AnimationUtils.loadAnimation(PhotoActivity.this, R.anim.fade_in);
-
-                seekBarArea.setVisibility(View.VISIBLE);
-                seekBarArea.startAnimation(fadeIn);
-            } else {
-                // invisible
-                Animation fadeOut = AnimationUtils.loadAnimation(PhotoActivity.this, R.anim.fade_out);
-
-                seekBarArea.setVisibility(View.GONE);
-                seekBarArea.startAnimation(fadeOut);
-            }
-        }
-    };
-
     public void toggleUIVisibility() {
-        if (isSystemUiVisible()) {
+        if (isUiVisible) {
             hideSystemUI();
         } else {
             showSystemUI();
         }
     }
 
-    public boolean isSystemUiVisible() {
-        return (decorView.getSystemUiVisibility() & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0;
-    }
-
     public void hideSystemUI() {
-        int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LOW_PROFILE;
+        int uiOptions = 0;
+        isUiVisible = false;
+
+        if (Build.VERSION.SDK_INT >= 14) {
+            uiOptions |= View.SYSTEM_UI_FLAG_LOW_PROFILE;
+        }
+
+        if (Build.VERSION.SDK_INT >= 16) {
+            uiOptions |= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN;
+        } else {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
+
+        Animation fadeOut = AnimationUtils.loadAnimation(PhotoActivity.this, R.anim.fade_out);
+
+        seekBarArea.setVisibility(View.GONE);
+        seekBarArea.startAnimation(fadeOut);
 
         decorView.setSystemUiVisibility(uiOptions);
     }
 
     public void showSystemUI() {
-        int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+        int uiOptions = 0;
+        isUiVisible = true;
+
+        if (Build.VERSION.SDK_INT >= 16) {
+            uiOptions |= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+        } else {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+        }
+
+        Animation fadeIn = AnimationUtils.loadAnimation(PhotoActivity.this, R.anim.fade_in);
+
+        seekBarArea.setVisibility(View.VISIBLE);
+        seekBarArea.startAnimation(fadeIn);
 
         decorView.setSystemUiVisibility(uiOptions);
     }

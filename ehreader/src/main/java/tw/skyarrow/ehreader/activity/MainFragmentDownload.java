@@ -39,7 +39,7 @@ import tw.skyarrow.ehreader.service.GalleryDownloadService;
 /**
  * Created by SkyArrow on 2014/1/26.
  */
-public class MainFragmentDownload extends Fragment implements AdapterView.OnItemClickListener {
+public class MainFragmentDownload extends Fragment {
     @InjectView(R.id.list)
     ListView listView;
 
@@ -78,7 +78,6 @@ public class MainFragmentDownload extends Fragment implements AdapterView.OnItem
         adapter = new DownloadListAdapter(getActivity(), downloadList);
 
         listView.setAdapter(adapter);
-        listView.setOnItemClickListener(this);
         loadingView.setVisibility(View.GONE);
 
         isDownloading = isServiceRunning();
@@ -184,20 +183,6 @@ public class MainFragmentDownload extends Fragment implements AdapterView.OnItem
                 getActivity().supportInvalidateOptionsMenu();
                 break;
         }
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Download download = (Download) adapterView.getAdapter().getItem(i);
-
-        if (download == null) return;
-
-        Intent intent = new Intent(getActivity(), GalleryActivity.class);
-        Bundle args = new Bundle();
-
-        args.putLong("id", download.getId());
-        intent.putExtras(args);
-        startActivity(intent);
     }
 
     // http://stackoverflow.com/a/5921190

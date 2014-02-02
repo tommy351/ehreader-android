@@ -1,6 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@drawable/listitem_bg">
     <ImageView
         android:id="@+id/cover"
         android:layout_height="@dimen/thumbnail_size"
@@ -41,8 +42,8 @@
         android:id="@+id/feature"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:src="@drawable/btn_overflow"
+        android:background="@drawable/listitem_bg"
+        android:src="@drawable/ic_overflow"
         android:layout_alignParentRight="true"
         android:padding="6dp"/>
     <View

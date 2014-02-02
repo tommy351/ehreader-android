@@ -30,6 +30,7 @@ import java.util.Date;
 import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.activity.GalleryActivity;
 import tw.skyarrow.ehreader.activity.MainActivity;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
@@ -301,9 +302,19 @@ public class GalleryDownloadService extends IntentService {
         private void success() {
             isTerminated = true;
 
+            Intent intent = new Intent(GalleryDownloadService.this, GalleryActivity.class);
+            Bundle args = new Bundle();
+
+            args.putLong("id", galleryId);
+            intent.putExtras(intent);
+
+            PendingIntent pendingIntent = PendingIntent.getActivity(GalleryDownloadService.this, 0,
+                    intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
             builder.setContentText(getResources().getString(R.string.download_success))
                     .setProgress(0, 0, false)
-                    .setAutoCancel(true);
+                    .setAutoCancel(true)
+                    .setContentIntent(pendingIntent);
 
             sendNotification();
             setStatus(Download.STATUS_SUCCESS);
@@ -341,7 +352,7 @@ public class GalleryDownloadService extends IntentService {
             Intent intent = new Intent(GalleryDownloadService.this, MainActivity.class);
             Bundle args = new Bundle();
 
-            args.putLong("tab", MainActivity.TAB_DOWNLOAD);
+            args.putInt("tab", MainActivity.TAB_DOWNLOAD);
             intent.putExtras(args);
 
             PendingIntent pendingIntent = PendingIntent.getActivity(GalleryDownloadService.this, 0,
