@@ -1,7 +1,3 @@
 <resources>
-    <style name="Theme"/>
-
     <style name="Theme.Main" parent="@style/Theme.AppCompat.Light"/>
-
-    <style name="Theme.Photo" parent="@style/Theme.AppCompat"/>
 </resources>

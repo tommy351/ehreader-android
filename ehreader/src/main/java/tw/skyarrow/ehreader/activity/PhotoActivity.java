@@ -2,26 +2,30 @@ package tw.skyarrow.ehreader.activity;
 
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.NavUtils;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.ShareActionProvider;
-import android.view.KeyEvent;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.StyleSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import java.util.Date;
 
@@ -34,7 +38,6 @@ import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
-import tw.skyarrow.ehreader.db.PhotoDao;
 import tw.skyarrow.ehreader.event.PhotoDialogEvent;
 
 /**
@@ -43,6 +46,15 @@ import tw.skyarrow.ehreader.event.PhotoDialogEvent;
 public class PhotoActivity extends ActionBarActivity {
     @InjectView(R.id.pager)
     ViewPager pager;
+
+    @InjectView(R.id.seekbar)
+    SeekBar seekBar;
+
+    @InjectView(R.id.seekbar_area)
+    View seekBarArea;
+
+    @InjectView(R.id.hint)
+    TextView hintText;
 
     private SQLiteDatabase db;
     private DaoMaster daoMaster;
@@ -53,15 +65,18 @@ public class PhotoActivity extends ActionBarActivity {
 
     private PagerAdapter pagerAdapter;
     private EventBus bus;
+    private View decorView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
         setContentView(R.layout.activity_photo);
         ButterKnife.inject(this);
+
+        decorView = getWindow().getDecorView();
+        decorView.setOnSystemUiVisibilityChangeListener(onSystemUiVisibilityChangeListener);
+        showSystemUI();
 
         bus = EventBus.getDefault();
         bus.register(this);
@@ -81,7 +96,6 @@ public class PhotoActivity extends ActionBarActivity {
         pagerAdapter = new PhotoPagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
         actionBar.setDisplayHomeAsUpEnabled(true);
-        //toggleUIVisibility();
 
         if (savedInstanceState != null) {
             page = savedInstanceState.getInt("page");
@@ -95,6 +109,9 @@ public class PhotoActivity extends ActionBarActivity {
 
         actionBar.setTitle(String.format("%d / %d", page + 1, gallery.getCount()));
         pager.setCurrentItem(page, false);
+        seekBar.setMax(gallery.getCount() - 1);
+        seekBar.setProgress(page);
+        seekBar.setOnSeekBarChangeListener(onSeekBarChangeListener);
 
         pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -104,6 +121,7 @@ public class PhotoActivity extends ActionBarActivity {
 
             @Override
             public void onPageSelected(int i) {
+                seekBar.setProgress(i);
                 actionBar.setTitle(String.format("%s / %s", i + 1, gallery.getCount()));
             }
 
@@ -198,24 +216,80 @@ public class PhotoActivity extends ActionBarActivity {
         dialog.setArguments(args);
         dialog.show(getSupportFragmentManager(), "bookmark");
     }
-/*
-    private void toggleUIVisibility() {
-        View decorView = getWindow().getDecorView();
-        int uiOptions = decorView.getSystemUiVisibility();
-        int newUiOptions = uiOptions;
 
-        if (Build.VERSION.SDK_INT >= 14) {
-            newUiOptions ^= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+    private SeekBar.OnSeekBarChangeListener onSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            if (pager.getCurrentItem() != i) {
+                showHintText(i);
+            }
         }
 
-        if (Build.VERSION.SDK_INT >= 16) {
-            newUiOptions ^= View.SYSTEM_UI_FLAG_FULLSCREEN;
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+            hintText.setVisibility(View.VISIBLE);
+            showHintText(pager.getCurrentItem());
         }
 
-        if (Build.VERSION.SDK_INT >= 18) {
-            newUiOptions ^= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+            hintText.setVisibility(View.GONE);
+            pager.setCurrentItem(seekBar.getProgress(), false);
         }
+    };
 
-        decorView.setSystemUiVisibility(newUiOptions);
-    }*/
+    private void showHintText(int i) {
+        int page = i + 1;
+        SpannableString sp = new SpannableString(page + " / " + gallery.getCount());
+        int pageLength = Integer.toString(page).length();
+
+        sp.setSpan(new StyleSpan(Typeface.BOLD), 0, pageLength, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        hintText.setText(sp);
+    }
+
+    private View.OnSystemUiVisibilityChangeListener onSystemUiVisibilityChangeListener = new View.OnSystemUiVisibilityChangeListener() {
+        @Override
+        public void onSystemUiVisibilityChange(int visibility) {
+            if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+                // visible
+                Animation fadeIn = AnimationUtils.loadAnimation(PhotoActivity.this, R.anim.fade_in);
+
+                seekBarArea.setVisibility(View.VISIBLE);
+                seekBarArea.startAnimation(fadeIn);
+            } else {
+                // invisible
+                Animation fadeOut = AnimationUtils.loadAnimation(PhotoActivity.this, R.anim.fade_out);
+
+                seekBarArea.setVisibility(View.GONE);
+                seekBarArea.startAnimation(fadeOut);
+            }
+        }
+    };
+
+    public void toggleUIVisibility() {
+        if (isSystemUiVisible()) {
+            hideSystemUI();
+        } else {
+            showSystemUI();
+        }
+    }
+
+    public boolean isSystemUiVisible() {
+        return (decorView.getSystemUiVisibility() & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0;
+    }
+
+    public void hideSystemUI() {
+        int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LOW_PROFILE;
+
+        decorView.setSystemUiVisibility(uiOptions);
+    }
+
+    public void showSystemUI() {
+        int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+
+        decorView.setSystemUiVisibility(uiOptions);
+    }
 }

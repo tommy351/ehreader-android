@@ -8,10 +8,12 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -80,6 +82,14 @@ public class PhotoFragment extends Fragment {
         ButterKnife.inject(this, view);
         setHasOptionsMenu(true);
 
+        view.setClickable(true);
+        view.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return gestureDetector.onTouchEvent(motionEvent);
+            }
+        });
+
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
         db = helper.getWritableDatabase();
         daoMaster = new DaoMaster(db);
@@ -97,6 +107,15 @@ public class PhotoFragment extends Fragment {
 
         return view;
     }
+
+    private GestureDetector gestureDetector = new GestureDetector(getActivity(),
+            new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onSingleTapUp(MotionEvent e) {
+                    ((PhotoActivity) getActivity()).toggleUIVisibility();
+                    return true;
+                }
+            });
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -238,12 +257,20 @@ public class PhotoFragment extends Fragment {
                 pageText.setVisibility(View.GONE);
                 progressBar.setVisibility(View.GONE);
                 iv.setImageBitmap(bm);
-                iv.setVisibility(View.VISIBLE);
-                new PhotoViewAttacher(iv);
+                PhotoViewAttacher attacher = new PhotoViewAttacher(iv);
+
+                attacher.setOnViewTapListener(onPhotoTap);
 
                 isLoaded = true;
                 getActivity().supportInvalidateOptionsMenu();
             }
+        }
+    };
+
+    private PhotoViewAttacher.OnViewTapListener onPhotoTap = new PhotoViewAttacher.OnViewTapListener() {
+        @Override
+        public void onViewTap(View view, float v, float v2) {
+            ((PhotoActivity) getActivity()).toggleUIVisibility();
         }
     };
 

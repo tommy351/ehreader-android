@@ -21,7 +21,7 @@
         android:ellipsize="end"/>
     <ProgressBar
         android:id="@+id/progress_bar"
-        style="@android:style/Widget.Holo.Light.ProgressBar.Horizontal"
+        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/progress_text"
@@ -43,7 +43,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        android:src="@drawable/overflow_btn"
+        android:src="@drawable/btn_overflow"
         android:layout_alignParentRight="true"
         android:paddingTop="6dp"
         android:paddingBottom="6dp"
