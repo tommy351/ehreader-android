@@ -1,11 +1,12 @@
 package tw.skyarrow.ehreader.activity;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -17,7 +18,12 @@ import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.util.SearchHelper;
 
-public class MainActivity extends FragmentActivity implements ActionBar.OnNavigationListener {
+public class MainActivity extends ActionBarActivity implements ActionBar.OnNavigationListener {
+    public static final int TAB_GALLERY = 0;
+    public static final int TAB_STARRED = 1;
+    public static final int TAB_HISTORY = 2;
+    public static final int TAB_DOWNLOAD = 3;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,11 +31,30 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
 
         SpinnerAdapter spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.main_tabs,
                 android.R.layout.simple_spinner_dropdown_item);
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getSupportActionBar();
 
         actionBar.setListNavigationCallbacks(spinnerAdapter, this);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         actionBar.setDisplayShowTitleEnabled(false);
+
+        Bundle args;
+
+        if (savedInstanceState != null) {
+            args = savedInstanceState;
+        } else {
+            args = getIntent().getExtras();
+        }
+
+        if (args != null) {
+            actionBar.setSelectedNavigationItem(args.getInt("tab"));
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putInt("tab", getActionBar().getSelectedNavigationIndex());
     }
 
     @Override
@@ -73,23 +98,32 @@ public class MainActivity extends FragmentActivity implements ActionBar.OnNaviga
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         Fragment fragment;
         Bundle args = new Bundle();
+        String tag;
 
         switch (i) {
-            case 1:
+            case TAB_STARRED:
                 fragment = new MainFragmentStar();
+                tag = MainFragmentStar.TAG;
                 break;
 
-            case 2:
+            case TAB_HISTORY:
+                fragment = new MainFragmentHistory();
+                tag = MainFragmentHistory.TAG;
+                break;
+
+            case TAB_DOWNLOAD:
                 fragment = new MainFragmentDownload();
+                tag = MainFragmentDownload.TAG;
                 break;
 
             default:
                 fragment = new MainFragmentWeb();
+                tag = MainFragmentWeb.TAG;
                 args.putString("base", Constant.BASE_URL);
         }
 
         fragment.setArguments(args);
-        ft.replace(R.id.container, fragment);
+        ft.replace(R.id.container, fragment, tag);
         ft.commit();
 
         return true;

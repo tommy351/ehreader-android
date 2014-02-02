@@ -1,6 +1,5 @@
 package tw.skyarrow.ehreader.activity;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Intent;
@@ -9,6 +8,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NavUtils;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.ShareActionProvider;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -19,9 +26,9 @@ import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
-import android.widget.ShareActionProvider;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,13 +45,15 @@ import java.util.Date;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
+import tw.skyarrow.ehreader.db.Download;
+import tw.skyarrow.ehreader.db.DownloadDao;
 import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
-import tw.skyarrow.ehreader.service.GalleryDownloadService;
 import tw.skyarrow.ehreader.util.BitmapHelper;
 import tw.skyarrow.ehreader.util.CategoryHelper;
 import tw.skyarrow.ehreader.util.UriHelper;
@@ -52,7 +61,7 @@ import tw.skyarrow.ehreader.util.UriHelper;
 /**
  * Created by SkyArrow on 2014/1/27.
  */
-public class GalleryActivity extends Activity {
+public class GalleryActivity extends ActionBarActivity {
     @InjectView(R.id.meta)
     TextView metaView;
 
@@ -80,15 +89,17 @@ public class GalleryActivity extends Activity {
     @InjectView(R.id.cover_bg)
     ImageView coverBackground;
 
+    @InjectView(R.id.read)
+    Button readBtn;
+
     private SQLiteDatabase db;
     private DaoMaster daoMaster;
     private DaoSession daoSession;
     private GalleryDao galleryDao;
+    private DownloadDao downloadDao;
 
     private AQuery aq;
     private Gallery gallery;
-
-    private ShareActionProvider shareActionProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,10 +112,11 @@ public class GalleryActivity extends Activity {
         daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();
+        downloadDao = daoSession.getDownloadDao();
 
         aq = new AQuery(this);
 
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getSupportActionBar();
 
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
@@ -134,6 +146,12 @@ public class GalleryActivity extends Activity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        db.close();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.gallery, menu);
 
@@ -144,7 +162,7 @@ public class GalleryActivity extends Activity {
         }
 
         MenuItem shareItem = menu.findItem(R.id.menu_share);
-        shareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
+        ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
         shareActionProvider.setShareIntent(getShareIntent());
 
         return true;
@@ -335,7 +353,7 @@ public class GalleryActivity extends Activity {
 
     private void starGallery(boolean isStarred) {
         gallery.setStarred(isStarred);
-        galleryDao.updateInTx(gallery);
+        galleryDao.update(gallery);
 
         if (isStarred) {
             Toast.makeText(this, R.string.notification_starred, Toast.LENGTH_SHORT).show();
@@ -343,20 +361,25 @@ public class GalleryActivity extends Activity {
             Toast.makeText(this, R.string.notification_unstarred, Toast.LENGTH_SHORT).show();
         }
 
-        invalidateOptionsMenu();
+        supportInvalidateOptionsMenu();
     }
 
     private void downloadGallery() {
-        Intent intent = new Intent(this, GalleryDownloadService.class);
+        Download download = downloadDao.load(gallery.getId());
+        Bundle args = new Bundle();
+        DialogFragment dialog;
 
-        if (gallery.getDownloadStatus() == GalleryDownloadService.STATUS_NOT_DOWNLOADED) {
-            gallery.setDownloadStatus(GalleryDownloadService.STATUS_DOWNLOADING);
-            gallery.setStarred(true);
-            galleryDao.update(gallery);
+        args.putLong("id", gallery.getId());
+        args.putLong("size", gallery.getSize());
+
+        if (download == null) {
+            dialog = new DownloadConfirmDialog();
+        } else {
+            dialog = new DownloadAgainDialog();
         }
 
-        intent.putExtra(GalleryDownloadService.GALLERY_ID, gallery.getId());
-        startService(intent);
+        dialog.setArguments(args);
+        dialog.show(getSupportFragmentManager(), "confirm");
     }
 
     private void openInBrowser() {
@@ -364,5 +387,17 @@ public class GalleryActivity extends Activity {
 
         intent.setData(UriHelper.getGalleryUri(gallery));
         startActivity(intent);
+    }
+
+    @OnClick(R.id.read)
+    void onReadBtnClick() {
+        Intent intent = new Intent(this, PhotoActivity.class);
+        Bundle args = new Bundle();
+
+        args.putLong("id", gallery.getId());
+
+        intent.putExtras(args);
+        startActivity(intent);
+
     }
 }

@@ -2,6 +2,7 @@ package tw.skyarrow.ehreader.event;
 
 import android.os.Bundle;
 
+import tw.skyarrow.ehreader.db.Download;
 import tw.skyarrow.ehreader.db.Gallery;
 
 /**
@@ -9,17 +10,11 @@ import tw.skyarrow.ehreader.db.Gallery;
  */
 public class GalleryDownloadEvent {
     private int code;
-    private Gallery gallery;
-    private Object extra;
+    private Download download;
 
-    public GalleryDownloadEvent(int code, Gallery gallery) {
-        this(code, gallery, null);
-    }
-
-    public GalleryDownloadEvent(int code, Gallery gallery, Object extra) {
+    public GalleryDownloadEvent(int code, Download download) {
         this.code = code;
-        this.gallery = gallery;
-        this.extra = extra;
+        this.download = download;
     }
 
     public int getCode() {
@@ -30,19 +25,11 @@ public class GalleryDownloadEvent {
         this.code = code;
     }
 
-    public Gallery getGallery() {
-        return gallery;
+    public Download getDownload() {
+        return download;
     }
 
-    public void setGallery(Gallery gallery) {
-        this.gallery = gallery;
-    }
-
-    public Object getExtra() {
-        return extra;
-    }
-
-    public void setExtra(Object extra) {
-        this.extra = extra;
+    public void setDownload(Download download) {
+        this.download = download;
     }
 }

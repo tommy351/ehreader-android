@@ -7,6 +7,7 @@ import de.greenrobot.daogenerator.Entity;
 import de.greenrobot.daogenerator.Property;
 import de.greenrobot.daogenerator.Schema;
 import de.greenrobot.daogenerator.ToMany;
+import de.greenrobot.daogenerator.ToOne;
 
 /**
  * Created by SkyArrow on 2014/1/26.
@@ -31,6 +32,7 @@ public class Generator {
         photo.addIntProperty("height");
         photo.addStringProperty("src");
         photo.addBooleanProperty("downloaded");
+        photo.addBooleanProperty("invalid");
 
         // Recent Image Search
         Entity imageSearch = schema.addEntity("ImageSearch");
@@ -49,7 +51,6 @@ public class Generator {
         gallery.addIntProperty("count");
         gallery.addStringProperty("thumbnail");
         gallery.addBooleanProperty("starred");
-        gallery.addIntProperty("downloadStatus");
         gallery.addFloatProperty("rating");
         gallery.addDateProperty("created");
         gallery.addDateProperty("lastread");
@@ -58,12 +59,22 @@ public class Generator {
         gallery.addIntProperty("progress");
         gallery.addStringProperty("showkey");
         gallery.addLongProperty("size");
-        gallery.addDateProperty("downloaded");
 
         Property photoProperty = photo.addLongProperty("galleryId").notNull().getProperty();
         ToMany galleryToPhotos = gallery.addToMany(photo, photoProperty);
         galleryToPhotos.setName("photos");
         galleryToPhotos.orderAsc(photoPage);
+
+        // Download
+        Entity download = schema.addEntity("Download");
+        download.setSuperclass("DownloadStatus");
+
+        Property downloadId = download.addIdProperty().autoincrement().getProperty();
+        download.addIntProperty("status");
+        download.addIntProperty("progress");
+        download.addDateProperty("created");
+
+        download.addToOne(gallery, downloadId);
 
         // Generate DAO
         File file = new File(dbPath);

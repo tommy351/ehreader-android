@@ -5,8 +5,9 @@ import android.app.SearchManager;
 import android.app.SearchableInfo;
 import android.content.Context;
 import android.net.Uri;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
 import android.view.MenuItem;
-import android.widget.SearchView;
 
 import tw.skyarrow.ehreader.Constant;
 
@@ -16,7 +17,7 @@ import tw.skyarrow.ehreader.Constant;
 public class SearchHelper {
     public static void createSearchMenu(Activity activity, MenuItem item) {
         SearchManager searchManager = (SearchManager) activity.getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) item.getActionView();
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
         SearchableInfo searchableInfo = searchManager.getSearchableInfo(activity.getComponentName());
 
         searchView.setOnQueryTextListener(new QueryTextListener(item));

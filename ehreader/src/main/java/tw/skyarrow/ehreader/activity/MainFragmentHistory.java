@@ -1,21 +1,14 @@
 package tw.skyarrow.ehreader.activity;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import com.androidquery.AQuery;
-
-import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -31,9 +24,9 @@ import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
 
 /**
- * Created by SkyArrow on 2014/1/26.
+ * Created by SkyArrow on 2014/2/2.
  */
-public class MainFragmentStar extends MainFragmentBase {
+public class MainFragmentHistory extends MainFragmentBase {
     @InjectView(R.id.list)
     ListView listView;
 
@@ -43,7 +36,7 @@ public class MainFragmentStar extends MainFragmentBase {
     @InjectView(R.id.loading)
     ProgressBar loadingView;
 
-    public static final String TAG = "MainFragmentStar";
+    public static final String TAG = "MainFragmentHistory";
 
     private SQLiteDatabase db;
     private DaoMaster daoMaster;
@@ -66,7 +59,7 @@ public class MainFragmentStar extends MainFragmentBase {
         galleryDao = daoSession.getGalleryDao();
 
         QueryBuilder qb = galleryDao.queryBuilder();
-        qb.where(GalleryDao.Properties.Starred.eq(true));
+        qb.where(GalleryDao.Properties.Lastread.isNotNull());
         qb.orderDesc(GalleryDao.Properties.Lastread);
 
         galleryList = qb.list();
@@ -77,7 +70,7 @@ public class MainFragmentStar extends MainFragmentBase {
         listView.setOnItemClickListener(this);
 
         if (galleryList.size() == 0) {
-            errorView.setText(R.string.error_no_starred);
+            errorView.setText(R.string.error_no_history);
         }
 
         if (savedInstanceState != null) {

@@ -56,9 +56,6 @@ public class PhotoInfoHelper {
         daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();
         photoDao = daoSession.getPhotoDao();
-
-        QueryBuilder.LOG_SQL = true;
-        QueryBuilder.LOG_VALUES = true;
     }
 
     public List<Photo> getPhotoList(long galleryId, int page) throws IOException {
@@ -91,16 +88,13 @@ public class PhotoInfoHelper {
 
             QueryBuilder qb = photoDao.queryBuilder();
             qb.where(qb.and(PhotoDao.Properties.GalleryId.eq(galleryId), PhotoDao.Properties.Page.eq(photoPage)));
-            long count = qb.count();
 
-            L.v("qb count: %d", count);
-
-            // TODO Error: Cannot update entity without key - was it inserted before?
-            if (count > 0) {
+            if (qb.count() > 0) {
                 photoDao.updateInTx(photo);
             } else {
                 photo.setDownloaded(false);
                 photo.setBookmarked(false);
+                photo.setInvalid(false);
 
                 photoDao.insertInTx(photo);
             }
@@ -132,6 +126,10 @@ public class PhotoInfoHelper {
     }
 
     public Photo getPhotoInfo(Gallery gallery, Photo photo) throws IOException, JSONException {
+        if (photo.getSrc() != null && !photo.getSrc().isEmpty() && !photo.getInvalid()) {
+            return photo;
+        }
+
         String showkey = gallery.getShowkey();
 
         if (showkey == null || showkey.isEmpty()) {
@@ -186,6 +184,7 @@ public class PhotoInfoHelper {
         photo.setSrc(src);
         photo.setWidth(Integer.parseInt(result.getString("x")));
         photo.setHeight(Integer.parseInt(result.getString("y")));
+        photo.setInvalid(false);
         photoDao.updateInTx(photo);
 
         return photo;

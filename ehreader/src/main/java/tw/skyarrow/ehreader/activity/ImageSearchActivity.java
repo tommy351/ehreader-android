@@ -1,12 +1,15 @@
 package tw.skyarrow.ehreader.activity;
 
-import android.app.ActionBar;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.MenuItem;
 
@@ -17,7 +20,7 @@ import tw.skyarrow.ehreader.event.ImageSearchUploadedEvent;
 /**
  * Created by SkyArrow on 2014/1/29.
  */
-public class ImageSearchActivity extends FragmentActivity {
+public class ImageSearchActivity extends ActionBarActivity {
     private static final int CONTAINER = R.id.container;
 
     private boolean isSelected = false;
@@ -28,7 +31,7 @@ public class ImageSearchActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
         EventBus.getDefault().register(this);
 
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();

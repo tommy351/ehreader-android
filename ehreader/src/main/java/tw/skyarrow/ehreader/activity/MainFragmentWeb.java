@@ -56,6 +56,8 @@ public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollL
     @InjectView(R.id.error)
     TextView errorView;
 
+    public static final String TAG = "MainFragmentWeb";
+
     private static final Pattern pGalleryURL = Pattern.compile("<a href=\"http://(g.e-|ex)hentai.org/g/(\\d+)/(\\w+)/\" onmouseover");
 
     private SQLiteDatabase db;
@@ -124,6 +126,12 @@ public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollL
         outState.putInt("position", listView.getSelectedItemPosition());
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        db.close();
+    }
+
     private AjaxCallback<String> getRawHtmlCallback = new AjaxCallback<String>() {
         @Override
         public void callback(String url, String html, AjaxStatus status) {
@@ -186,8 +194,7 @@ public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollL
                         gallery = new Gallery();
 
                         gallery.setStarred(false);
-                        gallery.setDownloadStatus(GalleryDownloadService.STATUS_NOT_DOWNLOADED);
-                        gallery.setProgress(0);
+                        gallery.setProgress(-1);
                     }
 
                     gallery.setId(data.getLong("gid"));

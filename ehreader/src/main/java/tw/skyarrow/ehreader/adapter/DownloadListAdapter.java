@@ -1,6 +1,9 @@
 package tw.skyarrow.ehreader.adapter;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +20,9 @@ import java.util.List;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.activity.DownloadContextMenu;
+import tw.skyarrow.ehreader.db.Download;
 import tw.skyarrow.ehreader.db.Gallery;
-import tw.skyarrow.ehreader.service.GalleryDownloadService;
-import tw.skyarrow.ehreader.util.GalleryDownload;
 
 /**
  * Created by SkyArrow on 2014/1/31.
@@ -28,13 +31,13 @@ public class DownloadListAdapter extends BaseAdapter {
     private static final boolean MEM_CACHE = true;
     private static final boolean FILE_CACHE = true;
 
-    private Context context;
+    private FragmentActivity activity;
     private LayoutInflater inflater;
-    private List<GalleryDownload> list;
+    private List<Download> list;
 
-    public DownloadListAdapter(Context context, List<GalleryDownload> list) {
-        this.context = context;
-        this.inflater = LayoutInflater.from(context);
+    public DownloadListAdapter(FragmentActivity activity, List<Download> list) {
+        this.activity = activity;
+        this.inflater = LayoutInflater.from(activity);
         this.list = list;
     }
 
@@ -44,7 +47,7 @@ public class DownloadListAdapter extends BaseAdapter {
     }
 
     @Override
-    public GalleryDownload getItem(int i) {
+    public Download getItem(int i) {
         return list.get(i);
     }
 
@@ -56,8 +59,8 @@ public class DownloadListAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         ViewHolder holder;
-        GalleryDownload galleryDownload = getItem(i);
-        Gallery gallery = galleryDownload.getGallery();
+        Download download = getItem(i);
+        Gallery gallery = download.getGallery();
 
         if (view == null) {
             view = inflater.inflate(R.layout.download_list_item, null);
@@ -68,30 +71,35 @@ public class DownloadListAdapter extends BaseAdapter {
         }
 
         AQuery aq = new AQuery(view);
-        int progress = galleryDownload.getDownloadProgress();
+        int progress = download.getProgress();
         int total = gallery.getCount();
 
         holder.title.setText(gallery.getTitle());
         aq.id(holder.cover).image(gallery.getThumbnail(), MEM_CACHE, FILE_CACHE);
         holder.progressBar.setMax(total);
         holder.progressBar.setProgress(progress);
+        holder.featureBtn.setOnClickListener(new OnFeatureClickListener(download));
 
-        switch (gallery.getDownloadStatus()) {
-            case GalleryDownloadService.STATUS_DOWNLOADING:
-                holder.progressText.setText(String.format("%d / %d (%.2f%%)", progress, total,
-                        progress * 100f / total));
+        switch (download.getStatus()) {
+            case Download.STATUS_DOWNLOADING:
+                holder.progressText.setText(String.format("%d / %d (%.2f%%)", progress, total, progress * 100f / total));
                 break;
 
-            case GalleryDownloadService.STATUS_PAUSED:
-                holder.progressText.setText("Paused");
+            case Download.STATUS_SUCCESS:
+                holder.progressText.setText(R.string.download_success);
                 break;
 
-            case GalleryDownloadService.STATUS_ERROR:
-                holder.progressText.setText("Error");
+            case Download.STATUS_ERROR:
+                holder.progressText.setText(R.string.download_failed);
                 break;
 
-            case GalleryDownloadService.STATUS_SUCCESS:
-                holder.progressText.setText("Download success");
+            case Download.STATUS_PAUSED:
+                holder.progressText.setText(R.string.download_paused);
+                break;
+
+            case Download.STATUS_PENDING:
+            case Download.STATUS_RETRY:
+                holder.progressText.setText(R.string.download_pending);
                 break;
         }
 
@@ -116,6 +124,26 @@ public class DownloadListAdapter extends BaseAdapter {
 
         public ViewHolder(View view) {
             ButterKnife.inject(this, view);
+        }
+    }
+
+    private class OnFeatureClickListener implements View.OnClickListener {
+        private Download download;
+
+        public OnFeatureClickListener(Download download) {
+            this.download = download;
+        }
+
+        @Override
+        public void onClick(View view) {
+            DialogFragment dialog = new DownloadContextMenu();
+            Bundle args = new Bundle();
+
+            args.putLong("id", download.getId());
+            args.putString("title", download.getGallery().getTitle());
+
+            dialog.setArguments(args);
+            dialog.show(activity.getSupportFragmentManager(), "context");
         }
     }
 }

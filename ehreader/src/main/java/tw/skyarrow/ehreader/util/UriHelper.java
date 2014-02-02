@@ -1,6 +1,9 @@
 package tw.skyarrow.ehreader.util;
 
 import android.net.Uri;
+import android.os.Environment;
+
+import java.io.File;
 
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.db.Gallery;
@@ -36,5 +39,23 @@ public class UriHelper {
 
     public static Uri getPhotoUri(Photo photo) {
         return Uri.parse(getPhotoUrlString(photo));
+    }
+
+    public static File getPicFolder() {
+        return new File(Environment.getExternalStorageDirectory(), Constant.FOLDER_NAME);
+    }
+
+    public static File getGalleryFolder(Gallery gallery) {
+        return getGalleryFolder(gallery.getId());
+    }
+
+    public static File getGalleryFolder(long id) {
+        return new File(getPicFolder(), Long.toString(id));
+    }
+
+    public static File getPhotoFile(Photo photo) {
+        if (photo.getFilename() == null) return null;
+
+        return new File(getGalleryFolder(photo.getGalleryId()), photo.getFilename());
     }
 }

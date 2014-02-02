@@ -1,5 +1,6 @@
 package tw.skyarrow.ehreader.activity;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -12,11 +13,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import com.androidquery.AQuery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,13 +30,11 @@ import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.adapter.DownloadListAdapter;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
+import tw.skyarrow.ehreader.db.Download;
+import tw.skyarrow.ehreader.db.DownloadDao;
 import tw.skyarrow.ehreader.db.Gallery;
-import tw.skyarrow.ehreader.db.GalleryDao;
-import tw.skyarrow.ehreader.db.Photo;
-import tw.skyarrow.ehreader.db.PhotoDao;
 import tw.skyarrow.ehreader.event.GalleryDownloadEvent;
 import tw.skyarrow.ehreader.service.GalleryDownloadService;
-import tw.skyarrow.ehreader.util.GalleryDownload;
 
 /**
  * Created by SkyArrow on 2014/1/26.
@@ -51,13 +49,18 @@ public class MainFragmentDownload extends Fragment implements AdapterView.OnItem
     @InjectView(R.id.loading)
     ProgressBar loadingView;
 
+    public static final String TAG = "MainFragmentDownload";
+
     private SQLiteDatabase db;
     private DaoMaster daoMaster;
     private DaoSession daoSession;
-    private GalleryDao galleryDao;
+    private DownloadDao downloadDao;
 
-    private List<GalleryDownload> galleryList;
+    private List<Download> downloadList;
     private DownloadListAdapter adapter;
+    private EventBus bus;
+
+    private boolean isDownloading = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -65,38 +68,22 @@ public class MainFragmentDownload extends Fragment implements AdapterView.OnItem
         ButterKnife.inject(this, view);
         setHasOptionsMenu(true);
 
-        Context context = getActivity();
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, Constant.DB_NAME, null);
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
         db = helper.getWritableDatabase();
         daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
-        galleryDao = daoSession.getGalleryDao();
+        downloadDao = daoSession.getDownloadDao();
 
-        galleryList = new ArrayList<GalleryDownload>();
-        adapter = new DownloadListAdapter(context, galleryList);
+        downloadList = downloadDao.loadAll();
+        adapter = new DownloadListAdapter(getActivity(), downloadList);
 
-        QueryBuilder galleryQb = galleryDao.queryBuilder();
-        galleryQb.where(GalleryDao.Properties.DownloadStatus.notEq(GalleryDownloadService.STATUS_NOT_DOWNLOADED));
-        galleryQb.orderDesc(GalleryDao.Properties.Downloaded);
-        List<Gallery> tmpList = galleryQb.list();
-
-        loadingView.setVisibility(View.GONE);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(this);
+        loadingView.setVisibility(View.GONE);
 
-        if (tmpList.size() > 0) {
-            for (Gallery gallery : tmpList) {
-                int count = 0;
+        isDownloading = isServiceRunning();
 
-                for (Photo photo : gallery.getPhotos()) {
-                    if (photo.getDownloaded()) count++;
-                }
-
-                galleryList.add(new GalleryDownload(gallery, count));
-            }
-
-            adapter.notifyDataSetChanged();
-        } else {
+        if (downloadList.size() == 0) {
             errorView.setText(R.string.error_no_download);
         }
 
@@ -108,20 +95,17 @@ public class MainFragmentDownload extends Fragment implements AdapterView.OnItem
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        EventBus.getDefault().unregister(this);
-    }
-
-    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.download, menu);
+
+        if (isDownloading) {
+            menu.findItem(R.id.menu_start_all).setVisible(false);
+            menu.findItem(R.id.menu_pause_all).setVisible(true);
+        } else {
+            menu.findItem(R.id.menu_start_all).setVisible(true);
+            menu.findItem(R.id.menu_pause_all).setVisible(false);
+        }
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -129,13 +113,30 @@ public class MainFragmentDownload extends Fragment implements AdapterView.OnItem
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_start_all:
+                startAll();
                 return true;
 
             case R.id.menu_pause_all:
+                pauseAll();
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        bus = EventBus.getDefault();
+        bus.register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        bus.unregister(this);
+        db.close();
     }
 
     @Override
@@ -146,42 +147,78 @@ public class MainFragmentDownload extends Fragment implements AdapterView.OnItem
     }
 
     public void onEventMainThread(GalleryDownloadEvent event) {
-        Gallery eGallery = event.getGallery();
-        boolean exist = false;
-        int progress = 0;
+        switch (event.getCode()) {
+            case GalleryDownloadService.EVENT_STARTED:
+            case GalleryDownloadService.EVENT_PAUSED:
+            case GalleryDownloadService.EVENT_ERROR:
+            case GalleryDownloadService.EVENT_PROGRESS:
+            case GalleryDownloadService.EVENT_SUCCESS:
+                Download eDownload = event.getDownload();
+                long eDownloadId = eDownload.getId();
+                boolean exist = false;
 
-        if (event.getCode() == GalleryDownloadService.EVENT_PROGRESS) {
-            progress = (Integer) event.getExtra();
-        }
+                for (int i = 0; i < downloadList.size(); i++) {
+                    Download download = downloadList.get(i);
 
-        for (GalleryDownload gallery : galleryList) {
-            if (gallery.getGallery().getId() == eGallery.getId()) {
-                gallery.setGallery(eGallery);
-                gallery.setDownloadProgress(progress);
+                    if (download.getId() == eDownloadId) {
+                        exist = true;
+                        downloadList.set(i, eDownload);
+                        break;
+                    }
+                }
 
-                exist = true;
+                if (!exist) {
+                    downloadList.add(0, eDownload);
+                }
+
+                adapter.notifyDataSetChanged();
                 break;
-            }
-        }
 
-        if (!exist) {
-            galleryList.add(0, new GalleryDownload(eGallery, progress));
-        }
+            case GalleryDownloadService.EVENT_SERVICE_START:
+                isDownloading = true;
+                getActivity().supportInvalidateOptionsMenu();
+                break;
 
-        adapter.notifyDataSetChanged();
+            case GalleryDownloadService.EVENT_SERVICE_STOP:
+                isDownloading = false;
+                getActivity().supportInvalidateOptionsMenu();
+                break;
+        }
     }
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        GalleryDownload gallery = (GalleryDownload) adapterView.getAdapter().getItem(i);
+        Download download = (Download) adapterView.getAdapter().getItem(i);
 
-        if (gallery == null) return;
+        if (download == null) return;
 
         Intent intent = new Intent(getActivity(), GalleryActivity.class);
         Bundle args = new Bundle();
 
-        args.putLong("id", gallery.getGallery().getId());
+        args.putLong("id", download.getId());
         intent.putExtras(args);
         startActivity(intent);
+    }
+
+    // http://stackoverflow.com/a/5921190
+    private boolean isServiceRunning() {
+        ActivityManager manager = (ActivityManager) getActivity().getSystemService(Context.ACTIVITY_SERVICE);
+        String className = GalleryDownloadService.class.getName();
+
+        for (ActivityManager.RunningServiceInfo info : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (className.equals(info.service.getClassName())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void startAll() {
+        //
+    }
+
+    private void pauseAll() {
+        getActivity().stopService(new Intent(getActivity(), GalleryDownloadService.class));
     }
 }
