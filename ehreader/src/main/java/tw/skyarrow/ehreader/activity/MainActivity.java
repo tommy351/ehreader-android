@@ -2,6 +2,7 @@ package tw.skyarrow.ehreader.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
@@ -88,6 +89,10 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
             case R.id.menu_file_search:
                 fileSearch();
                 return true;
+
+            case R.id.menu_filter:
+                openFilterDialog();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -133,5 +138,11 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         Intent intent = new Intent(MainActivity.this, ImageSearchActivity.class);
 
         startActivity(intent);
+    }
+
+    private void openFilterDialog() {
+        DialogFragment dialog = new FilterDialog();
+
+        dialog.show(getSupportFragmentManager(), "filter");
     }
 }

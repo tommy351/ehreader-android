@@ -92,6 +92,7 @@ public class PhotoActivity extends ActionBarActivity {
         gallery = galleryDao.load(galleryId);
         final ActionBar actionBar = getSupportActionBar();
         int page;
+        final int total = gallery.getCount();
 
         pagerAdapter = new PhotoPagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
@@ -105,11 +106,11 @@ public class PhotoActivity extends ActionBarActivity {
             page = gallery.getProgress();
         }
 
-        if (page < 0) page = 0;
+        if (page < 0 || page >= total) page = 0;
 
-        actionBar.setTitle(String.format("%d / %d", page + 1, gallery.getCount()));
+        actionBar.setTitle(String.format("%d / %d", page + 1, total));
         pager.setCurrentItem(page, false);
-        seekBar.setMax(gallery.getCount() - 1);
+        seekBar.setMax(total - 1);
         seekBar.setProgress(page);
         seekBar.setOnSeekBarChangeListener(onSeekBarChangeListener);
 
@@ -122,7 +123,7 @@ public class PhotoActivity extends ActionBarActivity {
             @Override
             public void onPageSelected(int i) {
                 seekBar.setProgress(i);
-                actionBar.setTitle(String.format("%s / %s", i + 1, gallery.getCount()));
+                actionBar.setTitle(String.format("%s / %s", i + 1, total));
             }
 
             @Override

@@ -325,7 +325,7 @@ public class GalleryDownloadService extends IntentService {
         private void progress(int progress) {
             String progressText = String.format("%d / %d (%.2f%%)", progress, total, progress * 100f / total);
 
-            builder.setProgress(total, progress, false)
+            builder.setProgress(total - 1, progress, false)
                     .setContentText(progressText);
 
             download.setProgress(progress);

@@ -76,7 +76,7 @@ public class DownloadListAdapter extends BaseAdapter {
 
         holder.title.setText(gallery.getTitle());
         aq.id(holder.cover).image(gallery.getThumbnail(), MEM_CACHE, FILE_CACHE);
-        holder.progressBar.setMax(total);
+        holder.progressBar.setMax(total - 1);
         holder.progressBar.setProgress(progress);
         holder.featureBtn.setOnClickListener(new OnFeatureClickListener(download));
 

@@ -7,4 +7,6 @@
 
     <dimen name="activity_horizontal_margin">@dimen/margin_medium</dimen>
     <dimen name="activity_vertical_margin">@dimen/margin_medium</dimen>
+
+    <dimen name="thumbnail_size">92dp</dimen>
 </resources>

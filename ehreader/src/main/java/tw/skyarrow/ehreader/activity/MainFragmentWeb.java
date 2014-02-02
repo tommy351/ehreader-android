@@ -194,7 +194,7 @@ public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollL
                         gallery = new Gallery();
 
                         gallery.setStarred(false);
-                        gallery.setProgress(-1);
+                        gallery.setProgress(0);
                     }
 
                     gallery.setId(data.getLong("gid"));
