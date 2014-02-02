@@ -306,7 +306,7 @@ public class GalleryDownloadService extends IntentService {
             Bundle args = new Bundle();
 
             args.putLong("id", galleryId);
-            intent.putExtras(intent);
+            intent.putExtras(args);
 
             PendingIntent pendingIntent = PendingIntent.getActivity(GalleryDownloadService.this, 0,
                     intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -336,7 +336,7 @@ public class GalleryDownloadService extends IntentService {
         private void progress(int progress) {
             String progressText = String.format("%d / %d (%.2f%%)", progress, total, progress * 100f / total);
 
-            builder.setProgress(total - 1, progress, false)
+            builder.setProgress(total, progress, false)
                     .setContentText(progressText);
 
             download.setProgress(progress);

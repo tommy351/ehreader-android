@@ -23,6 +23,8 @@ import tw.skyarrow.ehreader.event.PhotoDialogEvent;
  * Created by SkyArrow on 2014/2/2.
  */
 public class PhotoBookmarkDialog extends DialogFragment {
+    public static final String TAG = "PhotoBookmarkDialog";
+
     private SQLiteDatabase db;
     private DaoMaster daoMaster;
     private DaoSession daoSession;

@@ -143,6 +143,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     private void openFilterDialog() {
         DialogFragment dialog = new FilterDialog();
 
-        dialog.show(getSupportFragmentManager(), "filter");
+        dialog.show(getSupportFragmentManager(), FilterDialog.TAG);
     }
 }

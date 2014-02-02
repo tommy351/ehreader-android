@@ -80,7 +80,7 @@ public class DownloadListAdapter extends BaseAdapter {
 
         holder.title.setText(gallery.getTitle());
         aq.id(holder.cover).image(gallery.getThumbnail(), MEM_CACHE, FILE_CACHE);
-        holder.progressBar.setMax(total - 1);
+        holder.progressBar.setMax(total);
         holder.progressBar.setProgress(progress);
         holder.featureBtn.setOnClickListener(new OnFeatureClickListener(download));
 
@@ -184,6 +184,6 @@ public class DownloadListAdapter extends BaseAdapter {
         args.putString("title", download.getGallery().getTitle());
 
         dialog.setArguments(args);
-        dialog.show(activity.getSupportFragmentManager(), "context");
+        dialog.show(activity.getSupportFragmentManager(), DownloadContextMenu.TAG);
     }
 }

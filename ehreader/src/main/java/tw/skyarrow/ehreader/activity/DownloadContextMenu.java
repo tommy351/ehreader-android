@@ -13,6 +13,8 @@ import tw.skyarrow.ehreader.R;
  * Created by SkyArrow on 2014/2/1.
  */
 public class DownloadContextMenu extends DialogFragment {
+    public static final String TAG = "DownloadContextMenu";
+
     private long galleryId;
 
     @Override
@@ -57,10 +59,22 @@ public class DownloadContextMenu extends DialogFragment {
     }
 
     private void downloadAgain() {
-        //
+        Bundle args = new Bundle();
+        DialogFragment dialog = new DownloadAgainDialog();
+
+        args.putLong("id", galleryId);
+
+        dialog.setArguments(args);
+        dialog.show(getActivity().getSupportFragmentManager(), DownloadAgainDialog.TAG);
     }
 
     private void deleteGallery() {
-        //
+        DialogFragment dialog = new DownloadDeleteConfirmDialog();
+        Bundle args = new Bundle();
+
+        args.putLong("id", galleryId);
+
+        dialog.setArguments(args);
+        dialog.show(getActivity().getSupportFragmentManager(), DownloadDeleteConfirmDialog.TAG);
     }
 }

@@ -13,6 +13,8 @@ import tw.skyarrow.ehreader.R;
  * Created by SkyArrow on 2014/2/2.
  */
 public class FilterDialog extends DialogFragment {
+    public static final String TAG = "FilterDialog";
+
     private boolean[] filter;
 
     @Override

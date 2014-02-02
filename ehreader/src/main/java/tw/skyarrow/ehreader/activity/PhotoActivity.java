@@ -45,7 +45,7 @@ import tw.skyarrow.ehreader.event.PhotoDialogEvent;
 /**
  * Created by SkyArrow on 2014/1/31.
  */
-public class PhotoActivity extends ActionBarActivity {
+public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiVisibilityChangeListener {
     @InjectView(R.id.pager)
     ViewPager pager;
 
@@ -68,7 +68,6 @@ public class PhotoActivity extends ActionBarActivity {
     private PagerAdapter pagerAdapter;
     private EventBus bus;
     private View decorView;
-    private boolean isUiVisible = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,6 +185,15 @@ public class PhotoActivity extends ActionBarActivity {
         NavUtils.navigateUpTo(this, intent);
     }
 
+    @Override
+    public void onSystemUiVisibilityChange(int i) {
+        if (isUiVisible()) {
+            showSeekBar();
+        } else {
+            hideSeekBar();
+        }
+    }
+
     private class PhotoPagerAdapter extends FragmentStatePagerAdapter {
         public PhotoPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -217,15 +225,13 @@ public class PhotoActivity extends ActionBarActivity {
         args.putLong("id", gallery.getId());
 
         dialog.setArguments(args);
-        dialog.show(getSupportFragmentManager(), "bookmark");
+        dialog.show(getSupportFragmentManager(), PhotoBookmarkDialog.TAG);
     }
 
     private SeekBar.OnSeekBarChangeListener onSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-            if (pager.getCurrentItem() != i) {
-                showHintText(i);
-            }
+            showHintText(i);
         }
 
         @Override
@@ -252,16 +258,23 @@ public class PhotoActivity extends ActionBarActivity {
     }
 
     public void toggleUIVisibility() {
-        if (isUiVisible) {
+        if (isUiVisible()) {
             hideSystemUI();
         } else {
             showSystemUI();
         }
     }
 
+    private boolean isUiVisible() {
+        if (Build.VERSION.SDK_INT >= 16) {
+            return (decorView.getSystemUiVisibility() & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0;
+        } else {
+            return (getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) == 0;
+        }
+    }
+
     public void hideSystemUI() {
         int uiOptions = 0;
-        isUiVisible = false;
 
         if (Build.VERSION.SDK_INT >= 14) {
             uiOptions |= View.SYSTEM_UI_FLAG_LOW_PROFILE;
@@ -276,17 +289,11 @@ public class PhotoActivity extends ActionBarActivity {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
 
-        Animation fadeOut = AnimationUtils.loadAnimation(PhotoActivity.this, R.anim.fade_out);
-
-        seekBarArea.setVisibility(View.GONE);
-        seekBarArea.startAnimation(fadeOut);
-
         decorView.setSystemUiVisibility(uiOptions);
+        showSeekBar();
     }
-
     public void showSystemUI() {
         int uiOptions = 0;
-        isUiVisible = true;
 
         if (Build.VERSION.SDK_INT >= 16) {
             uiOptions |= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
@@ -296,11 +303,21 @@ public class PhotoActivity extends ActionBarActivity {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
         }
 
+        decorView.setSystemUiVisibility(uiOptions);
+        hideSeekBar();
+    }
+
+    private void showSeekBar() {
+        Animation fadeOut = AnimationUtils.loadAnimation(PhotoActivity.this, R.anim.fade_out);
+
+        seekBarArea.setVisibility(View.GONE);
+        seekBarArea.startAnimation(fadeOut);
+    }
+
+    private void hideSeekBar() {
         Animation fadeIn = AnimationUtils.loadAnimation(PhotoActivity.this, R.anim.fade_in);
 
         seekBarArea.setVisibility(View.VISIBLE);
         seekBarArea.startAnimation(fadeIn);
-
-        decorView.setSystemUiVisibility(uiOptions);
     }
 }

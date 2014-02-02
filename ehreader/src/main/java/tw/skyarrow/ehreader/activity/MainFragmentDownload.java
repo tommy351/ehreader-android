@@ -33,6 +33,7 @@ import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Download;
 import tw.skyarrow.ehreader.db.DownloadDao;
 import tw.skyarrow.ehreader.db.Gallery;
+import tw.skyarrow.ehreader.event.GalleryDeleteEvent;
 import tw.skyarrow.ehreader.event.GalleryDownloadEvent;
 import tw.skyarrow.ehreader.service.GalleryDownloadService;
 
@@ -74,7 +75,10 @@ public class MainFragmentDownload extends Fragment {
         daoSession = daoMaster.newSession();
         downloadDao = daoSession.getDownloadDao();
 
-        downloadList = downloadDao.loadAll();
+        QueryBuilder qb = downloadDao.queryBuilder();
+        qb.orderDesc(DownloadDao.Properties.Created);
+
+        downloadList = qb.list();
         adapter = new DownloadListAdapter(getActivity(), downloadList);
 
         listView.setAdapter(adapter);
@@ -183,6 +187,17 @@ public class MainFragmentDownload extends Fragment {
                 getActivity().supportInvalidateOptionsMenu();
                 break;
         }
+    }
+
+    public void onEvent(GalleryDeleteEvent event) {
+        for (int i = 0; i < downloadList.size(); i++) {
+            if (downloadList.get(i).getId() == event.getId()) {
+                downloadList.remove(i);
+                break;
+            }
+        }
+
+        adapter.notifyDataSetChanged();
     }
 
     // http://stackoverflow.com/a/5921190

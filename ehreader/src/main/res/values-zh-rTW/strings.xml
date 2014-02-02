@@ -86,4 +86,8 @@
     <string name="download_failed">下載失敗</string>
     <string name="download_success">下載成功</string>
     <string name="download_pending">正在等待下載</string>
+
+    <string name="delete_gallery_title">刪除相簿</string>
+    <string name="delete_gallery_msg">您要刪除已下載的相簿嗎？此操作無法復原。</string>
+    <string name="deleteing">刪除中&#8230;</string>
 </resources>

@@ -14,6 +14,8 @@ import tw.skyarrow.ehreader.service.GalleryDownloadService;
  * Created by SkyArrow on 2014/2/1.
  */
 public class DownloadAgainDialog extends DialogFragment {
+    public static final String TAG = "DownloadAgainDialog";
+
     private long galleryId;
 
     @Override

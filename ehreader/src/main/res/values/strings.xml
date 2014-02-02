@@ -86,4 +86,8 @@
     <string name="download_failed">Download failed</string>
     <string name="download_success">Download success</string>
     <string name="download_pending">Download pending</string>
+
+    <string name="delete_gallery_title">Delete gallery</string>
+    <string name="delete_gallery_msg">Do you want to delete the downloaded gallery? This operation can\'t be undone.</string>
+    <string name="deleteing">Deleting&#8230;</string>
 </resources>

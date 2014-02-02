@@ -15,6 +15,8 @@ import tw.skyarrow.ehreader.util.FileInfoHelper;
  * Created by SkyArrow on 2014/2/1.
  */
 public class DownloadConfirmDialog extends DialogFragment {
+    public static final String TAG = "DownloadConfirmDialog";
+
     private long galleryId;
 
     @Override

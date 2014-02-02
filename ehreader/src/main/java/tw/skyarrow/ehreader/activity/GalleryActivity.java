@@ -368,18 +368,21 @@ public class GalleryActivity extends ActionBarActivity {
         Download download = downloadDao.load(gallery.getId());
         Bundle args = new Bundle();
         DialogFragment dialog;
+        String tag;
 
         args.putLong("id", gallery.getId());
         args.putLong("size", gallery.getSize());
 
         if (download == null) {
             dialog = new DownloadConfirmDialog();
+            tag = DownloadConfirmDialog.TAG;
         } else {
             dialog = new DownloadAgainDialog();
+            tag = DownloadAgainDialog.TAG;
         }
 
         dialog.setArguments(args);
-        dialog.show(getSupportFragmentManager(), "confirm");
+        dialog.show(getSupportFragmentManager(), tag);
     }
 
     private void openInBrowser() {
