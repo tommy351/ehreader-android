@@ -1,0 +1,16 @@
+<resources>
+    <string name="label_image_search">圖片搜尋</string>
+
+    // Menu
+    <string name="menu_search">搜尋</string>
+    <string name="menu_image_search">圖片搜尋</string>
+
+    <string name="search_hint">搜尋</string>
+
+    // Image search
+    <string name="image_search_hint">選擇圖片以搜尋擁有該圖片的相簿。</string>
+    <string name="image_search_select">選擇</string>
+    <string name="image_search_similar">搜尋相似圖片</string>
+    <string name="image_search_only_cover">僅搜尋封面</string>
+    <string name="image_search_uploading">上傳中&#8230;</string>
+</resources>

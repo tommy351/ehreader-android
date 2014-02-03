@@ -1,33 +1,13 @@
 <resources>
+    // App info
     <string name="app_name">E-Hentai 閱讀器</string>
+    <string name="version">0.1</string>
 
-    <string name="menu_search">搜尋</string>
+    // Menu
     <string name="menu_settings">設定</string>
-    <string name="menu_star">收藏</string>
-    <string name="menu_unstar">取消收藏</string>
-    <string name="menu_download">下載</string>
-    <string name="menu_image_search">圖片搜尋</string>
     <string name="menu_share">分享</string>
-    <string name="menu_open_in_browser">以瀏覽器開啟</string>
-    <string name="menu_start_all">全部開始</string>
-    <string name="menu_pause_all">全部暫停</string>
-    <string name="menu_add_bookmark">新增書籤</string>
-    <string name="menu_remove_bookmark">移除書籤</string>
-    <string name="menu_bookmark_list">書籤清單</string>
-    <string name="menu_filter">過濾</string>
 
-    <string name="label_image_search">圖片搜尋</string>
-    <string name="label_settings">設定</string>
-
-    <string name="search_hint">Search</string>
-
-    <string-array name="main_tabs">
-        <item>藝廊</item>
-        <item>收藏</item>
-        <item>歷史</item>
-        <item>下載</item>
-    </string-array>
-
+    // Categories
     <string name="category_doujinshi">同人誌</string>
     <string name="category_manga">漫畫</string>
     <string name="category_artistcg">作家 CG</string>
@@ -39,55 +19,11 @@
     <string name="category_asianporn">亞洲色情</string>
     <string name="category_misc">其他</string>
 
-    <string name="notification_starred">已收藏</string>
-    <string name="notification_unstarred">已取消收藏</string>
-    <string name="notification_bookmark_added">書籤已新增</string>
-    <string name="notification_bookmark_removed">書籤已移除</string>
-
-    <string name="meta_tags">標籤：</string>
-    <string name="meta_uploader">上傳者：</string>
-    <string name="meta_created">建立時間：</string>
-    <string name="read">閱讀</string>
-
-    <string name="error_no_results">找不到相簿，請試試其他關鍵字。</string>
+    // Error
     <string name="error_no_network">網路無法連線，請檢查您的網路連線。</string>
-    <string name="error_no_starred">您收藏的所有相簿都在這。</string>
-    <string name="error_no_more_results">找不到更多相簿了。</string>
-    <string name="error_no_download">下載佇列為空，試著下載一些相簿吧。</string>
-    <string name="error_no_history">沒有記錄。</string>
 
-    <string name="image_search_hint">選擇圖片以搜尋擁有該圖片的相簿。</string>
-    <string name="image_search_select">選擇</string>
-    <string name="image_search_similar">搜尋相似圖片</string>
-    <string name="image_search_only_cover">僅搜尋封面</string>
-    <string name="uploading">上傳中&#8230;</string>
-
-    <string name="download_confirm">此相簿總共需要 %s，您確定要下載嗎？</string>
-    <string name="download_again_confirm">此相簿已經下載過了，您要再次下載嗎？</string>
-    <string name="download_again">再次下載</string>
+    // Common buttons
+    <string name="retry">重試</string>
     <string name="ok">確定</string>
     <string name="cancel">取消</string>
-
-    <string-array name="download_context_menu">
-        <item>開啟</item>
-        <item>重新下載</item>
-        <item>刪除</item>
-    </string-array>
-
-    <string name="retry">重試</string>
-
-    <string name="bookmark_list">書籤清單</string>
-    <string name="bookmark_list_item">第 %d 頁</string>
-    <string name="no_bookmarks">沒有書籤。</string>
-
-    <string name="download_started">下載已開始</string>
-    <string name="download_in_progress">正在下載</string>
-    <string name="download_paused">下載已暫停</string>
-    <string name="download_failed">下載失敗</string>
-    <string name="download_success">下載成功</string>
-    <string name="download_pending">正在等待下載</string>
-
-    <string name="delete_gallery_title">刪除相簿</string>
-    <string name="delete_gallery_msg">您要刪除已下載的相簿嗎？此操作無法復原。</string>
-    <string name="deleteing">刪除中&#8230;</string>
 </resources>

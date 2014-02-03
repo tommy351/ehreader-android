@@ -59,7 +59,7 @@ public class DownloadDeleteDialog extends DialogFragment {
 
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
-        dialog.setTitle(R.string.deleteing);
+        dialog.setTitle(R.string.gallery_deleting);
         dialog.setMax(gallery.getCount());
         dialog.setProgress(0);
         dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);

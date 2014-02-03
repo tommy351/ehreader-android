@@ -42,7 +42,7 @@ public class FilterDialog extends DialogFragment {
 
         builder.setMultiChoiceItems(buildResourceArray(categories), null, onChoose)
                 .setPositiveButton(R.string.ok, onSubmitClick)
-                .setNegativeButton(R.string.cancel, onCancelClick);
+                .setNegativeButton(R.string.cancel, null);
 
         return builder.create();
     }
@@ -51,7 +51,7 @@ public class FilterDialog extends DialogFragment {
         String[] result = new String[arr.length];
 
         for (int i = 0; i < arr.length; i++) {
-            result[i] = getResources().getString(arr[i]);
+            result[i] = getString(arr[i]);
         }
 
         return result;
@@ -74,13 +74,6 @@ public class FilterDialog extends DialogFragment {
             intent.putExtras(args);
 
             startActivity(intent);
-        }
-    };
-
-    private DialogInterface.OnClickListener onCancelClick = new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialogInterface, int i) {
-            dismiss();
         }
     };
 }

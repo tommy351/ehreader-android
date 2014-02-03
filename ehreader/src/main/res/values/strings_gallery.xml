@@ -1,0 +1,18 @@
+<resources>
+    // Menu
+    <string name="menu_star">Star</string>
+    <string name="menu_unstar">Unstar</string>
+    <string name="menu_download">Download</string>
+    <string name="menu_open_in_browser">Open in browser</string>
+
+    // Meta
+    <string name="meta_tags">Tags:</string>
+    <string name="meta_uploader">Uploader:</string>
+    <string name="meta_created">Created at:</string>
+
+    <string name="read_btn">Read</string>
+
+    // Notification
+    <string name="notification_starred">Starred</string>
+    <string name="notification_unstarred">Unstarred</string>
+</resources>

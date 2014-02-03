@@ -5,6 +5,7 @@ import android.app.SearchManager;
 import android.app.SearchableInfo;
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.view.MenuItem;
@@ -34,7 +35,10 @@ public class SearchHelper {
 
         @Override
         public boolean onQueryTextSubmit(String s) {
-            menuItem.collapseActionView();
+            if (Build.VERSION.SDK_INT >= 14) {
+                menuItem.collapseActionView();
+            }
+
             return false;
         }
 
@@ -58,7 +62,10 @@ public class SearchHelper {
 
         @Override
         public boolean onSuggestionClick(int i) {
-            menuItem.collapseActionView();
+            if (Build.VERSION.SDK_INT >= 14) {
+                menuItem.collapseActionView();
+            }
+
             return false;
         }
     }

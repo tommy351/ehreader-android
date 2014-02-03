@@ -25,4 +25,6 @@ public class Constant {
 
     public static final int PHOTO_PER_PAGE = 20;
     public static final String FOLDER_NAME = "ehreader";
+
+    public static final String HOMEPAGE = "https://github.com/tommy351/ehreader-android";
 }

@@ -1,0 +1,16 @@
+<resources>
+    <string name="label_image_search">Image Search</string>
+
+    // Menu
+    <string name="menu_search">Search</string>
+    <string name="menu_image_search">Image search</string>
+
+    <string name="search_hint">Search</string>
+
+    // Image search
+    <string name="image_search_hint">Select a image to find galleries including the selected photo.</string>
+    <string name="image_search_select">Select</string>
+    <string name="image_search_similar">Search similar photos</string>
+    <string name="image_search_only_cover">Only search covers</string>
+    <string name="image_search_uploading">Uploading&#8230;</string>
+</resources>

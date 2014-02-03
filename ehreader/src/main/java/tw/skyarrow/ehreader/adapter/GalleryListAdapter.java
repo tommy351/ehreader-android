@@ -66,7 +66,7 @@ public class GalleryListAdapter extends BaseAdapter {
 
         AQuery aq = new AQuery(view);
         int categoryRes = CategoryHelper.getResource(gallery.getCategory());
-        String meta = context.getResources().getString(categoryRes) + " / " + gallery.getCount() + "P";
+        String meta = context.getString(categoryRes) + " / " + gallery.getCount() + "P";
 
         holder.title.setText(gallery.getTitle());
         holder.meta.setText(meta);

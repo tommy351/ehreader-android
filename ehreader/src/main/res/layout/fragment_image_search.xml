@@ -64,7 +64,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="?android:attr/textColorHint"
-            android:text="@string/uploading"
+            android:text="@string/image_search_uploading"
             android:layout_alignParentBottom="true"/>
     </RelativeLayout>
 </RelativeLayout>

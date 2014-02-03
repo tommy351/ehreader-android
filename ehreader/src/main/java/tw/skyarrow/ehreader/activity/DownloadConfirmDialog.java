@@ -25,11 +25,11 @@ public class DownloadConfirmDialog extends DialogFragment {
         Bundle args = getArguments();
         galleryId = args.getLong("id");
         long gallerySize = args.getLong("size");
-        String message = String.format(getResources().getString(R.string.download_confirm), FileInfoHelper.toBytes(gallerySize));
+        String message = String.format(getString(R.string.download_confirm), FileInfoHelper.toBytes(gallerySize));
 
         builder.setMessage(message)
                 .setPositiveButton(R.string.ok, onSubmitClick)
-                .setNegativeButton(R.string.cancel, onCancelClick);
+                .setNegativeButton(R.string.cancel, null);
 
         return builder.create();
     }
@@ -42,13 +42,6 @@ public class DownloadConfirmDialog extends DialogFragment {
             intent.setAction(GalleryDownloadService.ACTION_START);
             intent.putExtra(GalleryDownloadService.GALLERY_ID, galleryId);
             getActivity().startService(intent);
-        }
-    };
-
-    private DialogInterface.OnClickListener onCancelClick = new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialogInterface, int i) {
-            dismiss();
         }
     };
 }

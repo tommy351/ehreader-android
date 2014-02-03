@@ -25,7 +25,7 @@ public class DownloadDeleteConfirmDialog extends DialogFragment {
         builder.setTitle(R.string.delete_gallery_title)
                 .setMessage(R.string.delete_gallery_msg)
                 .setPositiveButton(R.string.ok, onSubmitClick)
-                .setNegativeButton(R.string.cancel, onCancelClick);
+                .setNegativeButton(R.string.cancel, null);
 
         return builder.create();
     }
@@ -40,13 +40,6 @@ public class DownloadDeleteConfirmDialog extends DialogFragment {
 
             dialog.setArguments(args);
             dialog.show(getActivity().getSupportFragmentManager(), DownloadDeleteDialog.TAG);
-        }
-    };
-
-    private DialogInterface.OnClickListener onCancelClick = new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialogInterface, int i) {
-            dismiss();
         }
     };
 }

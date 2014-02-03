@@ -1,0 +1,18 @@
+<resources>
+    // Menu
+    <string name="menu_star">收藏</string>
+    <string name="menu_unstar">取消收藏</string>
+    <string name="menu_download">下載</string>
+    <string name="menu_open_in_browser">以瀏覽器開啟</string>
+
+    // Meta
+    <string name="meta_tags">標籤：</string>
+    <string name="meta_uploader">上傳者：</string>
+    <string name="meta_created">建立時間：</string>
+
+    <string name="read_btn">閱讀</string>
+
+    // Notification
+    <string name="notification_starred">已收藏</string>
+    <string name="notification_unstarred">已取消收藏</string>
+</resources>

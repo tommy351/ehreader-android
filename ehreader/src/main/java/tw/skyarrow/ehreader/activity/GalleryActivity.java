@@ -215,7 +215,7 @@ public class GalleryActivity extends ActionBarActivity {
 
     private void showGallery() {
         int categoryRes = CategoryHelper.getResource(gallery.getCategory());
-        String meta = getResources().getString(categoryRes) + " / " + gallery.getCount() + "P";
+        String meta = getString(categoryRes) + " / " + gallery.getCount() + "P";
 
         metaView.setText(meta);
         titleView.setText(gallery.getTitle());
@@ -274,7 +274,7 @@ public class GalleryActivity extends ActionBarActivity {
                 tags[i] = arr.getString(i);
             }
 
-            String tagTitle = getResources().getString(R.string.meta_tags) + " ";
+            String tagTitle = getString(R.string.meta_tags) + " ";
             String separator = ", ";
             SpannableString sp = new SpannableString(tagTitle + TextUtils.join(separator, tags));
             int length = tagTitle.length();
@@ -305,7 +305,7 @@ public class GalleryActivity extends ActionBarActivity {
             return;
         }
 
-        String title = getResources().getString(R.string.meta_uploader) + " ";
+        String title = getString(R.string.meta_uploader) + " ";
         SpannableString sp = new SpannableString(title + uploader);
         int titleLength = title.length();
 
@@ -342,7 +342,7 @@ public class GalleryActivity extends ActionBarActivity {
 
         DateFormat dateFormat = DateFormat.getDateInstance();
         String dateString = dateFormat.format(date);
-        String title = getResources().getString(R.string.meta_created) + " ";
+        String title = getString(R.string.meta_created) + " ";
         SpannableString sp = new SpannableString(title + dateString);
         int titleLength = title.length();
 

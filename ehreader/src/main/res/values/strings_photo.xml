@@ -1,0 +1,15 @@
+<resources>
+    // Menu
+    <string name="menu_add_bookmark">Add bookmark</string>
+    <string name="menu_remove_bookmark">Remove bookmark</string>
+    <string name="menu_bookmark_list">Bookmark list</string>
+
+    // Notification
+    <string name="notification_bookmark_added">Bookmark added</string>
+    <string name="notification_bookmark_removed">Bookmark removed</string>
+
+    // Bookmark list
+    <string name="bookmark_list">Bookmark list</string>
+    <string name="bookmark_list_item">Page %d</string>
+    <string name="no_bookmarks">No bookmarks.</string>
+</resources>

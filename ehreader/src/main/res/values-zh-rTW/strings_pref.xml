@@ -1,0 +1,54 @@
+<resources>
+    <string name="label_settings">設定</string>
+
+    // View
+    <string name="pref_view_title">檢視</string>
+
+    <string name="pref_launch_page_title">首頁</string>
+
+    <string name="pref_volume_key_navigation_title">音量鍵導覽</string>
+    <string name="pref_volume_key_navigation_summary">使用音量鍵翻頁</string>
+
+    <string name="pref_keep_screen_on_title">保持螢幕開啟</string>
+    <string name="pref_keep_screen_on_summary">閱讀時保持螢幕開啟</string>
+
+    // Download
+    <string name="pref_download_title">下載</string>
+
+    <string name="pref_download_over_wifi_title">僅透過 Wi-Fi 下載</string>
+    <string name="pref_download_over_wifi_summary">為了減少資料流量，避免使用行動網路下載。</string>
+
+    <string name="pref_auto_download_title">自動下載</string>
+    <string name="pref_auto_download_summary">自動繼續未完成的下載</string>
+
+    // Advanced
+    <string name="pref_advanced_title">進階</string>
+
+    <string name="pref_clear_cache_title">清除快取</string>
+    <string name="pref_clear_cache_summary">上次清除時間：%s</string>
+
+    <string name="pref_clear_history_title">清除歷史</string>
+
+    <string name="pref_clear_search_title">清除搜尋記錄</string>
+
+    // About
+    <string name="pref_about_title">關於</string>
+    <string name="pref_about_ver">版本 %s</string>
+
+    <string name="pref_open_source_license_title">開放原始碼授權</string>
+
+    // Dialog: Clear cache
+    <string name="clear_cache_title">清除快取</string>
+    <string name="clear_cache_msg">您要清除快取嗎？</string>
+
+    // Dialog: Clear history
+    <string name="clear_history_title">清除歷史</string>
+    <string name="clear_history_msg">您要清除歷史紀錄嗎？</string>
+
+    // Dialog: Clear search history
+    <string name="clear_search_title">清除搜尋記錄</string>
+    <string name="clear_search_msg">您要清除搜尋記錄嗎？</string>
+
+    // Dialog: Open source license
+    <string name="open_source_license">開放原始碼授權</string>
+</resources>

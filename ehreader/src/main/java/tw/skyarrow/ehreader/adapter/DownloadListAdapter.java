@@ -68,8 +68,6 @@ public class DownloadListAdapter extends BaseAdapter {
             holder = new ViewHolder(view);
             view.setTag(holder);
             view.setClickable(true);
-            view.setOnClickListener(new OnClickListener(download));
-            view.setOnLongClickListener(new OnLongClickListener(download));
         } else {
             holder = (ViewHolder) view.getTag();
         }
@@ -78,6 +76,8 @@ public class DownloadListAdapter extends BaseAdapter {
         int progress = download.getProgress();
         int total = gallery.getCount();
 
+        view.setOnClickListener(new OnClickListener(download));
+        view.setOnLongClickListener(new OnLongClickListener(download));
         holder.title.setText(gallery.getTitle());
         aq.id(holder.cover).image(gallery.getThumbnail(), MEM_CACHE, FILE_CACHE);
         holder.progressBar.setMax(total);

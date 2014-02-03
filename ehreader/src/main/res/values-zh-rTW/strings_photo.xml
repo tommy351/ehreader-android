@@ -1,0 +1,15 @@
+<resources>
+    // Menu
+    <string name="menu_add_bookmark">新增書籤</string>
+    <string name="menu_remove_bookmark">移除書籤</string>
+    <string name="menu_bookmark_list">書籤清單</string>
+
+    // Notification
+    <string name="notification_bookmark_added">書籤已新增</string>
+    <string name="notification_bookmark_removed">書籤已移除</string>
+
+    // Bookmark list
+    <string name="bookmark_list">書籤清單</string>
+    <string name="bookmark_list_item">第 %d 頁</string>
+    <string name="no_bookmarks">沒有書籤。</string>
+</resources>

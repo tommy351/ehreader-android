@@ -1,10 +1,11 @@
 package tw.skyarrow.ehreader.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -25,6 +26,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     public static final int TAB_HISTORY = 2;
     public static final int TAB_DOWNLOAD = 3;
 
+    private static final int CONTAINER = R.id.container;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +41,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         actionBar.setDisplayShowTitleEnabled(false);
 
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String launchPagePref = preferences.getString(getString(R.string.pref_launch_page), "0");
+        int tab = Integer.parseInt(launchPagePref);
         Bundle args;
 
         if (savedInstanceState != null) {
@@ -47,8 +53,10 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         }
 
         if (args != null) {
-            actionBar.setSelectedNavigationItem(args.getInt("tab"));
+            tab = args.getInt("tab");
         }
+
+        actionBar.setSelectedNavigationItem(tab);
     }
 
     @Override
@@ -84,6 +92,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_settings:
+                openSettings();
                 return true;
 
             case R.id.menu_file_search:
@@ -128,14 +137,14 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         }
 
         fragment.setArguments(args);
-        ft.replace(R.id.container, fragment, tag);
+        ft.replace(CONTAINER, fragment, tag);
         ft.commit();
 
         return true;
     }
 
     private void fileSearch() {
-        Intent intent = new Intent(MainActivity.this, ImageSearchActivity.class);
+        Intent intent = new Intent(this, ImageSearchActivity.class);
 
         startActivity(intent);
     }
@@ -144,5 +153,22 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         DialogFragment dialog = new FilterDialog();
 
         dialog.show(getSupportFragmentManager(), FilterDialog.TAG);
+    }
+
+    private void openSettings() {
+        Intent intent = new Intent(this, PrefActivity.class);
+
+        startActivity(intent);
+    }
+
+    public void refreshFragment() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment fragment = new MainFragmentWeb();
+        Bundle args = new Bundle();
+
+        args.putString("base", Constant.BASE_URL);
+        fragment.setArguments(args);
+        ft.replace(CONTAINER, fragment, MainFragmentWeb.TAG);
+        ft.commit();
     }
 }

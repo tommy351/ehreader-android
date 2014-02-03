@@ -1,0 +1,20 @@
+<resources>
+    // Main
+    <string name="menu_filter">過濾</string>
+    <string name="menu_refresh">重新整理</string>
+
+    // Tabs
+    <string-array name="main_tabs">
+        <item>藝廊</item>
+        <item>收藏</item>
+        <item>歷史</item>
+        <item>下載</item>
+    </string-array>
+
+    // Error
+    <string name="error_no_results">找不到相簿，請試試其他關鍵字。</string>
+    <string name="error_no_starred">您收藏的所有相簿都在這。</string>
+    <string name="error_no_more_results">找不到更多相簿了。</string>
+    <string name="error_no_download">下載佇列為空，試著下載一些相簿吧。</string>
+    <string name="error_no_history">沒有記錄。</string>
+</resources>

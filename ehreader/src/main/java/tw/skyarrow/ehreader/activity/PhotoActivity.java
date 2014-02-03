@@ -135,6 +135,13 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
     }
 
     @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
+        hideSystemUI();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.photo, menu);
 

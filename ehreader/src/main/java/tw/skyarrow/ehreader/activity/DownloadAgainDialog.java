@@ -26,7 +26,7 @@ public class DownloadAgainDialog extends DialogFragment {
 
         builder.setMessage(R.string.download_again_confirm)
                 .setPositiveButton(R.string.download_again, onSubmitClick)
-                .setNegativeButton(R.string.cancel, onCancelClick);
+                .setNegativeButton(R.string.cancel, null);
 
         return builder.create();
     }
@@ -39,13 +39,6 @@ public class DownloadAgainDialog extends DialogFragment {
             intent.setAction(GalleryDownloadService.ACTION_RETRY);
             intent.putExtra(GalleryDownloadService.GALLERY_ID, galleryId);
             getActivity().startService(intent);
-        }
-    };
-
-    private DialogInterface.OnClickListener onCancelClick = new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialogInterface, int i) {
-            dismiss();
         }
     };
 }

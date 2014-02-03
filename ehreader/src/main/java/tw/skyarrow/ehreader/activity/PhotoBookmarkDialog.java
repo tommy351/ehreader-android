@@ -54,7 +54,7 @@ public class PhotoBookmarkDialog extends DialogFragment {
             String[] menuItems = new String[size];
 
             for (int i = 0; i < size; i++) {
-                menuItems[i] = String.format(getResources().getString(R.string.bookmark_list_item),
+                menuItems[i] = String.format(getString(R.string.bookmark_list_item),
                         photoList.get(i).getPage());
             }
 
@@ -81,7 +81,6 @@ public class PhotoBookmarkDialog extends DialogFragment {
             if (photo == null) return;
 
             EventBus.getDefault().post(new PhotoDialogEvent(galleryId, photo.getPage() - 1));
-            dismiss();
         }
     };
 }

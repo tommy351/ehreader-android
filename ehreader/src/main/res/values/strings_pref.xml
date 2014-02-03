@@ -1,0 +1,76 @@
+<resources>
+    <string name="label_settings">Settings</string>
+
+    // View
+    <string name="pref_view_title">View</string>
+
+    <string name="pref_launch_page">launch_page</string>
+    <string name="pref_launch_page_title">Launch page</string>
+    <string name="pref_launch_page_default">0</string>
+    <string-array name="pref_launch_page_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string name="pref_volume_key_navigation">volume_key_navigation</string>
+    <string name="pref_volume_key_navigation_title">Volume key navigation</string>
+    <string name="pref_volume_key_navigation_summary">Navigate between pages using volume keys</string>
+    <bool name="pref_volume_key_navigation_default">false</bool>
+
+    <string name="pref_keep_screen_on">keep_screen_on</string>
+    <string name="pref_keep_screen_on_title">Keep screen on</string>
+    <string name="pref_keep_screen_on_summary">Keep screen on when reading</string>
+    <bool name="pref_keep_screen_on_default">true</bool>
+
+    // Download
+    <string name="pref_download_title">Download</string>
+
+    <string name="pref_download_over_wifi">download_over_wifi</string>
+    <string name="pref_download_over_wifi_title">Download over Wi-Fi only</string>
+    <string name="pref_download_over_wifi_summary">To reduce carrier data charges, don\'t download over mobile networks</string>
+    <bool name="pref_download_over_wifi_default">true</bool>
+
+    <string name="pref_auto_download">auto_download</string>
+    <string name="pref_auto_download_title">Auto download</string>
+    <string name="pref_auto_download_summary">Continue unfinished downloads automatically</string>
+    <bool name="pref_auto_download_default">true</bool>
+
+    // Advanced
+    <string name="pref_advanced_title">Advanced</string>
+
+    <string name="pref_clear_cache">clear_cache</string>
+    <string name="pref_clear_cache_title">Clear cache</string>
+    <string name="pref_clear_cache_summary">Last cleared: %s</string>
+
+    <string name="pref_clear_history">clear_history</string>
+    <string name="pref_clear_history_title">Clear history</string>
+
+    <string name="pref_clear_search">clear_search</string>
+    <string name="pref_clear_search_title">Clear search history</string>
+
+    // About
+    <string name="pref_about">about</string>
+    <string name="pref_about_title">About</string>
+    <string name="pref_about_ver">Version %s</string>
+    <string name="pref_about_summary">SkyArrow &lt;tommy351@gmail.com&gt;</string>
+
+    <string name="pref_open_source_license">open_source_license</string>
+    <string name="pref_open_source_license_title">Open source license</string>
+
+    // Dialog: Clear cache
+    <string name="clear_cache_title">Clear cache</string>
+    <string name="clear_cache_msg">Do you want to clear cache?</string>
+
+    // Dialog: Clear history
+    <string name="clear_history_title">Clear history</string>
+    <string name="clear_history_msg">Do you want to clear history?</string>
+
+    // Dialog: Clear search history
+    <string name="clear_search_title">Clear search history</string>
+    <string name="clear_search_msg">Do you want to clear search history?</string>
+
+    // Dialog: Open source license
+    <string name="open_source_license">Open source license</string>
+</resources>

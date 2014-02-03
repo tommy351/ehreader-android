@@ -7,6 +7,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -81,6 +84,7 @@ public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollL
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         ButterKnife.inject(this, view);
+        setHasOptionsMenu(true);
 
         Context context = getActivity();
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, Constant.DB_NAME, null);
@@ -117,6 +121,26 @@ public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollL
         getGalleryList(0);
 
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if (!firstLoaded) {
+            inflater.inflate(R.menu.main_web, menu);
+        }
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_refresh:
+                refresh();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -260,6 +284,7 @@ public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollL
         if (firstLoaded) {
             firstLoaded = false;
             progressBar.setVisibility(View.GONE);
+            getActivity().supportInvalidateOptionsMenu();
         } else {
             footerProgressBar.setVisibility(View.INVISIBLE);
         }
@@ -268,5 +293,9 @@ public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollL
     @Override
     public void onScrollToEnd(int page) {
         getGalleryList(page);
+    }
+
+    private void refresh() {
+        ((MainActivity) getActivity()).refreshFragment();
     }
 }
