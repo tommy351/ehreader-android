@@ -13,8 +13,8 @@ import tw.skyarrow.ehreader.service.GalleryDownloadService;
 /**
  * Created by SkyArrow on 2014/2/1.
  */
-public class DownloadAgainDialog extends DialogFragment {
-    public static final String TAG = "DownloadAgainDialog";
+public class RedownloadDialog extends DialogFragment {
+    public static final String TAG = "RedownloadDialog";
 
     private long galleryId;
 
@@ -24,8 +24,8 @@ public class DownloadAgainDialog extends DialogFragment {
         Bundle args = getArguments();
         galleryId = args.getLong("id");
 
-        builder.setMessage(R.string.download_again_confirm)
-                .setPositiveButton(R.string.download_again, onSubmitClick)
+        builder.setMessage(R.string.redownload_confirm)
+                .setPositiveButton(R.string.download_redownload, onSubmitClick)
                 .setNegativeButton(R.string.cancel, null);
 
         return builder.create();

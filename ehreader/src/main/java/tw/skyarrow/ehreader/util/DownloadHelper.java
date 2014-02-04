@@ -1,19 +1,23 @@
 package tw.skyarrow.ehreader.util;
 
+import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,18 +26,22 @@ import de.greenrobot.dao.query.QueryBuilder;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
+import tw.skyarrow.ehreader.db.Download;
+import tw.skyarrow.ehreader.db.DownloadDao;
 import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
 import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.db.PhotoDao;
+import tw.skyarrow.ehreader.service.GalleryDownloadService;
 
 /**
  * Created by SkyArrow on 2014/1/30.
  */
-public class PhotoInfoHelper {
+public class DownloadHelper {
     private static final Pattern pPhotoUrl = Pattern.compile("http://(g.e-|ex)hentai.org/s/(\\w+?)/(\\d+)-(\\d+)");
     private static final Pattern pShowkey = Pattern.compile("var showkey.*=.*\"([\\w-]+?)\";");
     private static final Pattern pImageSrc = Pattern.compile("<img id=\"img\" src=\"(.+)/(.+?)\"");
+    private static final Pattern pGalleryURL = Pattern.compile("<a href=\"http://(g.e-|ex)hentai.org/g/(\\d+)/(\\w+)/\" onmouseover");
 
     private Context context;
 
@@ -42,8 +50,9 @@ public class PhotoInfoHelper {
     private DaoSession daoSession;
     private GalleryDao galleryDao;
     private PhotoDao photoDao;
+    private DownloadDao downloadDao;
 
-    public PhotoInfoHelper(Context context) {
+    public DownloadHelper(Context context) {
         this.context = context;
 
         initDb();
@@ -56,6 +65,27 @@ public class PhotoInfoHelper {
         daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();
         photoDao = daoSession.getPhotoDao();
+        downloadDao = daoSession.getDownloadDao();
+    }
+
+    private JSONObject getAPIResponse(JSONObject json) throws IOException, JSONException {
+        HttpClient client = new DefaultHttpClient();
+        HttpPost httpPost = new HttpPost(Constant.API_URL);
+
+        httpPost.setHeader("Accept", "application/json");
+        httpPost.setHeader("Content-Type", "application/json");
+        httpPost.setEntity(new StringEntity(json.toString()));
+
+        HttpResponse response = client.execute(httpPost);
+        String result = HttpRequestHelper.readResponse(response);
+
+        return new JSONObject(result);
+    }
+
+    private JSONObject getAPIResponse(String method, JSONObject json) throws IOException, JSONException {
+        json.put("method", method);
+
+        return getAPIResponse(json);
     }
 
     public List<Photo> getPhotoList(long galleryId, int page) throws IOException {
@@ -136,11 +166,8 @@ public class PhotoInfoHelper {
             showkey = getShowkey(gallery);
         }
 
-        HttpClient httpClient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost(Constant.API_URL);
         JSONObject json = new JSONObject();
 
-        json.put("method", "showpage");
         json.put("gid", gallery.getId());
         json.put("page", photo.getPage());
         json.put("imgkey", photo.getToken());
@@ -148,15 +175,9 @@ public class PhotoInfoHelper {
 
         L.v("Show page request: %s", json.toString());
 
-        httpPost.setHeader("Accept", "application/json");
-        httpPost.setHeader("Content-Type", "application/json");
-        httpPost.setEntity(GalleryAjaxCallback.jsonToEntity(json));
+        JSONObject result = getAPIResponse("showpage", json);
 
-        HttpResponse response = httpClient.execute(httpPost);
-        String content = HttpRequestHelper.readResponse(response);
-        JSONObject result = new JSONObject(content);
-
-        L.v("Show page callback: %s", content);
+        L.v("Show page callback: %s", result.toString());
 
         if (result.has("error")) {
             String error = result.getString("error");
@@ -219,5 +240,133 @@ public class PhotoInfoHelper {
         }
 
         return showkey;
+    }
+
+    public List<Gallery> getGalleryList(String base) throws IOException, JSONException {
+        return getGalleryList(base, 0);
+    }
+
+    public List<Gallery> getGalleryList(String base, int page) throws IOException, JSONException {
+        String url = getGalleryListURL(base, page);
+        List<Gallery> galleryList = new ArrayList<Gallery>();
+
+        L.v("Get gallery list: %s", url);
+
+        String html = HttpRequestHelper.getString(url);
+        Matcher matcher = pGalleryURL.matcher(html);
+        JSONArray gidlist = new JSONArray();
+
+        while (matcher.find()) {
+            long id = Long.parseLong(matcher.group(2));
+            String token = matcher.group(3);
+            JSONArray arr = new JSONArray();
+
+            arr.put(id);
+            arr.put(token);
+
+            L.v("Gallery found: {id: %d, token: %s}", id, token);
+            gidlist.put(arr);
+        }
+
+        if (gidlist.length() == 0) return galleryList;
+
+        JSONObject obj = new JSONObject();
+
+        obj.put("gidlist", gidlist);
+
+        JSONObject json = getAPIResponse("gdata", obj);
+
+        if (json.has("error")) {
+            L.e("Get gallery list error: %s", json.getString("error"));
+            return null;
+        }
+
+        JSONArray gmetadata = json.getJSONArray("gmetadata");
+
+        for (int i = 0, len = gmetadata.length(); i < len; i++) {
+            JSONObject data = gmetadata.getJSONObject(i);
+            long id = data.getLong("gid");
+
+            if (data.getBoolean("expunged")) continue;
+
+
+            Gallery gallery = galleryDao.load(id);
+            boolean isNew = gallery == null;
+
+            if (isNew) {
+                gallery = new Gallery();
+
+                gallery.setStarred(false);
+                gallery.setProgress(0);
+            }
+
+            gallery.setId(id);
+            gallery.setToken(data.getString("token"));
+            gallery.setTitle(data.getString("title"));
+            gallery.setSubtitle(data.getString("title_jpn"));
+            gallery.setCategory(CategoryHelper.toCategoryId(data.getString("category")));
+            gallery.setThumbnail(data.getString("thumb"));
+            gallery.setCount(data.getInt("filecount"));
+            gallery.setRating((float) data.getDouble("rating"));
+            gallery.setUploader(data.getString("uploader"));
+            gallery.setTags(data.getJSONArray("tags").toString());
+            gallery.setCreated(new Date(data.getLong("posted") * 1000));
+            gallery.setSize(Long.parseLong(data.getString("filesize")));
+
+            if (isNew) {
+                galleryDao.insertInTx(gallery);
+            } else {
+                galleryDao.updateInTx(gallery);
+            }
+
+            galleryList.add(gallery);
+        }
+
+        return galleryList;
+    }
+
+    private String getGalleryListURL(String base, int page) {
+        Uri.Builder builder = Uri.parse(base).buildUpon();
+        builder.appendQueryParameter("page", Integer.toString(page));
+
+        return builder.build().toString();
+    }
+
+    public void startAllDownload() {
+        QueryBuilder qb = downloadDao.queryBuilder();
+        qb.where(DownloadDao.Properties.Status.notIn(Download.STATUS_SUCCESS, Download.STATUS_ERROR));
+        List<Download> downloadList = qb.list();
+
+        for (Download download : downloadList) {
+            Intent intent = new Intent(context, GalleryDownloadService.class);
+
+            intent.putExtra(GalleryDownloadService.GALLERY_ID, download.getId());
+            context.startService(intent);
+        }
+    }
+
+    public void pauseAllDownload() {
+        Intent intent = new Intent(context, GalleryDownloadService.class);
+
+        intent.setAction(GalleryDownloadService.ACTION_STOP);
+        context.startService(intent);
+    }
+
+    public boolean isServiceRunning() {
+        return isServiceRunning(context);
+    }
+
+    // http://stackoverflow.com/a/5921190
+    public static boolean isServiceRunning(Context context) {
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        String className = GalleryDownloadService.class.getName();
+
+        for (ActivityManager.RunningServiceInfo info : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (className.equals(info.service.getClassName())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

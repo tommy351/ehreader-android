@@ -1,41 +1,42 @@
 package tw.skyarrow.ehreader.activity;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.MenuItem;
 
-import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.R;
-import tw.skyarrow.ehreader.event.ImageSearchUploadedEvent;
 
 /**
  * Created by SkyArrow on 2014/1/29.
  */
 public class ImageSearchActivity extends ActionBarActivity {
-    private static final int CONTAINER = R.id.container;
-
     private boolean isSelected = false;
+    private static final int CONTAINER = R.id.container;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        EventBus.getDefault().register(this);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(CONTAINER, new ImageSearchSelectFragment());
+        Bundle args = getIntent().getExtras();
+        Fragment fragment;
+
+        if (args == null) {
+            fragment = new ImageSearchSelectFragment();
+        } else {
+            fragment = new MainFragmentWeb();
+        }
+
+        fragment.setArguments(args);
+        ft.replace(CONTAINER, fragment);
         ft.commit();
     }
 
@@ -60,25 +61,18 @@ public class ImageSearchActivity extends ActionBarActivity {
         }
     }
 
-    public void onEvent(ImageSearchUploadedEvent event) {
+    public void displayResult(String base) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         Fragment fragment = new MainFragmentWeb();
         Bundle args = new Bundle();
         isSelected = true;
 
-        args.putString("base", event.buildUrl());
+        args.putString("base", base);
         fragment.setArguments(args);
 
         ft.replace(CONTAINER, fragment);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         ft.addToBackStack(null);
         ft.commit();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        EventBus.getDefault().unregister(this);
     }
 }

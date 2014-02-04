@@ -1,8 +1,5 @@
 package tw.skyarrow.ehreader.activity;
 
-import android.app.ActivityManager;
-import android.content.Context;
-import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,13 +9,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -32,10 +26,10 @@ import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Download;
 import tw.skyarrow.ehreader.db.DownloadDao;
-import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.event.GalleryDeleteEvent;
 import tw.skyarrow.ehreader.event.GalleryDownloadEvent;
 import tw.skyarrow.ehreader.service.GalleryDownloadService;
+import tw.skyarrow.ehreader.util.DownloadHelper;
 
 /**
  * Created by SkyArrow on 2014/1/26.
@@ -60,6 +54,7 @@ public class MainFragmentDownload extends Fragment {
     private List<Download> downloadList;
     private DownloadListAdapter adapter;
     private EventBus bus;
+    private DownloadHelper downloadHelper;
 
     private boolean isDownloading = false;
 
@@ -74,6 +69,7 @@ public class MainFragmentDownload extends Fragment {
         daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
         downloadDao = daoSession.getDownloadDao();
+        downloadHelper = new DownloadHelper(getActivity());
 
         QueryBuilder qb = downloadDao.queryBuilder();
         qb.orderDesc(DownloadDao.Properties.Created);
@@ -84,7 +80,7 @@ public class MainFragmentDownload extends Fragment {
         listView.setAdapter(adapter);
         loadingView.setVisibility(View.GONE);
 
-        isDownloading = isServiceRunning();
+        isDownloading = downloadHelper.isServiceRunning();
 
         if (downloadList.size() == 0) {
             errorView.setText(R.string.error_no_download);
@@ -151,21 +147,21 @@ public class MainFragmentDownload extends Fragment {
 
     public void onEventMainThread(GalleryDownloadEvent event) {
         switch (event.getCode()) {
-            case GalleryDownloadService.EVENT_STARTED:
+            case GalleryDownloadService.EVENT_DOWNLOADING:
             case GalleryDownloadService.EVENT_PAUSED:
-            case GalleryDownloadService.EVENT_ERROR:
-            case GalleryDownloadService.EVENT_PROGRESS:
             case GalleryDownloadService.EVENT_SUCCESS:
+            case GalleryDownloadService.EVENT_PENDING:
+            case GalleryDownloadService.EVENT_ERROR:
                 Download eDownload = event.getDownload();
-                long eDownloadId = eDownload.getId();
+                long id = eDownload.getId();
                 boolean exist = false;
 
-                for (int i = 0; i < downloadList.size(); i++) {
+                for (int i = 0, len = downloadList.size(); i < len; i++) {
                     Download download = downloadList.get(i);
 
-                    if (download.getId() == eDownloadId) {
+                    if (download.getId() == id) {
                         exist = true;
-                        downloadList.set(i, eDownload);
+                        downloadList.set(i, download);
                         break;
                     }
                 }
@@ -200,25 +196,11 @@ public class MainFragmentDownload extends Fragment {
         adapter.notifyDataSetChanged();
     }
 
-    // http://stackoverflow.com/a/5921190
-    private boolean isServiceRunning() {
-        ActivityManager manager = (ActivityManager) getActivity().getSystemService(Context.ACTIVITY_SERVICE);
-        String className = GalleryDownloadService.class.getName();
-
-        for (ActivityManager.RunningServiceInfo info : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (className.equals(info.service.getClassName())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     private void startAll() {
-        //
+        downloadHelper.startAllDownload();
     }
 
     private void pauseAll() {
-        getActivity().stopService(new Intent(getActivity(), GalleryDownloadService.class));
+        downloadHelper.pauseAllDownload();
     }
 }

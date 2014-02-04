@@ -1,9 +1,6 @@
 package tw.skyarrow.ehreader.event;
 
-import android.os.Bundle;
-
 import tw.skyarrow.ehreader.db.Download;
-import tw.skyarrow.ehreader.db.Gallery;
 
 /**
  * Created by SkyArrow on 2014/1/28.

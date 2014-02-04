@@ -160,15 +160,4 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 
         startActivity(intent);
     }
-
-    public void refreshFragment() {
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        Fragment fragment = new MainFragmentWeb();
-        Bundle args = new Bundle();
-
-        args.putString("base", Constant.BASE_URL);
-        fragment.setArguments(args);
-        ft.replace(CONTAINER, fragment, MainFragmentWeb.TAG);
-        ft.commit();
-    }
 }

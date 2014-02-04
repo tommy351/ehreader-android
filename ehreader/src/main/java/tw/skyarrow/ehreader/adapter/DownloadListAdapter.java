@@ -102,7 +102,6 @@ public class DownloadListAdapter extends BaseAdapter {
                 break;
 
             case Download.STATUS_PENDING:
-            case Download.STATUS_RETRY:
                 holder.progressText.setText(R.string.download_pending);
                 break;
         }

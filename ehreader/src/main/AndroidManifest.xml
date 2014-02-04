@@ -27,8 +27,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.GalleryActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden">
+            android:name=".activity.GalleryActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.MainActivity"/>
@@ -84,5 +83,12 @@
             android:name=".service.GalleryDownloadService"/>
         <service
             android:name=".service.PhotoInfoService"/>
+        <receiver
+            android:name=".receiver.NetworkStateReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+                <action android:name="android.net.wifi.WIFI_STATE_CHANGED"/>
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

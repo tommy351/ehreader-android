@@ -9,9 +9,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -37,10 +34,8 @@ import java.io.IOException;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
-import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
-import tw.skyarrow.ehreader.event.ImageSearchUploadedEvent;
 
 /**
  * Created by SkyArrow on 2014/1/29.
@@ -154,17 +149,30 @@ public class ImageSearchSelectFragment extends Fragment {
 
         @Override
         protected void onPreExecute() {
-            selectBtn.setVisibility(View.GONE);
-            cancelBtn.setVisibility(View.VISIBLE);
-            progressView.setVisibility(View.VISIBLE);
+            showProgressBar();
         }
 
         @Override
-        protected void onPostExecute(String s) {
-            ImageSearchUploadedEvent event = new ImageSearchUploadedEvent(s,
-                    similarSearch.isChecked(), onlyCover.isChecked());
+        protected void onPostExecute(String url) {
+            Uri uri = Uri.parse(url);
+            String hash = uri.getQueryParameter("f_shash");
+            String from = uri.getQueryParameter("fs_from");
 
-            EventBus.getDefault().post(event);
+            Uri.Builder builder = uri.buildUpon();
+
+            builder.clearQuery();
+            builder.appendQueryParameter("f_shash", hash);
+            builder.appendQueryParameter("fs_from", from);
+
+            if (similarSearch.isChecked()) {
+                builder.appendQueryParameter("fs_similar", "1");
+            }
+
+            if (onlyCover.isChecked()) {
+                builder.appendQueryParameter("fs_covers", "1");
+            }
+
+            ((ImageSearchActivity) getActivity()).displayResult(builder.build().toString());
         }
 
         @Override
@@ -181,9 +189,19 @@ public class ImageSearchSelectFragment extends Fragment {
 
         @Override
         protected void onCancelled() {
-            selectBtn.setVisibility(View.VISIBLE);
-            cancelBtn.setVisibility(View.GONE);
-            progressView.setVisibility(View.GONE);
+            hideProgressBar();
         }
+    }
+
+    private void showProgressBar() {
+        selectBtn.setVisibility(View.GONE);
+        cancelBtn.setVisibility(View.VISIBLE);
+        progressView.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgressBar() {
+        selectBtn.setVisibility(View.VISIBLE);
+        cancelBtn.setVisibility(View.GONE);
+        progressView.setVisibility(View.GONE);
     }
 }

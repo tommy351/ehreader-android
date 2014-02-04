@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <TextView
@@ -17,4 +17,4 @@
         android:numStars="5"
         android:stepSize="0.5"
         android:isIndicator="true"/>
-</RelativeLayout>
+</merge>

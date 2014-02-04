@@ -1,0 +1,10 @@
+<resources>
+    <dimen name="activity_horizontal_margin">@dimen/margin_large</dimen>
+
+    <dimen name="thumbnail_size">128dp</dimen>
+    <integer name="title_max_line">3</integer>
+    <dimen name="list_item_margin_top">@dimen/margin_medium</dimen>
+
+    <dimen name="cover_size">400dp</dimen>
+    <dimen name="cover_margin">48dp</dimen>
+</resources>

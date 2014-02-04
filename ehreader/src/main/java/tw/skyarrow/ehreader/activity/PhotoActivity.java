@@ -1,12 +1,16 @@
 package tw.skyarrow.ehreader.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -19,13 +23,14 @@ import android.support.v7.app.ActionBarActivity;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.StyleSpan;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -33,14 +38,12 @@ import java.util.Date;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
-import tw.skyarrow.ehreader.event.PhotoDialogEvent;
 
 /**
  * Created by SkyArrow on 2014/1/31.
@@ -48,6 +51,9 @@ import tw.skyarrow.ehreader.event.PhotoDialogEvent;
 public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiVisibilityChangeListener {
     @InjectView(R.id.pager)
     ViewPager pager;
+
+    @InjectView(R.id.header)
+    View headerView;
 
     @InjectView(R.id.seekbar)
     SeekBar seekBar;
@@ -58,16 +64,22 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
     @InjectView(R.id.hint)
     TextView hintText;
 
+    private static final int UI_HIDE_DELAY = 3000;
+    private static final int HINT_HIDE_DELAY = 500;
+
     private SQLiteDatabase db;
     private DaoMaster daoMaster;
     private DaoSession daoSession;
     private GalleryDao galleryDao;
+    private SharedPreferences preferences;
 
     private Gallery gallery;
 
     private PagerAdapter pagerAdapter;
-    private EventBus bus;
     private View decorView;
+    private boolean isKitkat = Build.VERSION.SDK_INT >= 19;
+    private boolean isVolumeNavEnabled = false;
+    private int tmpPage = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,16 +89,14 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
         ButterKnife.inject(this);
 
         decorView = getWindow().getDecorView();
-        showSystemUI();
-
-        bus = EventBus.getDefault();
-        bus.register(this);
+        decorView.setOnSystemUiVisibilityChangeListener(this);
 
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, Constant.DB_NAME, null);
         db = helper.getWritableDatabase();
         daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         Bundle args = getIntent().getExtras();
         long galleryId = args.getLong("id");
@@ -110,10 +120,15 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
         if (page < 0 || page >= total) page = 0;
 
         actionBar.setTitle(String.format("%d / %d", page + 1, total));
-        pager.setCurrentItem(page, false);
+        setCurrent(page, false);
         seekBar.setMax(total - 1);
         seekBar.setProgress(page);
         seekBar.setOnSeekBarChangeListener(onSeekBarChangeListener);
+        if (isKitkat) headerView.setVisibility(View.VISIBLE);
+
+        boolean keepScreenOn = preferences.getBoolean(getString(R.string.pref_keep_screen_on), true);
+        isVolumeNavEnabled = preferences.getBoolean(getString(R.string.pref_volume_key_navigation), false);
+        pager.setKeepScreenOn(keepScreenOn);
 
         pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -139,6 +154,13 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
         super.onPostCreate(savedInstanceState);
 
         hideSystemUI();
+        setSeekBarMargin();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        setSeekBarMargin();
     }
 
     @Override
@@ -165,22 +187,69 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putInt("page", pager.getCurrentItem());
+        outState.putInt("page", getCurrent());
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-        gallery.setProgress(pager.getCurrentItem());
+        gallery.setProgress(getCurrent());
         gallery.setLastread(new Date(System.currentTimeMillis()));
         galleryDao.update(gallery);
     }
 
-    public void onEvent(PhotoDialogEvent event) {
-        if (event.getId() == gallery.getId()) {
-            pager.setCurrentItem(event.getPage(), false);
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+
+        if (hasFocus) {
+            delayedHideSystemUI(UI_HIDE_DELAY);
+        } else {
+            systemUIHandler.removeMessages(0);
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (!isVolumeNavEnabled) return super.onKeyDown(keyCode, event);
+
+        switch (keyCode) {
+            // Previous page
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                if (tmpPage < 0) tmpPage = getCurrent();
+                if (tmpPage > 0) tmpPage--;
+
+                showHintText(tmpPage);
+                return true;
+
+            // Next page
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                if (tmpPage < 0) tmpPage = getCurrent();
+                if (tmpPage < gallery.getCount() - 1) tmpPage++;
+
+                showHintText(tmpPage);
+                return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (!isVolumeNavEnabled) return super.onKeyUp(keyCode, event);
+
+        switch (keyCode) {
+            // Commit the page transition
+            case KeyEvent.KEYCODE_VOLUME_UP:
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                setCurrent(tmpPage, false);
+                tmpPage = -1;
+                hideHintText();
+                return true;
+        }
+
+        return super.onKeyUp(keyCode, event);
     }
 
     private void onBackClick() {
@@ -190,6 +259,18 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
         args.putLong("id", gallery.getId());
         intent.putExtras(args);
         NavUtils.navigateUpTo(this, intent);
+    }
+
+    public int getCurrent() {
+        return pager.getCurrentItem();
+    }
+
+    public void setCurrent(int i) {
+        setCurrent(i, true);
+    }
+
+    public void setCurrent(int i, boolean anim) {
+        pager.setCurrentItem(i, anim);
     }
 
     @Override
@@ -236,21 +317,30 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
     }
 
     private SeekBar.OnSeekBarChangeListener onSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        private boolean isTracking = false;
+
         @Override
         public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            if (!isTracking) return;
+
             showHintText(i);
         }
 
         @Override
         public void onStartTrackingTouch(SeekBar seekBar) {
-            hintText.setVisibility(View.VISIBLE);
-            showHintText(pager.getCurrentItem());
+            isTracking = true;
+
+            systemUIHandler.removeMessages(0);
+            showHintText(getCurrent());
         }
 
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
-            hintText.setVisibility(View.GONE);
-            pager.setCurrentItem(seekBar.getProgress(), false);
+            isTracking = false;
+
+            setCurrent(seekBar.getProgress(), false);
+            hideHintText();
+            delayedHideSystemUI(UI_HIDE_DELAY);
         }
     };
 
@@ -261,8 +351,25 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
 
         sp.setSpan(new StyleSpan(Typeface.BOLD), 0, pageLength, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
+        hideHintHandler.removeMessages(0);
+        hintText.setVisibility(View.VISIBLE);
         hintText.setText(sp);
     }
+
+    private void hideHintText() {
+        hideHintHandler.removeMessages(0);
+        hideHintHandler.sendEmptyMessageDelayed(0, HINT_HIDE_DELAY);
+    }
+
+    private Handler hideHintHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            Animation fadeOut = AnimationUtils.loadAnimation(PhotoActivity.this, R.anim.fade_out);
+
+            hintText.setVisibility(View.GONE);
+            hintText.startAnimation(fadeOut);
+        }
+    };
 
     public void toggleUIVisibility() {
         if (isUiVisible()) {
@@ -281,6 +388,8 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
     }
 
     public void hideSystemUI() {
+        systemUIHandler.removeMessages(0);
+
         int uiOptions = 0;
 
         if (Build.VERSION.SDK_INT >= 14) {
@@ -296,8 +405,14 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
 
+        if (isKitkat) {
+            uiOptions |= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE;
+        }
+
         decorView.setSystemUiVisibility(uiOptions);
-        showSeekBar();
+        hideSeekBar();
     }
     public void showSystemUI() {
         int uiOptions = 0;
@@ -310,21 +425,59 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
         }
 
+        if (isKitkat) {
+            uiOptions |= View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+        }
+
         decorView.setSystemUiVisibility(uiOptions);
-        hideSeekBar();
+        showSeekBar();
+        delayedHideSystemUI(UI_HIDE_DELAY);
     }
 
-    private void showSeekBar() {
+    private void hideSeekBar() {
         Animation fadeOut = AnimationUtils.loadAnimation(PhotoActivity.this, R.anim.fade_out);
 
         seekBarArea.setVisibility(View.GONE);
         seekBarArea.startAnimation(fadeOut);
+        if (isKitkat) headerView.setVisibility(View.GONE);
     }
 
-    private void hideSeekBar() {
+    private void showSeekBar() {
         Animation fadeIn = AnimationUtils.loadAnimation(PhotoActivity.this, R.anim.fade_in);
 
         seekBarArea.setVisibility(View.VISIBLE);
         seekBarArea.startAnimation(fadeIn);
+        if (isKitkat) headerView.setVisibility(View.VISIBLE);
+    }
+
+    private void setSeekBarMargin() {
+        if (!isKitkat) return;
+
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(seekBarArea.getLayoutParams());
+
+        // http://stackoverflow.com/a/20264361
+        Resources resources = getResources();
+        int navigationBarId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+        int navigationBarSize = resources.getDimensionPixelSize(navigationBarId);
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            layoutParams.setMargins(0, 0, navigationBarSize, 0);
+        } else {
+            layoutParams.setMargins(0, 0, 0, navigationBarSize);
+        }
+
+        seekBarArea.setLayoutParams(layoutParams);
+    }
+
+    private Handler systemUIHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            hideSystemUI();
+        }
+    };
+
+    private void delayedHideSystemUI(int delay) {
+        systemUIHandler.removeMessages(0);
+        systemUIHandler.sendEmptyMessageDelayed(0, delay);
     }
 }

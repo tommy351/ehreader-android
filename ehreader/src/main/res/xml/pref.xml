@@ -1,4 +1,16 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+    <PreferenceCategory
+        android:title="@string/pref_account_title">
+        <PreferenceScreen
+            android:key="@string/pref_login"
+            android:title="@string/pref_login_title"
+            android:summary="@string/pref_login_summary"/>
+        <PreferenceScreen
+            android:key="@string/pref_logout"
+            android:title="@string/pref_logout_title"/>
+    </PreferenceCategory>
+    -->
     <PreferenceCategory
         android:title="@string/pref_view_title">
         <tw.skyarrow.ehreader.app.ListPreferenceWithSummary

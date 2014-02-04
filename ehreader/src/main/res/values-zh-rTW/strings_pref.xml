@@ -1,6 +1,14 @@
 <resources>
     <string name="label_settings">設定</string>
 
+    // Account
+    <string name="pref_account_title">帳號</string>
+
+    <string name="pref_login_title">登入</string>
+    <string name="pref_login_summary">登入至 E-Hentai</string>
+
+    <string name="pref_logout_title">登出</string>
+
     // View
     <string name="pref_view_title">檢視</string>
 
@@ -36,6 +44,16 @@
     <string name="pref_about_ver">版本 %s</string>
 
     <string name="pref_open_source_license_title">開放原始碼授權</string>
+
+    // Dialog: Log in
+    <string name="login_title">登入</string>
+    <string name="login_username_hint">使用者名稱</string>
+    <string name="login_password_hint">密碼</string>
+    <string name="login_btn">登入</string>
+
+    // Dialog: Log out
+    <string name="logout_title">登出</string>
+    <string name="logout_msg">您要登出嗎？</string>
 
     // Dialog: Clear cache
     <string name="clear_cache_title">清除快取</string>

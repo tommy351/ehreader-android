@@ -17,7 +17,7 @@
         android:text="Title"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_toRightOf="@+id/cover"
-        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginTop="@dimen/list_item_margin_top"
         android:layout_marginRight="48dp"
         android:ellipsize="end"/>
     <TextView

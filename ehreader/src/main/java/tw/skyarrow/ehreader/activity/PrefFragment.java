@@ -20,6 +20,15 @@ public class PrefFragment extends PreferenceFragment {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.pref);
 
+        /*
+        Preference loginPref = findPreferenceByResource(R.string.pref_login);
+        loginPref.setOnPreferenceClickListener(
+                new OpenDialogPreference(new LoginDialog(), LoginDialog.TAG));
+
+        Preference logoutPref = findPreferenceByResource(R.string.pref_logout);
+        logoutPref.setOnPreferenceClickListener(
+                new OpenDialogPreference(new LogoutDialog(), LogoutDialog.TAG));*/
+
         Preference clearCachePref = findPreferenceByResource(R.string.pref_clear_cache);
         clearCachePref.setOnPreferenceClickListener(
                 new OpenDialogPreference(new ClearCacheDialog(), ClearCacheDialog.TAG));

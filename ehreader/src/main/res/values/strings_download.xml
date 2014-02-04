@@ -4,14 +4,13 @@
     <string name="menu_pause_all">Pause all</string>
 
     <string name="download_confirm">This gallery needs total %s. Do you want to download?</string>
-    <string name="download_again_confirm">This gallery has been already downloaded. Do you want to download it again?</string>
-    <string name="download_again">Download again</string>
+    <string name="redownload_confirm">This gallery has been already downloaded. Do you want to redownload?</string>
 
-    <string-array name="download_context_menu">
-        <item>Open</item>
-        <item>Download again</item>
-        <item>Delete</item>
-    </string-array>
+    <string name="download_open">Open</string>
+    <string name="download_start">Start</string>
+    <string name="download_pause">Pause</string>
+    <string name="download_redownload">Redownload</string>
+    <string name="download_delete">Delete</string>
 
     <string name="download_started">Download started</string>
     <string name="download_in_progress">Download in progress</string>

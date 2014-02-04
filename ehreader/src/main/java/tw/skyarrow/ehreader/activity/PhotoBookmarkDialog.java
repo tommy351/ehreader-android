@@ -10,14 +10,12 @@ import android.support.v4.app.DialogFragment;
 import java.util.List;
 
 import de.greenrobot.dao.query.QueryBuilder;
-import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.db.PhotoDao;
-import tw.skyarrow.ehreader.event.PhotoDialogEvent;
 
 /**
  * Created by SkyArrow on 2014/2/2.
@@ -40,7 +38,7 @@ public class PhotoBookmarkDialog extends DialogFragment {
         galleryId = args.getLong("id");
 
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
-        db = helper.getWritableDatabase();
+        db = helper.getReadableDatabase();
         daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
         photoDao = daoSession.getPhotoDao();
@@ -71,6 +69,7 @@ public class PhotoBookmarkDialog extends DialogFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        db.close();
     }
 
     private DialogInterface.OnClickListener onItemClick = new DialogInterface.OnClickListener() {
@@ -80,7 +79,7 @@ public class PhotoBookmarkDialog extends DialogFragment {
 
             if (photo == null) return;
 
-            EventBus.getDefault().post(new PhotoDialogEvent(galleryId, photo.getPage() - 1));
+            ((PhotoActivity) getActivity()).setCurrent(photo.getPage() - 1, false);
         }
     };
 }

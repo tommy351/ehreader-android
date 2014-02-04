@@ -1,17 +1,12 @@
 package tw.skyarrow.ehreader.activity;
 
-import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.NavUtils;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -22,10 +17,11 @@ import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.StyleSpan;
-import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -83,6 +79,9 @@ public class GalleryActivity extends ActionBarActivity {
     @InjectView(R.id.created)
     TextView createdView;
 
+    @InjectView(R.id.cover_area)
+    View coverArea;
+
     @InjectView(R.id.cover_fg)
     ImageView coverForeground;
 
@@ -100,6 +99,9 @@ public class GalleryActivity extends ActionBarActivity {
 
     private AQuery aq;
     private Gallery gallery;
+/*
+    private int coverWidth;
+    private int coverHeight;*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -204,15 +206,6 @@ public class GalleryActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        if (gallery != null) {
-            displayCover(gallery.getThumbnail());
-        }
-    }
-
     private void showGallery() {
         int categoryRes = CategoryHelper.getResource(gallery.getCategory());
         String meta = getString(categoryRes) + " / " + gallery.getCount() + "P";
@@ -234,29 +227,66 @@ public class GalleryActivity extends ActionBarActivity {
     }
 
     private void displayCover(String url) {
-        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-        final int coverWidth = displayMetrics.widthPixels;
-        final int coverHeight = (int) displayMetrics.density * 250;
-
         aq.ajax(url, Bitmap.class, 1000 * 60 * 60 * 12, new AjaxCallback<Bitmap>() {
             @Override
             public void callback(String url, Bitmap bm, AjaxStatus status) {
-                int bmWidth = bm.getWidth();
-                int bmHeight= bm.getHeight();
-                float scale;
+                // http://www.sherif.mobi/2013/01/how-to-get-widthheight-of-view.html
+                coverArea.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+                int coverWidth = coverArea.getMeasuredWidth();
+                int coverHeight = coverArea.getMeasuredHeight();
 
-                if (bmWidth * coverHeight > bmHeight * coverWidth) {
-                    scale = (float) coverHeight / (float) bmHeight;
-                } else {
-                    scale = (float) coverWidth / (float) bmWidth;
-                }
-
-                Bitmap bg = Bitmap.createScaledBitmap(BitmapHelper.blur(bm, 10), (int) (bmWidth * scale), (int) (bmHeight * scale), true);
-
-                coverBackground.setImageBitmap(bg);
-                coverForeground.setImageBitmap(bm);
+                new Thread(new BlurCoverRunnable(bm, coverWidth, coverHeight)).start();
             }
         });
+    }
+
+    private class BlurCoverRunnable implements Runnable {
+        private Bitmap bitmap;
+        private int coverWidth;
+        private int coverHeight;
+
+        public BlurCoverRunnable(Bitmap bitmap, int coverWidth, int coverHeight) {
+            this.bitmap = bitmap;
+            this.coverWidth = coverWidth;
+            this.coverHeight = coverHeight;
+        }
+
+        @Override
+        public void run() {
+            int bmWidth = bitmap.getWidth();
+            int bmHeight= bitmap.getHeight();
+            float scale;
+
+            if (bmWidth * coverHeight > bmHeight * coverWidth) {
+                scale = (float) coverHeight / (float) bmHeight;
+            } else {
+                scale = (float) coverWidth / (float) bmWidth;
+            }
+
+            Bitmap bg = Bitmap.createScaledBitmap(BitmapHelper.blur(bitmap, 10), (int) (bmWidth * scale), (int) (bmHeight * scale), true);
+            runOnUiThread(new UpdateCoverRunnable(bg, bitmap));
+        }
+    };
+
+    private class UpdateCoverRunnable implements Runnable {
+        private Bitmap background;
+        private Bitmap foreground;
+
+        public UpdateCoverRunnable(Bitmap background, Bitmap foreground) {
+            this.background = background;
+            this.foreground = foreground;
+        }
+
+        @Override
+        public void run() {
+            Animation fadeIn = AnimationUtils.loadAnimation(GalleryActivity.this, R.anim.cover_fade_in);
+
+            coverBackground.setImageBitmap(background);
+            coverBackground.startAnimation(fadeIn);
+
+            coverForeground.setImageBitmap(foreground);
+            coverForeground.startAnimation(fadeIn);
+        }
     }
 
     private void displayTags(String str) {
@@ -377,8 +407,8 @@ public class GalleryActivity extends ActionBarActivity {
             dialog = new DownloadConfirmDialog();
             tag = DownloadConfirmDialog.TAG;
         } else {
-            dialog = new DownloadAgainDialog();
-            tag = DownloadAgainDialog.TAG;
+            dialog = new RedownloadDialog();
+            tag = RedownloadDialog.TAG;
         }
 
         dialog.setArguments(args);

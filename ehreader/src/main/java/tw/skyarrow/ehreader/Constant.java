@@ -1,7 +1,5 @@
 package tw.skyarrow.ehreader;
 
-import java.util.regex.Pattern;
-
 /**
  * Created by SkyArrow on 2014/1/25.
  */

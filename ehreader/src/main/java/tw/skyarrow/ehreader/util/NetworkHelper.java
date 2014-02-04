@@ -16,9 +16,19 @@ public class NetworkHelper {
         this.cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
+    public NetworkInfo getNetworkInfo() {
+        return cm.getActiveNetworkInfo();
+    }
+
     public boolean isAvailable() {
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        NetworkInfo netInfo = getNetworkInfo();
 
         return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+
+    public boolean isWifiAvailable() {
+        NetworkInfo netInfo = getNetworkInfo();
+
+        return netInfo != null && netInfo.getType() == ConnectivityManager.TYPE_WIFI;
     }
 }

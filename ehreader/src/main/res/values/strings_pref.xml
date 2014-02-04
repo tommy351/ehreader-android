@@ -1,6 +1,18 @@
 <resources>
     <string name="label_settings">Settings</string>
 
+    // Account
+    <string name="pref_account_title">Account</string>
+
+    <string name="pref_login">login</string>
+    <string name="pref_login_title">Log in</string>
+    <string name="pref_login_summary">Login to E-Hentai</string>
+
+    <string name="pref_logout">logout</string>
+    <string name="pref_logout_title">Log out</string>
+
+    <string name="pref_login_cookie">login_cookie</string>
+
     // View
     <string name="pref_view_title">View</string>
 
@@ -17,7 +29,7 @@
     <string name="pref_volume_key_navigation">volume_key_navigation</string>
     <string name="pref_volume_key_navigation_title">Volume key navigation</string>
     <string name="pref_volume_key_navigation_summary">Navigate between pages using volume keys</string>
-    <bool name="pref_volume_key_navigation_default">false</bool>
+    <bool name="pref_volume_key_navigation_default">true</bool>
 
     <string name="pref_keep_screen_on">keep_screen_on</string>
     <string name="pref_keep_screen_on_title">Keep screen on</string>
@@ -58,6 +70,16 @@
 
     <string name="pref_open_source_license">open_source_license</string>
     <string name="pref_open_source_license_title">Open source license</string>
+
+    // Dialog: Log in
+    <string name="login_title">Log in</string>
+    <string name="login_username_hint">Username</string>
+    <string name="login_password_hint">Password</string>
+    <string name="login_btn">Log in</string>
+
+    // Dialog: Log out
+    <string name="logout_title">Log out</string>
+    <string name="logout_msg">Do you want to log out?</string>
 
     // Dialog: Clear cache
     <string name="clear_cache_title">Clear cache</string>

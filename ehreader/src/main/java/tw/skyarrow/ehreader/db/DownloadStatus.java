@@ -9,5 +9,4 @@ public class DownloadStatus {
     public static final int STATUS_PAUSED = 2;
     public static final int STATUS_SUCCESS = 3;
     public static final int STATUS_ERROR = 4;
-    public static final int STATUS_RETRY = 5;
 }

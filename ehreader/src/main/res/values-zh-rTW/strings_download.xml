@@ -4,14 +4,13 @@
     <string name="menu_pause_all">全部暫停</string>
 
     <string name="download_confirm">此相簿總共需要 %s，您確定要下載嗎？</string>
-    <string name="download_again_confirm">此相簿已經下載過了，您要再次下載嗎？</string>
-    <string name="download_again">再次下載</string>
+    <string name="redownload_confirm">此相簿已經下載過了，您要再次下載嗎？</string>
 
-    <string-array name="download_context_menu">
-        <item>開啟</item>
-        <item>重新下載</item>
-        <item>刪除</item>
-    </string-array>
+    <string name="download_open">開啟</string>
+    <string name="download_start">開始</string>
+    <string name="download_pause">暫停</string>
+    <string name="download_redownload">重新下載</string>
+    <string name="download_delete">刪除</string>
 
     <string name="download_started">下載已開始</string>
     <string name="download_in_progress">正在下載</string>

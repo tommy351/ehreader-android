@@ -8,20 +8,20 @@
         android:background="@android:color/darker_gray"
         android:layout_marginRight="@dimen/margin_medium"
         android:scaleType="centerCrop"/>
-    <FrameLayout
+    <RelativeLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/cover"
-        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginTop="@dimen/list_item_margin_top"
         android:layout_marginRight="@dimen/activity_horizontal_margin">
         <include layout="@layout/gallery_header"/>
-    </FrameLayout>
+    </RelativeLayout>
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:maxLines="2"
+        android:maxLines="@integer/title_max_line"
         android:text="Title"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_below="@+id/header"

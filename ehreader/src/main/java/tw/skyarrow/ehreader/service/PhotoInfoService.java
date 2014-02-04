@@ -16,8 +16,8 @@ import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
 import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.event.PhotoInfoEvent;
+import tw.skyarrow.ehreader.util.DownloadHelper;
 import tw.skyarrow.ehreader.util.L;
-import tw.skyarrow.ehreader.util.PhotoInfoHelper;
 
 /**
  * Created by SkyArrow on 2014/1/29.
@@ -33,7 +33,7 @@ public class PhotoInfoService extends IntentService {
     private DaoSession daoSession;
     private GalleryDao galleryDao;
 
-    private PhotoInfoHelper infoHelper;
+    private DownloadHelper infoHelper;
     private EventBus bus;
 
     public PhotoInfoService() {
@@ -50,7 +50,7 @@ public class PhotoInfoService extends IntentService {
         daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();
 
-        infoHelper = new PhotoInfoHelper(this);
+        infoHelper = new DownloadHelper(this);
         bus = EventBus.getDefault();
     }
 

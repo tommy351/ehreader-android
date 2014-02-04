@@ -1,7 +1,6 @@
 package tw.skyarrow.ehreader;
 
 import android.app.Application;
-import android.content.SharedPreferences;
 
 import com.androidquery.callback.BitmapAjaxCallback;
 
