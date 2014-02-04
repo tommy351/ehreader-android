@@ -161,7 +161,7 @@ public class MainFragmentDownload extends Fragment {
 
                     if (download.getId() == id) {
                         exist = true;
-                        downloadList.set(i, download);
+                        downloadList.set(i, eDownload);
                         break;
                     }
                 }

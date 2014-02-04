@@ -22,7 +22,6 @@ import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.db.PhotoDao;
 import tw.skyarrow.ehreader.event.GalleryDeleteEvent;
-import tw.skyarrow.ehreader.util.UriHelper;
 
 /**
  * Created by SkyArrow on 2014/2/3.
@@ -83,7 +82,7 @@ public class DownloadDeleteDialog extends DialogFragment {
             List<Photo> photos = qb.list();
 
             for (Photo photo : photos) {
-                File file = UriHelper.getPhotoFile(photo);
+                File file = photo.getFile();
 
                 if (file.exists()) {
                     file.delete();
@@ -104,7 +103,7 @@ public class DownloadDeleteDialog extends DialogFragment {
 
         @Override
         protected void onPostExecute(String s) {
-            File galleryFolder = UriHelper.getGalleryFolder(gallery);
+            File galleryFolder = gallery.getFolder();
 
             if (galleryFolder.exists()) {
                 galleryFolder.delete();

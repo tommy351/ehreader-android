@@ -17,4 +17,5 @@
     <string name="error_no_more_results">找不到更多相簿了。</string>
     <string name="error_no_download">下載佇列為空，試著下載一些相簿吧。</string>
     <string name="error_no_history">沒有記錄。</string>
+    <string name="error_load_gallery_list">相簿清單載入失敗。</string>
 </resources>

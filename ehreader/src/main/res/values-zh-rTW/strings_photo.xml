@@ -3,6 +3,8 @@
     <string name="menu_add_bookmark">新增書籤</string>
     <string name="menu_remove_bookmark">移除書籤</string>
     <string name="menu_bookmark_list">書籤清單</string>
+    <string name="menu_find_similar">搜尋相似圖片</string>
+    <string name="menu_set_as_wallpaper">設為桌布</string>
 
     // Notification
     <string name="notification_bookmark_added">書籤已新增</string>

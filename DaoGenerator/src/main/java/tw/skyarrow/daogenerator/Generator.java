@@ -22,6 +22,7 @@ public class Generator {
 
         // Photo
         Entity photo = schema.addEntity("Photo");
+        photo.setSuperclass("PhotoBase");
 
         photo.addIdProperty().autoincrement();
         Property photoPage = photo.addIntProperty("page").notNull().getProperty();
@@ -42,6 +43,7 @@ public class Generator {
 
         // Gallery
         Entity gallery = schema.addEntity("Gallery");
+        gallery.setSuperclass("GalleryBase");
 
         gallery.addIdProperty();
         gallery.addStringProperty("token").notNull();
@@ -67,7 +69,7 @@ public class Generator {
 
         // Download
         Entity download = schema.addEntity("Download");
-        download.setSuperclass("DownloadStatus");
+        download.setSuperclass("DownloadBase");
 
         Property downloadId = download.addIdProperty().autoincrement().getProperty();
         download.addIntProperty("status");

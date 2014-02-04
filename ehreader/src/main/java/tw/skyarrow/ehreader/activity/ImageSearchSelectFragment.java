@@ -68,7 +68,7 @@ public class ImageSearchSelectFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_image_search, container, false);
+        View view = inflater.inflate(R.layout.image_search_select, container, false);
         ButterKnife.inject(this, view);
 
         return view;
@@ -172,7 +172,7 @@ public class ImageSearchSelectFragment extends Fragment {
                 builder.appendQueryParameter("fs_covers", "1");
             }
 
-            ((ImageSearchActivity) getActivity()).displayResult(builder.build().toString());
+            ((ImageSearchActivity) getActivity()).displaySelectResult(builder.build().toString());
         }
 
         @Override

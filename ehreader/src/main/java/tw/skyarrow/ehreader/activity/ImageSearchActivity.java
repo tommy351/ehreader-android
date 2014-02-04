@@ -32,7 +32,13 @@ public class ImageSearchActivity extends ActionBarActivity {
         if (args == null) {
             fragment = new ImageSearchSelectFragment();
         } else {
-            fragment = new MainFragmentWeb();
+            if (args.getLong("photo") > 0) {
+                fragment = new ImageSearchPhotoFragment();
+            } else if (args.getString("base") != null) {
+                fragment = new MainFragmentWeb();
+            } else {
+                fragment = new ImageSearchSelectFragment();
+            }
         }
 
         fragment.setArguments(args);
@@ -61,7 +67,7 @@ public class ImageSearchActivity extends ActionBarActivity {
         }
     }
 
-    public void displayResult(String base) {
+    public void displaySelectResult(String base) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         Fragment fragment = new MainFragmentWeb();
         Bundle args = new Bundle();
@@ -73,6 +79,18 @@ public class ImageSearchActivity extends ActionBarActivity {
         ft.replace(CONTAINER, fragment);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         ft.addToBackStack(null);
+        ft.commit();
+    }
+
+    public void displayPhotoResult(String base) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment fragment = new MainFragmentWeb();
+        Bundle args = new Bundle();
+
+        args.putString("base", base);
+        fragment.setArguments(args);
+
+        ft.replace(CONTAINER, fragment);
         ft.commit();
     }
 }

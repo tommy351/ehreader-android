@@ -17,6 +17,14 @@
         android:icon="@drawable/ic_remove_bookmark_dark"
         app:showAsAction="always"/>
     <item
+        android:id="@+id/menu_set_as_wallpaper"
+        android:title="@string/menu_set_as_wallpaper"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/menu_find_similar"
+        android:title="@string/menu_find_similar"
+        app:showAsAction="never"/>
+    <item
         android:id="@+id/menu_open_in_browser"
         android:title="@string/menu_open_in_browser"
         app:showAsAction="never"/>

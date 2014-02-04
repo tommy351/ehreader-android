@@ -17,7 +17,6 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.db.Gallery;
-import tw.skyarrow.ehreader.util.CategoryHelper;
 
 /**
  * Created by SkyArrow on 2014/1/26.
@@ -65,7 +64,7 @@ public class GalleryListAdapter extends BaseAdapter {
         }
 
         AQuery aq = new AQuery(view);
-        int categoryRes = CategoryHelper.getResource(gallery.getCategory());
+        int categoryRes = gallery.getCategoryResource();
         String meta = context.getString(categoryRes) + " / " + gallery.getCount() + "P";
 
         holder.title.setText(gallery.getTitle());

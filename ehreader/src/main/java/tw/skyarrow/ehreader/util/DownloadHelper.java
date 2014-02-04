@@ -101,7 +101,7 @@ public class DownloadHelper {
     public List<Photo> getPhotoList(Gallery gallery, int page) throws IOException {
         List<Photo> list = new ArrayList<Photo>();
         long galleryId = gallery.getId();
-        String content = HttpRequestHelper.getString(UriHelper.getGalleryUrlString(gallery, page));
+        String content = HttpRequestHelper.getString(gallery.getUrl(page));
         Matcher matcher = pPhotoUrl.matcher(content);
 
         while (matcher.find()) {
@@ -160,24 +160,7 @@ public class DownloadHelper {
             return photo;
         }
 
-        String showkey = gallery.getShowkey();
-
-        if (showkey == null || showkey.isEmpty()) {
-            showkey = getShowkey(gallery);
-        }
-
-        JSONObject json = new JSONObject();
-
-        json.put("gid", gallery.getId());
-        json.put("page", photo.getPage());
-        json.put("imgkey", photo.getToken());
-        json.put("showkey", showkey);
-
-        L.v("Show page request: %s", json.toString());
-
-        JSONObject result = getAPIResponse("showpage", json);
-
-        L.v("Show page callback: %s", result.toString());
+        JSONObject result = getPhotoInfoRaw(gallery, photo);
 
         if (result.has("error")) {
             String error = result.getString("error");
@@ -186,7 +169,7 @@ public class DownloadHelper {
 
             if (error.equals("Key mismatch")) {
                 getShowkey(gallery);
-                getPhotoInfo(gallery, photo);
+                return getPhotoInfo(gallery, photo);
             }
 
             return null;
@@ -211,6 +194,29 @@ public class DownloadHelper {
         return photo;
     }
 
+    public JSONObject getPhotoInfoRaw(Gallery gallery, Photo photo) throws IOException, JSONException {
+        String showkey = gallery.getShowkey();
+
+        if (showkey == null || showkey.isEmpty()) {
+            showkey = getShowkey(gallery);
+        }
+
+        JSONObject json = new JSONObject();
+
+        json.put("gid", gallery.getId());
+        json.put("page", photo.getPage());
+        json.put("imgkey", photo.getToken());
+        json.put("showkey", showkey);
+
+        L.v("Show page request: %s", json.toString());
+
+        JSONObject result = getAPIResponse("showpage", json);
+
+        L.v("Show page callback: %s", result.toString());
+
+        return result;
+    }
+
     public String getShowkey(long galleryId) throws IOException {
         Gallery gallery = galleryDao.load(galleryId);
 
@@ -226,7 +232,7 @@ public class DownloadHelper {
         qb.where(PhotoDao.Properties.GalleryId.eq(gallery.getId())).limit(1);
         Photo photo = (Photo) qb.list().get(0);
 
-        String content = HttpRequestHelper.getString(UriHelper.getPhotoUrlString(photo));
+        String content = HttpRequestHelper.getString(photo.getUrl());
         Matcher matcher = pShowkey.matcher(content);
         String showkey = "";
 
@@ -304,7 +310,7 @@ public class DownloadHelper {
             gallery.setToken(data.getString("token"));
             gallery.setTitle(data.getString("title"));
             gallery.setSubtitle(data.getString("title_jpn"));
-            gallery.setCategory(CategoryHelper.toCategoryId(data.getString("category")));
+            gallery.setCategory(data.getString("category"));
             gallery.setThumbnail(data.getString("thumb"));
             gallery.setCount(data.getInt("filecount"));
             gallery.setRating((float) data.getDouble("rating"));

@@ -1,5 +1,6 @@
 package tw.skyarrow.ehreader.activity;
 
+import android.app.WallpaperManager;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -27,6 +28,7 @@ import com.androidquery.callback.AjaxStatus;
 import com.androidquery.callback.BitmapAjaxCallback;
 
 import java.io.File;
+import java.io.IOException;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -41,7 +43,6 @@ import tw.skyarrow.ehreader.db.PhotoDao;
 import tw.skyarrow.ehreader.event.PhotoInfoEvent;
 import tw.skyarrow.ehreader.service.PhotoInfoService;
 import tw.skyarrow.ehreader.util.FileInfoHelper;
-import tw.skyarrow.ehreader.util.UriHelper;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 /**
@@ -75,6 +76,7 @@ public class PhotoFragment extends Fragment {
     private boolean isLoaded = false;
     private File photoFile = null;
     private String galleryTitle;
+    private Bitmap bitmap;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -164,6 +166,14 @@ public class PhotoFragment extends Fragment {
                 bookmarkPhoto(false);
                 return true;
 
+            case R.id.menu_set_as_wallpaper:
+                setAsWallpaper();
+                return true;
+
+            case R.id.menu_find_similar:
+                findSimilar();
+                return true;
+
             case R.id.menu_open_in_browser:
                 openInBrowser();
                 return true;
@@ -181,7 +191,7 @@ public class PhotoFragment extends Fragment {
         }
 
         intent.setType(FileInfoHelper.getMimeType(filename));
-        intent.putExtra(Intent.EXTRA_TEXT, galleryTitle + " " + UriHelper.getPhotoUri(photo));
+        intent.putExtra(Intent.EXTRA_TEXT, galleryTitle + " " + photo.getUrl());
         intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(photoFile));
 
         return intent;
@@ -230,7 +240,7 @@ public class PhotoFragment extends Fragment {
 
     private void loadImage() {
         if (photo.getDownloaded()) {
-            photoFile = UriHelper.getPhotoFile(photo);
+            photoFile = photo.getFile();
             if (!photoFile.exists()) photoFile = null;
         }
 
@@ -254,6 +264,8 @@ public class PhotoFragment extends Fragment {
                 retryBtn.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
             } else if (iv != null) {
+                bitmap = bm;
+
                 pageText.setVisibility(View.GONE);
                 progressBar.setVisibility(View.GONE);
                 iv.setImageBitmap(bm);
@@ -274,10 +286,30 @@ public class PhotoFragment extends Fragment {
         }
     };
 
+    private void setAsWallpaper() {
+        if (bitmap == null) return;
+
+        try {
+            WallpaperManager wm = WallpaperManager.getInstance(getActivity());
+            wm.setBitmap(bitmap);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void findSimilar() {
+        Intent intent = new Intent(getActivity(), ImageSearchActivity.class);
+        Bundle args = new Bundle();
+
+        args.putLong("photo", photo.getId());
+        intent.putExtras(args);
+        startActivity(intent);
+    }
+
     private void openInBrowser() {
         Intent intent = new Intent(Intent.ACTION_VIEW);
 
-        intent.setData(UriHelper.getPhotoUri(photo));
+        intent.setData(photo.getUri());
         startActivity(intent);
     }
 }

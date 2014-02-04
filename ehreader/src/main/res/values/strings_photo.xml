@@ -3,6 +3,8 @@
     <string name="menu_add_bookmark">Add bookmark</string>
     <string name="menu_remove_bookmark">Remove bookmark</string>
     <string name="menu_bookmark_list">Bookmark list</string>
+    <string name="menu_find_similar">Find similar</string>
+    <string name="menu_set_as_wallpaper">Set as wallpaper</string>
 
     // Notification
     <string name="notification_bookmark_added">Bookmark added</string>

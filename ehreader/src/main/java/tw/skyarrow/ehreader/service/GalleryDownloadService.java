@@ -48,7 +48,6 @@ import tw.skyarrow.ehreader.db.PhotoDao;
 import tw.skyarrow.ehreader.event.GalleryDownloadEvent;
 import tw.skyarrow.ehreader.util.DownloadHelper;
 import tw.skyarrow.ehreader.util.L;
-import tw.skyarrow.ehreader.util.UriHelper;
 
 /**
  * Created by SkyArrow on 2014/2/4.
@@ -252,7 +251,7 @@ public class GalleryDownloadService extends Service {
             total = gallery.getCount();
 
             // Create the gallery folder if not exists
-            galleryFolder = UriHelper.getGalleryFolder(gallery);
+            galleryFolder = gallery.getFolder();
             if (!galleryFolder.exists()) galleryFolder.mkdirs();
 
             bus.post(new GalleryDownloadEvent(EVENT_DOWNLOADING, download));
@@ -345,7 +344,7 @@ public class GalleryDownloadService extends Service {
                     }
 
                     String src = photo.getSrc();
-                    File dest = UriHelper.getPhotoFile(photo);
+                    File dest = photo.getFile();
                     File cache = aq.getCachedFile(src);
 
                     if (cache == null) {

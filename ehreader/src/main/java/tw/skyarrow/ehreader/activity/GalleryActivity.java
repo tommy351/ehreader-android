@@ -51,8 +51,6 @@ import tw.skyarrow.ehreader.db.DownloadDao;
 import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
 import tw.skyarrow.ehreader.util.BitmapHelper;
-import tw.skyarrow.ehreader.util.CategoryHelper;
-import tw.skyarrow.ehreader.util.UriHelper;
 
 /**
  * Created by SkyArrow on 2014/1/27.
@@ -99,9 +97,6 @@ public class GalleryActivity extends ActionBarActivity {
 
     private AQuery aq;
     private Gallery gallery;
-/*
-    private int coverWidth;
-    private int coverHeight;*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,7 +152,7 @@ public class GalleryActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.gallery, menu);
 
-        if (gallery.getStarred()) {
+        if (gallery != null && gallery.getStarred()) {
             menu.findItem(R.id.menu_star).setVisible(false);
         } else {
             menu.findItem(R.id.menu_unstar).setVisible(false);
@@ -173,7 +168,7 @@ public class GalleryActivity extends ActionBarActivity {
     private Intent getShareIntent() {
         Intent intent = new Intent(Intent.ACTION_SEND);
 
-        intent.putExtra(Intent.EXTRA_TEXT, gallery.getTitle() + " " + UriHelper.getGalleryUrlString(gallery));
+        intent.putExtra(Intent.EXTRA_TEXT, gallery.getTitle() + " " + gallery.getUrl());
         intent.setType("text/plain");
 
         return intent;
@@ -207,7 +202,7 @@ public class GalleryActivity extends ActionBarActivity {
     }
 
     private void showGallery() {
-        int categoryRes = CategoryHelper.getResource(gallery.getCategory());
+        int categoryRes = gallery.getCategoryResource();
         String meta = getString(categoryRes) + " / " + gallery.getCount() + "P";
 
         metaView.setText(meta);
@@ -418,7 +413,7 @@ public class GalleryActivity extends ActionBarActivity {
     private void openInBrowser() {
         Intent intent = new Intent(Intent.ACTION_VIEW);
 
-        intent.setData(UriHelper.getGalleryUri(gallery));
+        intent.setData(gallery.getUri());
         startActivity(intent);
     }
 
