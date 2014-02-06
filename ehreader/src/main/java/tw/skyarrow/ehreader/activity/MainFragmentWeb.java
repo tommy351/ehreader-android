@@ -53,6 +53,7 @@ public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollL
     private ProgressBar footerProgressBar;
     private TextView footerError;
     private boolean firstLoaded = true;
+    private GalleryListTask task;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -93,6 +94,16 @@ public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollL
     }
 
     @Override
+    public void onDetach() {
+        super.onDetach();
+
+        if (task != null && !task.isCancelled()) {
+            task.cancel(true);
+            task = null;
+        }
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         if (!firstLoaded) {
             inflater.inflate(R.menu.main_web, menu);
@@ -120,9 +131,10 @@ public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollL
     }
 
     private void getGalleryList(int page) {
+        task = new GalleryListTask();
+
         startLoading();
-        //new Thread(new GalleryListRunnable(baseUrl, page)).start();
-        new GalleryListTask().execute(page);
+        task.execute(page);
     }
 
     private class GalleryListTask extends AsyncTask<Integer, Integer, List<Gallery>> {
@@ -143,6 +155,8 @@ public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollL
 
         @Override
         protected void onPostExecute(List<Gallery> list) {
+            task = null;
+
             if (list == null) {
                 scrollListener.setEnd(true);
                 showError(R.string.error_load_gallery_list);

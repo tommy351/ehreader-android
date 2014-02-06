@@ -10,7 +10,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
-import android.os.Message;
 import android.os.Process;
 import android.support.v4.app.NotificationCompat;
 
@@ -30,7 +29,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.greenrobot.dao.query.QueryBuilder;
 import de.greenrobot.event.EventBus;
@@ -43,6 +44,7 @@ import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Download;
 import tw.skyarrow.ehreader.db.DownloadDao;
 import tw.skyarrow.ehreader.db.Gallery;
+import tw.skyarrow.ehreader.db.GalleryDao;
 import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.db.PhotoDao;
 import tw.skyarrow.ehreader.event.GalleryDownloadEvent;
@@ -75,14 +77,17 @@ public class GalleryDownloadService extends Service {
     private DaoMaster daoMaster;
     private DaoSession daoSession;
     private PhotoDao photoDao;
+    private GalleryDao galleryDao;
     private DownloadDao downloadDao;
 
     private EventBus bus;
-    private Looper looper;
+
     private Handler handler;
-    private DownloadHelper infoHelper;
+    private DownloadHelper downloadHelper;
     private AQuery aq;
     private NotificationManager nm;
+    private Map<Long, Download> downloadMap;
+    private DownloadRunnable runnable;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -98,18 +103,20 @@ public class GalleryDownloadService extends Service {
         db = helper.getWritableDatabase();
         daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
+        galleryDao = daoSession.getGalleryDao();
         photoDao = daoSession.getPhotoDao();
         downloadDao = daoSession.getDownloadDao();
 
-        infoHelper = new DownloadHelper(this);
+        downloadHelper = new DownloadHelper(this);
         aq = new AQuery(this);
         nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        downloadMap = new HashMap<Long, Download>();
 
         HandlerThread thread = new HandlerThread(TAG, Process.THREAD_PRIORITY_BACKGROUND);
         thread.start();
 
-        looper = thread.getLooper();
-        handler = new GalleryDownloadHandler(looper);
+        Looper looper = thread.getLooper();
+        handler = new Handler(looper);
         bus.post(new GalleryDownloadEvent(EVENT_SERVICE_START, null));
     }
 
@@ -117,229 +124,206 @@ public class GalleryDownloadService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         String action = intent.getAction();
 
-        if (action.equals(ACTION_STOP)) {
-            handler.removeCallbacksAndMessages(null);
-            stopSelf();
-            return START_STICKY;
-        }
-
-        long galleryId = intent.getLongExtra(GALLERY_ID, 0);
-        int what = (int) galleryId;
-        boolean inQueue = handler.hasMessages(what);
-
-        if (galleryId <= 0) {
-            L.e("Gallery ID must be a positive number.");
-            return START_STICKY;
-        }
-
-        if (action.equals(ACTION_START)) {
-            if (inQueue) {
-                L.e("Download %d has been already started.", galleryId);
-            } else {
-                Download download = downloadDao.load(galleryId);
-
-                if (download == null) {
-                    download = new Download();
-
-                    download.setId(galleryId);
-                    download.setCreated(new Date(System.currentTimeMillis()));
-                    download.setProgress(0);
-                    download.setStatus(Download.STATUS_PENDING);
-
-                    downloadDao.insert(download);
-                } else {
-                    download.setStatus(Download.STATUS_PENDING);
-                    downloadDao.update(download);
-                }
-
-                addDownloadToQueue(download, startId);
-            }
+        if (action == null) {
+            L.e("Action is undefined.");
+        } else if (action.equals(ACTION_START)) {
+            startAction(intent, startId);
         } else if (action.equals(ACTION_PAUSE)) {
-            if (inQueue) {
-                handler.removeMessages(what);
-            } else {
-                L.e("Download %d is not in the queue.", galleryId);
-            }
+            pauseAction(intent, startId);
         } else if (action.equals(ACTION_RETRY)) {
-            if (inQueue) {
-                L.e("Download %d has been already started.", galleryId);
-            } else {
-                Download download = downloadDao.load(galleryId);
-
-                if (download == null) {
-                    download = new Download();
-
-                    download.setId(galleryId);
-                    download.setCreated(new Date(System.currentTimeMillis()));
-                    download.setProgress(0);
-                    download.setStatus(Download.STATUS_PENDING);
-
-                    downloadDao.insert(download);
-                } else {
-                    QueryBuilder qb = photoDao.queryBuilder();
-                    qb.where(PhotoDao.Properties.GalleryId.eq(galleryId));
-                    List<Photo> photoList = qb.list();
-
-                    for (Photo photo : photoList) {
-                        photo.setDownloaded(false);
-                        photoDao.updateInTx(photo);
-                    }
-
-                    download.setStatus(Download.STATUS_PENDING);
-                    download.setProgress(0);
-                    downloadDao.update(download);
-                }
-
-                addDownloadToQueue(download, startId);
-            }
+            retryAction(intent, startId);
+        } else if (action.equals(ACTION_STOP)) {
+            stopAction(intent, startId);
         }
-
 
         return START_STICKY;
     }
 
-    private void addDownloadToQueue(Download download, int startId) {
-        Message msg = handler.obtainMessage();
-        msg.what = download.getId().intValue();
-        msg.arg1 = startId;
-        handler.sendMessage(msg);
-        bus.post(new GalleryDownloadEvent(EVENT_PENDING, download));
-    }
-
     @Override
     public void onDestroy() {
-        QueryBuilder qb = downloadDao.queryBuilder();
-        qb.where(DownloadDao.Properties.Status.in(Download.STATUS_PENDING, Download.STATUS_DOWNLOADING));
-        List<Download> downloadList = qb.list();
+        bus.post(new GalleryDownloadEvent(EVENT_SERVICE_STOP, null));
+        db.close();
+        super.onDestroy();
+    }
 
-        for (Download download : downloadList) {
-            download.setStatus(Download.STATUS_PAUSED);
+    private void startAction(Intent intent, int startId) {
+        long id = intent.getLongExtra(GALLERY_ID, 0);
+
+        if (downloadMap.containsKey(id)) {
+            L.e("Download %d is already in the download queue.", id);
+            return;
+        }
+
+        Download download = downloadDao.load(id);
+
+        if (download == null) {
+            Gallery gallery = galleryDao.load(id);
+
+            if (gallery == null) {
+                L.e("Gallery %d does not exist.", id);
+                return;
+            }
+
+            download = new Download();
+
+            download.setId(id);
+            download.setStatus(Download.STATUS_PENDING);
+            download.setCreated(new Date(System.currentTimeMillis()));
+            download.setProgress(0);
+            downloadDao.insertInTx(download);
+        } else {
+            download.setStatus(Download.STATUS_PENDING);
             downloadDao.updateInTx(download);
         }
 
-        super.onDestroy();
-        bus.post(new GalleryDownloadEvent(EVENT_SERVICE_STOP, null));
-        db.close();
+        addDownload(download, startId);
     }
 
-    private final class GalleryDownloadHandler extends Handler {
-        public GalleryDownloadHandler(Looper looper) {
-            super(looper);
+    private void pauseAction(Intent intent, int startId) {
+        long id = intent.getLongExtra(GALLERY_ID, 0);
+
+        pauseDownload(id);
+    }
+
+    private void retryAction(Intent intent, int startId) {
+        long id = intent.getLongExtra(GALLERY_ID, 0);
+
+        if (downloadMap.containsKey(id)) {
+            L.e("Download %d is already in the download queue.", id);
+            return;
+        }
+
+        Download download = downloadDao.load(id);
+
+        if (download == null) {
+            L.e("Download %d does not exist.", id);
+            return;
+        }
+
+        QueryBuilder qb = photoDao.queryBuilder();
+        qb.where(qb.and(
+                PhotoDao.Properties.GalleryId.eq(id),
+                PhotoDao.Properties.Downloaded.notEq(true)
+        ));
+        List<Photo> photoList = qb.list();
+
+        for (Photo photo : photoList) {
+            photo.setDownloaded(false);
+            photoDao.updateInTx(photo);
+        }
+
+        download.setStatus(Download.STATUS_PENDING);
+        download.setProgress(0);
+        downloadDao.updateInTx(download);
+
+        addDownload(download, startId);
+    }
+
+    private void stopAction(Intent intent, int startId) {
+        for (Long key : downloadMap.keySet()) {
+            pauseDownload(key);
+        }
+    }
+
+    private void addDownload(Download download, int startId) {
+        downloadMap.put(download.getId(), download);
+        bus.post(new GalleryDownloadEvent(EVENT_PENDING, download));
+        handler.post(new DownloadRunnable(download, startId));
+    }
+
+    private void pauseDownload(long id) {
+
+        Download download = downloadMap.get(id);
+
+        if (download == null) return;
+
+        if (runnable.getId() == id) {
+            runnable.stop();
+        } else {
+            download.setStatus(Download.STATUS_PAUSED);
+            downloadDao.updateInTx(download);
+            downloadMap.remove(id);
+            bus.post(new GalleryDownloadEvent(EVENT_PAUSED, download));
+        }
+    }
+
+    private class DownloadRunnable implements Runnable {
+        private Download download;
+        private int id;
+        private int startId;
+        private Gallery gallery;
+        private int total;
+        private NotificationCompat.Builder builder;
+        private File galleryFolder;
+        private boolean isTerminated = false;
+
+        public DownloadRunnable(Download download, int startId) {
+            this.download = download;
+            this.startId = startId;
+        }
+
+        public long getId() {
+            return id;
         }
 
         @Override
-        public void handleMessage(Message msg) {
-            new GalleryDownloadTask(msg.what);
-            stopSelf(msg.arg1);
-        }
-    }
+        public void run() {
+            runnable = this;
 
-    private class GalleryDownloadTask {
-        private int id;
-        private Gallery gallery;
-        private Download download;
-        private File galleryFolder;
-        private NotificationCompat.Builder builder;
-        private int total;
-        private boolean isTerminated = false;
-
-        public GalleryDownloadTask(int id) {
-            this.id = id;
-
-            download = downloadDao.load((long) id);
             gallery = download.getGallery();
+            id = gallery.getId().intValue();
             total = gallery.getCount();
-
-            // Create the gallery folder if not exists
             galleryFolder = gallery.getFolder();
+
             if (!galleryFolder.exists()) galleryFolder.mkdirs();
 
-            bus.post(new GalleryDownloadEvent(EVENT_DOWNLOADING, download));
-            buildNotification();
-
-            for (int i = 1; i <= total; i++) {
-                if (isTerminated) {
-                    return;
-                } else {
-                    fetchPhoto(i);
-                }
-            }
-
-            success();
-        }
-
-        public void terminate() {
-            if (isTerminated) return;
-
-            isTerminated = true;
-
-            builder.setContentText(getResources().getString(R.string.download_paused))
-                    .setProgress(0, 0, false)
-                    .setAutoCancel(true);
-
-            sendNotification();
-            setStatus(Download.STATUS_PAUSED);
-            bus.post(new GalleryDownloadEvent(EVENT_PAUSED, download));
-        }
-
-        private void success() {
-            isTerminated = true;
-
-            Intent intent = new Intent(GalleryDownloadService.this, GalleryActivity.class);
+            builder = new NotificationCompat.Builder(GalleryDownloadService.this);
+            Intent intent = new Intent(GalleryDownloadService.this, MainActivity.class);
             Bundle args = new Bundle();
 
-            args.putLong("id", id);
+            args.putInt("tab", MainActivity.TAB_DOWNLOAD);
             intent.putExtras(args);
 
             PendingIntent pendingIntent = PendingIntent.getActivity(GalleryDownloadService.this, 0,
                     intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-            builder.setContentText(getResources().getString(R.string.download_success))
-                    .setProgress(0, 0, false)
-                    .setAutoCancel(true)
-                    .setContentIntent(pendingIntent);
+            builder.setSmallIcon(R.drawable.ic_launcher)
+                    .setContentTitle(gallery.getTitle())
+                    .setContentIntent(pendingIntent)
+                    .setProgress(0, 0, true)
+                    .setContentText(getString(R.string.download_in_progress));
 
             sendNotification();
-            setStatus(Download.STATUS_SUCCESS);
-            bus.post(new GalleryDownloadEvent(EVENT_SUCCESS, download));
-        }
-
-        private void fail() {
-            isTerminated = true;
-
-            builder.setContentText(getResources().getString(R.string.download_failed))
-                    .setProgress(0, 0, false)
-                    .setAutoCancel(true);
-
-            sendNotification();
-            setStatus(Download.STATUS_ERROR);
-            bus.post(new GalleryDownloadEvent(EVENT_ERROR, download));
-        }
-
-        private void progress(int progress) {
-            String progressText = String.format("%d / %d (%.2f%%)", progress, total, progress * 100f / total);
-
-            builder.setProgress(total, progress, false)
-                    .setContentText(progressText);
-
-            download.setProgress(progress);
-            downloadDao.update(download);
-
-            sendNotification();
-            setStatus(Download.STATUS_DOWNLOADING);
             bus.post(new GalleryDownloadEvent(EVENT_DOWNLOADING, download));
+
+            for (int i = 1; i <= total; i++) {
+                int status = download.getStatus();
+
+                if (isTerminated) {
+                    break;
+                } else if (status == Download.STATUS_PAUSED) {
+                    stop();
+                    break;
+                } else {
+                    fetchPhoto(i);
+                }
+            }
+
+            if (!isTerminated) success();
         }
 
         private void fetchPhoto(int page) {
             Photo photo = null;
             boolean isSuccess = false;
+            boolean skip = false;
 
             for (int i = 0; i < MAX_RETRY; i++) {
                 try {
-                    photo = infoHelper.getPhotoInfo(gallery, page);
+                    photo = downloadHelper.getPhotoInfo(gallery, page);
 
                     if (photo.getDownloaded()) {
                         isSuccess = true;
+                        skip = true;
                         break;
                     }
 
@@ -378,6 +362,8 @@ public class GalleryDownloadService extends Service {
                     }
 
                     isSuccess = true;
+                    photo.setDownloaded(true);
+                    photoDao.updateInTx(photo);
                     break;
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -389,7 +375,7 @@ public class GalleryDownloadService extends Service {
             }
 
             if (isSuccess) {
-                progress(page);
+                if (!skip) progress(page);
             } else {
                 fail();
             }
@@ -399,38 +385,100 @@ public class GalleryDownloadService extends Service {
             if (photo == null) return;
 
             photo.setInvalid(true);
-            photoDao.update(photo);
+            photoDao.updateInTx(photo);
         }
 
-        private void buildNotification() {
-            builder = new NotificationCompat.Builder(GalleryDownloadService.this);
-            Intent intent = new Intent(GalleryDownloadService.this, MainActivity.class);
+        private void success() {
+            if (isTerminated) return;
+
+            isTerminated = true;
+
+            Intent intent = new Intent(GalleryDownloadService.this, GalleryActivity.class);
             Bundle args = new Bundle();
 
-            args.putInt("tab", MainActivity.TAB_DOWNLOAD);
+            args.putLong("id", id);
             intent.putExtras(args);
 
             PendingIntent pendingIntent = PendingIntent.getActivity(GalleryDownloadService.this, 0,
                     intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-            builder.setSmallIcon(R.drawable.ic_launcher)
-                    .setContentTitle(gallery.getTitle())
-                    .setContentIntent(pendingIntent)
-                    .setProgress(0, 0, true)
-                    .setContentText(getResources().getString(R.string.download_in_progress));
+            builder.setContentText(getString(R.string.download_success))
+                    .setProgress(0, 0, false)
+                    .setAutoCancel(true)
+                    .setContentIntent(pendingIntent);
 
             sendNotification();
+            setStatus(Download.STATUS_SUCCESS);
+            sendEvent(EVENT_SUCCESS);
+            terminate();
+        }
+
+        private void fail() {
+            if (isTerminated) return;
+
+            isTerminated = true;
+
+            builder.setContentText(getString(R.string.download_failed))
+                    .setProgress(0, 0, false)
+                    .setAutoCancel(true);
+
+            sendNotification();
+            setStatus(Download.STATUS_ERROR);
+            sendEvent(EVENT_ERROR);
+            terminate();
+        }
+
+        private void progress(int progress) {
+            if (isTerminated) return;
+
+            String progressText = String.format("%d / %d (%.2f%%)", progress, total, progress * 100f / total);
+
+            builder.setProgress(total, progress, false)
+                    .setContentText(progressText);
+
+            download.setProgress(progress);
+            downloadDao.updateInTx(download);
+
+            sendNotification();
+            setStatus(Download.STATUS_DOWNLOADING);
+            sendEvent(EVENT_DOWNLOADING);
+        }
+
+        public void stop() {
+            if (isTerminated) return;
+
+            isTerminated = true;
+
+            builder.setContentText(getString(R.string.download_paused))
+                    .setProgress(0, 0, false)
+                    .setAutoCancel(true);
+
+            sendNotification();
+            setStatus(Download.STATUS_PAUSED);
+            sendEvent(EVENT_PAUSED);
+            terminate();
+        }
+
+        private void terminate() {
+            runnable = null;
+
+            downloadMap.remove(id);
+            stopSelf(startId);
         }
 
         private void sendNotification() {
             nm.notify(id, builder.build());
         }
 
+        private void sendEvent(int event) {
+            bus.post(new GalleryDownloadEvent(event, download));
+        }
+
         private void setStatus(int status) {
             if (download.getStatus() == status) return;
 
             download.setStatus(status);
-            downloadDao.update(download);
+            downloadDao.updateInTx(download);
         }
     }
 }
