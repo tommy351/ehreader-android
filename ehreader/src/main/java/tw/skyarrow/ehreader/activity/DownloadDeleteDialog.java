@@ -2,6 +2,7 @@ package tw.skyarrow.ehreader.activity;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.db.PhotoDao;
 import tw.skyarrow.ehreader.event.GalleryDeleteEvent;
+import tw.skyarrow.ehreader.service.GalleryDownloadService;
 
 /**
  * Created by SkyArrow on 2014/2/3.
@@ -62,6 +64,13 @@ public class DownloadDeleteDialog extends DialogFragment {
         dialog.setMax(gallery.getCount());
         dialog.setProgress(0);
         dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+
+        Intent intent = new Intent(getActivity(), GalleryDownloadService.class);
+
+        intent.setAction(GalleryDownloadService.ACTION_PAUSE);
+        intent.putExtra(GalleryDownloadService.GALLERY_ID, galleryId);
+
+        getActivity().startService(intent);
 
         new GalleryDeleteTask().execute();
 
