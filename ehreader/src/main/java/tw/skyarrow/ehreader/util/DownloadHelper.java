@@ -3,14 +3,23 @@ package tw.skyarrow.ehreader.util;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.cookie.BasicClientCookie;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,7 +32,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.greenrobot.dao.query.QueryBuilder;
+import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
+import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Download;
@@ -51,11 +62,13 @@ public class DownloadHelper {
     private GalleryDao galleryDao;
     private PhotoDao photoDao;
     private DownloadDao downloadDao;
+    private HttpContext httpContext;
 
     public DownloadHelper(Context context) {
         this.context = context;
 
         initDb();
+        httpContext = setupHttpContext(context);
     }
 
     private void initDb() {
@@ -68,15 +81,46 @@ public class DownloadHelper {
         downloadDao = daoSession.getDownloadDao();
     }
 
+    public boolean isLoggedIn() {
+        return ((BaseApplication) context.getApplicationContext()).isLoggedIn();
+    }
+
+    public static HttpContext setupHttpContext(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean loggedIn = preferences.getBoolean(context.getString(R.string.pref_logged_in), false);
+        String memberid = preferences.getString(context.getString(R.string.pref_login_memberid), "");
+        String passhash = preferences.getString(context.getString(R.string.pref_login_passhash), "");
+        String sessionId = preferences.getString(context.getString(R.string.pref_login_sessionid), "");
+
+        HttpContext httpContext = new BasicHttpContext();
+        CookieStore cookieStore = new BasicCookieStore();
+
+        cookieStore.addCookie(new Cookie(Constant.IPB_MEMBER_ID, memberid, loggedIn));
+        cookieStore.addCookie(new Cookie(Constant.IPB_PASS_HASH, passhash, loggedIn));
+        cookieStore.addCookie(new Cookie(Constant.IPB_SESSION_ID, sessionId, loggedIn));
+        httpContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
+
+        return httpContext;
+    }
+
+    private static class Cookie extends BasicClientCookie {
+        private Cookie(String name, String value, boolean loggedIn) {
+            super(name, value);
+
+            setPath("/");
+            setDomain(loggedIn ? "exhentai.org" : "e-hentai.org");
+        }
+    }
+
     private JSONObject getAPIResponse(JSONObject json) throws IOException, JSONException {
         HttpClient client = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost(Constant.API_URL);
+        HttpPost httpPost = new HttpPost(isLoggedIn() ? Constant.API_URL_EX : Constant.API_URL);
 
         httpPost.setHeader("Accept", "application/json");
         httpPost.setHeader("Content-Type", "application/json");
         httpPost.setEntity(new StringEntity(json.toString()));
 
-        HttpResponse response = client.execute(httpPost);
+        HttpResponse response = client.execute(httpPost, httpContext);
         String result = HttpRequestHelper.readResponse(response);
 
         return new JSONObject(result);
@@ -99,9 +143,13 @@ public class DownloadHelper {
     }
 
     public List<Photo> getPhotoList(Gallery gallery, int page) throws IOException {
+        HttpClient client = new DefaultHttpClient();
+        HttpGet httpGet = new HttpGet(gallery.getUrl(page, isLoggedIn()));
+        HttpResponse response = client.execute(httpGet, httpContext);
+        String content = HttpRequestHelper.readResponse(response);
+
         List<Photo> list = new ArrayList<Photo>();
         long galleryId = gallery.getId();
-        String content = HttpRequestHelper.getString(gallery.getUrl(page));
         Matcher matcher = pPhotoUrl.matcher(content);
 
         while (matcher.find()) {
@@ -232,7 +280,10 @@ public class DownloadHelper {
         qb.where(PhotoDao.Properties.GalleryId.eq(gallery.getId())).limit(1);
         Photo photo = (Photo) qb.list().get(0);
 
-        String content = HttpRequestHelper.getString(photo.getUrl());
+        HttpClient client = new DefaultHttpClient();
+        HttpGet httpGet = new HttpGet(photo.getUrl(isLoggedIn()));
+        HttpResponse response = client.execute(httpGet, httpContext);
+        String content = HttpRequestHelper.readResponse(response);
         Matcher matcher = pShowkey.matcher(content);
         String showkey = "";
 
@@ -258,7 +309,10 @@ public class DownloadHelper {
 
         L.v("Get gallery list: %s", url);
 
-        String html = HttpRequestHelper.getString(url);
+        HttpClient client = new DefaultHttpClient();
+        HttpGet httpGet = new HttpGet(url);
+        HttpResponse response = client.execute(httpGet, httpContext);
+        String html = HttpRequestHelper.readResponse(response);
         Matcher matcher = pGalleryURL.matcher(html);
         JSONArray gidlist = new JSONArray();
 

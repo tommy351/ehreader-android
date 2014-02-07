@@ -71,7 +71,11 @@ public class SearchHelper {
     }
 
     public static String buildUrl(String query) {
-        Uri.Builder builder = Uri.parse(Constant.BASE_URL).buildUpon();
+        return buildUrl(query, false);
+    }
+
+    public static String buildUrl(String query, boolean ex) {
+        Uri.Builder builder = Uri.parse(ex ? Constant.BASE_URL_EX : Constant.BASE_URL).buildUpon();
 
         builder.appendQueryParameter("f_search", query);
 

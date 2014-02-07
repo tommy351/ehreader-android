@@ -26,6 +26,7 @@ import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpParams;
+import org.apache.http.protocol.HttpContext;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -34,8 +35,10 @@ import java.io.IOException;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.util.DownloadHelper;
 
 /**
  * Created by SkyArrow on 2014/1/29.
@@ -65,11 +68,14 @@ public class ImageSearchSelectFragment extends Fragment {
     CheckBox onlyCover;
 
     private MultiPartPostTask uploadTask;
+    private boolean loggedIn;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.image_search_select, container, false);
         ButterKnife.inject(this, view);
+
+        loggedIn = ((BaseApplication) getActivity().getApplicationContext()).isLoggedIn();
 
         return view;
     }
@@ -112,7 +118,8 @@ public class ImageSearchSelectFragment extends Fragment {
         protected String doInBackground(Uri... uris) {
             try {
                 HttpClient httpClient = new DefaultHttpClient();
-                HttpPost httpPost = new HttpPost(Constant.IMAGE_SEARCH_URL);
+                HttpPost httpPost = new HttpPost(loggedIn ? Constant.IMAGE_SEARCH_URL_EX : Constant.IMAGE_SEARCH_URL);
+                HttpContext httpContext = DownloadHelper.setupHttpContext(getActivity());
                 HttpParams params = httpPost.getParams();
                 MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
 
@@ -132,7 +139,7 @@ public class ImageSearchSelectFragment extends Fragment {
                 httpPost.setEntity(entity);
                 params.setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, false);
 
-                HttpResponse response = httpClient.execute(httpPost);
+                HttpResponse response = httpClient.execute(httpPost, httpContext);
                 Header location = response.getLastHeader("Location");
 
                 if (location != null) {

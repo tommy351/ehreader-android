@@ -2,6 +2,7 @@
     <string name="label_settings">Settings</string>
 
     // Account
+    <string name="pref_account">account</string>
     <string name="pref_account_title">Account</string>
 
     <string name="pref_login">login</string>
@@ -11,7 +12,10 @@
     <string name="pref_logout">logout</string>
     <string name="pref_logout_title">Log out</string>
 
-    <string name="pref_login_cookie">login_cookie</string>
+    <string name="pref_logged_in">logged_in</string>
+    <string name="pref_login_memberid">login_memberid</string>
+    <string name="pref_login_passhash">login_passhash</string>
+    <string name="pref_login_sessionid">login_sessionid</string>
 
     // View
     <string name="pref_view_title">View</string>
@@ -76,6 +80,11 @@
     <string name="login_username_hint">Username</string>
     <string name="login_password_hint">Password</string>
     <string name="login_btn">Log in</string>
+    <string name="login_username_required">Username is required</string>
+    <string name="login_password_required">Password is required</string>
+    <string name="logging_in">Logging in&#8230;</string>
+    <string name="login_failed_title">Login failed</string>
+    <string name="login_failed_msg">Maybe you enter a wrong username or password. Please try again.</string>
 
     // Dialog: Log out
     <string name="logout_title">Log out</string>

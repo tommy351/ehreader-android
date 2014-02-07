@@ -1,33 +1,43 @@
 package tw.skyarrow.ehreader.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 
+import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.event.LoginEvent;
 
 /**
  * Created by SkyArrow on 2014/2/3.
  */
 public class PrefFragment extends PreferenceFragment {
+    private PreferenceCategory accountCategory;
+    private Preference loginPref;
+    private Preference logoutPref;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.pref);
+        EventBus.getDefault().register(this);
 
-        /*
-        Preference loginPref = findPreferenceByResource(R.string.pref_login);
+        accountCategory = (PreferenceCategory) findPreferenceByResource(R.string.pref_account);
+
+        loginPref = findPreferenceByResource(R.string.pref_login);
         loginPref.setOnPreferenceClickListener(
-                new OpenDialogPreference(new LoginDialog(), LoginDialog.TAG));
+                new OpenDialogPreference(new LoginPromptDialog(), LoginPromptDialog.TAG));
 
-        Preference logoutPref = findPreferenceByResource(R.string.pref_logout);
+        logoutPref = findPreferenceByResource(R.string.pref_logout);
         logoutPref.setOnPreferenceClickListener(
-                new OpenDialogPreference(new LogoutDialog(), LogoutDialog.TAG));*/
+                new OpenDialogPreference(new LogoutDialog(), LogoutDialog.TAG));
 
         Preference clearCachePref = findPreferenceByResource(R.string.pref_clear_cache);
         clearCachePref.setOnPreferenceClickListener(
@@ -49,6 +59,43 @@ public class PrefFragment extends PreferenceFragment {
         Preference licensePref = findPreferenceByResource(R.string.pref_open_source_license);
         licensePref.setOnPreferenceClickListener(
                 new OpenDialogPreference(new LicenseDialog(), LicenseDialog.TAG));
+
+        SharedPreferences preferences = getPreferenceManager().getSharedPreferences();
+        boolean loggedIn = preferences.getBoolean(getString(R.string.pref_logged_in), false);
+
+        if (loggedIn) {
+            hideLoginPref();
+        } else {
+            hideLogoutPref();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    public void onEvent(LoginEvent event) {
+        switch (event.getCode()) {
+            case LoginEvent.LOGIN:
+                hideLoginPref();
+                break;
+
+            case LoginEvent.LOGOUT:
+                hideLogoutPref();
+                break;
+        }
+    }
+
+    private void hideLoginPref() {
+        accountCategory.removePreference(loginPref);
+        accountCategory.addPreference(logoutPref);
+    }
+
+    private void hideLogoutPref() {
+        accountCategory.removePreference(logoutPref);
+        accountCategory.addPreference(loginPref);
     }
 
     private Preference.OnPreferenceClickListener onAboutClick = new Preference.OnPreferenceClickListener() {

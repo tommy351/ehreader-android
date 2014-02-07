@@ -25,4 +25,8 @@ public class Constant {
     public static final String FOLDER_NAME = "ehreader";
 
     public static final String HOMEPAGE = "https://github.com/tommy351/ehreader-android";
+
+    public static final String IPB_MEMBER_ID = "ipb_member_id";
+    public static final String IPB_PASS_HASH = "ipb_pass_hash";
+    public static final String IPB_SESSION_ID = "ipb_session_id";
 }

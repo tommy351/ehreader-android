@@ -35,7 +35,6 @@ public abstract class PhotoBase {
     }
 
     public File getFile() {
-        //File ehFolder = new File()
         File ehFolder = new File(Environment.getExternalStorageDirectory(), Constant.FOLDER_NAME);
         File galleryFolder = new File(ehFolder, Long.toString(getGalleryId()));
 

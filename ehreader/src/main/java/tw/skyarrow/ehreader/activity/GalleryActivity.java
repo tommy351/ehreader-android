@@ -42,6 +42,7 @@ import java.util.Date;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.db.DaoMaster;
@@ -167,8 +168,9 @@ public class GalleryActivity extends ActionBarActivity {
 
     private Intent getShareIntent() {
         Intent intent = new Intent(Intent.ACTION_SEND);
+        boolean isLoggedIn = ((BaseApplication) getApplicationContext()).isLoggedIn();
 
-        intent.putExtra(Intent.EXTRA_TEXT, gallery.getTitle() + " " + gallery.getUrl());
+        intent.putExtra(Intent.EXTRA_TEXT, gallery.getTitle() + " " + gallery.getUrl(isLoggedIn));
         intent.setType("text/plain");
 
         return intent;
@@ -412,8 +414,9 @@ public class GalleryActivity extends ActionBarActivity {
 
     private void openInBrowser() {
         Intent intent = new Intent(Intent.ACTION_VIEW);
+        boolean isLoggedIn = ((BaseApplication) getApplicationContext()).isLoggedIn();
 
-        intent.setData(gallery.getUri());
+        intent.setData(gallery.getUri(isLoggedIn));
         startActivity(intent);
     }
 

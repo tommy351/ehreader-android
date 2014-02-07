@@ -12,6 +12,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Process;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 
 import com.androidquery.AQuery;
 
@@ -117,7 +118,6 @@ public class GalleryDownloadService extends Service {
 
         Looper looper = thread.getLooper();
         handler = new Handler(looper);
-        bus.post(new GalleryDownloadEvent(EVENT_SERVICE_START, null));
     }
 
     @Override
@@ -141,7 +141,6 @@ public class GalleryDownloadService extends Service {
 
     @Override
     public void onDestroy() {
-        bus.post(new GalleryDownloadEvent(EVENT_SERVICE_STOP, null));
         db.close();
         super.onDestroy();
     }
@@ -228,11 +227,11 @@ public class GalleryDownloadService extends Service {
     private void addDownload(Download download, int startId) {
         downloadMap.put(download.getId(), download);
         bus.post(new GalleryDownloadEvent(EVENT_PENDING, download));
-        handler.post(new DownloadRunnable(download, startId));
+        handler.post(new DownloadRunnable(download.getId(), startId));
+        bus.post(new GalleryDownloadEvent(EVENT_SERVICE_START, null));
     }
 
     private void pauseDownload(long id) {
-
         Download download = downloadMap.get(id);
 
         if (download == null) return;
@@ -245,11 +244,15 @@ public class GalleryDownloadService extends Service {
             downloadMap.remove(id);
             bus.post(new GalleryDownloadEvent(EVENT_PAUSED, download));
         }
+
+        if (downloadMap.size() == 0) {
+            bus.post(new GalleryDownloadEvent(EVENT_SERVICE_STOP, null));
+        }
     }
 
     private class DownloadRunnable implements Runnable {
         private Download download;
-        private int id;
+        private long id;
         private int startId;
         private Gallery gallery;
         private int total;
@@ -257,8 +260,8 @@ public class GalleryDownloadService extends Service {
         private File galleryFolder;
         private boolean isTerminated = false;
 
-        public DownloadRunnable(Download download, int startId) {
-            this.download = download;
+        public DownloadRunnable(long id, int startId) {
+            this.id = id;
             this.startId = startId;
         }
 
@@ -268,8 +271,14 @@ public class GalleryDownloadService extends Service {
 
         @Override
         public void run() {
+            if (!downloadMap.containsKey(id)) {
+                stopSelf(startId);
+                return;
+            }
+
             runnable = this;
 
+            download = downloadMap.get(id);
             gallery = download.getGallery();
             id = gallery.getId().intValue();
             total = gallery.getCount();
@@ -399,8 +408,9 @@ public class GalleryDownloadService extends Service {
             args.putLong("id", id);
             intent.putExtras(args);
 
-            PendingIntent pendingIntent = PendingIntent.getActivity(GalleryDownloadService.this, 0,
-                    intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingIntent = TaskStackBuilder.create(GalleryDownloadService.this)
+                    .addNextIntentWithParentStack(intent)
+                    .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
             builder.setContentText(getString(R.string.download_success))
                     .setProgress(0, 0, false)
@@ -464,10 +474,14 @@ public class GalleryDownloadService extends Service {
 
             downloadMap.remove(id);
             stopSelf(startId);
+
+            if (downloadMap.size() == 0) {
+                bus.post(new GalleryDownloadEvent(EVENT_SERVICE_STOP, null));
+            }
         }
 
         private void sendNotification() {
-            nm.notify(id, builder.build());
+            nm.notify((int) id, builder.build());
         }
 
         private void sendEvent(int event) {

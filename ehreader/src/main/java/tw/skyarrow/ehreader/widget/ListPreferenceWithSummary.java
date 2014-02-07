@@ -1,4 +1,4 @@
-package tw.skyarrow.ehreader.app;
+package tw.skyarrow.ehreader.widget;
 
 import android.content.Context;
 import android.preference.ListPreference;

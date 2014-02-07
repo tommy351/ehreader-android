@@ -16,6 +16,7 @@ import android.widget.SpinnerAdapter;
 
 import com.google.analytics.tracking.android.EasyTracker;
 
+import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.util.SearchHelper;
@@ -113,6 +114,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         Fragment fragment;
         Bundle args = new Bundle();
         String tag;
+        boolean loggedIn = ((BaseApplication) getApplicationContext()).isLoggedIn();
 
         switch (i) {
             case TAB_STARRED:
@@ -133,7 +135,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
             default:
                 fragment = new MainFragmentWeb();
                 tag = MainFragmentWeb.TAG;
-                args.putString("base", Constant.BASE_URL);
+                args.putString("base", loggedIn ? Constant.BASE_URL_EX : Constant.BASE_URL);
         }
 
         fragment.setArguments(args);

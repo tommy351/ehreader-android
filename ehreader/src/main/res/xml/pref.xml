@@ -1,6 +1,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <!--
     <PreferenceCategory
+        android:key="@string/pref_account"
         android:title="@string/pref_account_title">
         <PreferenceScreen
             android:key="@string/pref_login"
@@ -10,10 +10,9 @@
             android:key="@string/pref_logout"
             android:title="@string/pref_logout_title"/>
     </PreferenceCategory>
-    -->
     <PreferenceCategory
         android:title="@string/pref_view_title">
-        <tw.skyarrow.ehreader.app.ListPreferenceWithSummary
+        <tw.skyarrow.ehreader.widget.ListPreferenceWithSummary
             android:key="@string/pref_launch_page"
             android:title="@string/pref_launch_page_title"
             android:entries="@array/main_tabs"

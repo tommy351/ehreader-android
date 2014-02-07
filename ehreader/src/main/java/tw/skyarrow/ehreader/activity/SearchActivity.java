@@ -2,7 +2,9 @@ package tw.skyarrow.ehreader.activity;
 
 import android.app.SearchManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.SearchRecentSuggestions;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -30,6 +32,9 @@ public class SearchActivity extends ActionBarActivity {
 
         actionBar.setDisplayHomeAsUpEnabled(true);
 
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean loggedIn = preferences.getBoolean(getString(R.string.pref_logged_in), false);
+
         if (Intent.ACTION_SEARCH.equals(intent.getAction()) && savedInstanceState == null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             Fragment fragment = new MainFragmentWeb();
@@ -38,7 +43,7 @@ public class SearchActivity extends ActionBarActivity {
             SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
                     SearchSuggestionProvider.AUTHORITY, SearchSuggestionProvider.MODE);
 
-            bundle.putString("base", SearchHelper.buildUrl(query));
+            bundle.putString("base", SearchHelper.buildUrl(query, loggedIn));
             fragment.setArguments(bundle);
             suggestions.saveRecentQuery(query, null);
             actionBar.setTitle(query);

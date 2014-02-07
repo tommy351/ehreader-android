@@ -8,6 +8,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 
+import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 
@@ -22,11 +23,12 @@ public class FilterActivity extends ActionBarActivity {
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
+        boolean isLoggedIn = ((BaseApplication) getApplicationContext()).isLoggedIn();
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         Fragment fragment = new MainFragmentWeb();
         Bundle args = getIntent().getExtras();
-        Uri.Builder builder = Uri.parse(Constant.BASE_URL).buildUpon();
+        Uri.Builder builder = Uri.parse(isLoggedIn ? Constant.BASE_URL_EX : Constant.BASE_URL).buildUpon();
         boolean[] filter = args.getBooleanArray("filter");
 
         for (int i = 0; i < filter.length; i++) {
