@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.greenrobot.dao.DaoException;
 import de.greenrobot.dao.query.QueryBuilder;
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
@@ -143,8 +144,12 @@ public class DownloadHelper {
     }
 
     public List<Photo> getPhotoList(Gallery gallery, int page) throws IOException {
+        String url = gallery.getUrl(page, isLoggedIn());
+
+        L.d("Get photo list: %s", url);
+
         HttpClient client = new DefaultHttpClient();
-        HttpGet httpGet = new HttpGet(gallery.getUrl(page, isLoggedIn()));
+        HttpGet httpGet = new HttpGet(url);
         HttpResponse response = client.execute(httpGet, httpContext);
         String content = HttpRequestHelper.readResponse(response);
 
@@ -157,18 +162,22 @@ public class DownloadHelper {
             String token = matcher.group(2);
             int photoPage = Integer.parseInt(matcher.group(4));
 
-            L.v("Photo found: {galleryId: %d, token: %s, page: %d}", galleryId, token, photoPage);
+            L.d("Photo found: {galleryId: %d, token: %s, page: %d}", galleryId, token, photoPage);
 
             photo.setGalleryId(galleryId);
-            photo.setToken(matcher.group(2));
+            photo.setToken(token);
             photo.setPage(photoPage);
             list.add(photo);
 
             QueryBuilder qb = photoDao.queryBuilder();
             qb.where(qb.and(PhotoDao.Properties.GalleryId.eq(galleryId), PhotoDao.Properties.Page.eq(photoPage)));
+            qb.limit(1);
 
             if (qb.count() > 0) {
-                photoDao.updateInTx(photo);
+                Photo qPhoto = (Photo) qb.list().get(0);
+
+                qPhoto.setToken(token);
+                photoDao.updateInTx(qPhoto);
             } else {
                 photo.setDownloaded(false);
                 photo.setBookmarked(false);
@@ -256,11 +265,11 @@ public class DownloadHelper {
         json.put("imgkey", photo.getToken());
         json.put("showkey", showkey);
 
-        L.v("Show page request: %s", json.toString());
+        L.d("Show page request: %s", json.toString());
 
         JSONObject result = getAPIResponse("showpage", json);
 
-        L.v("Show page callback: %s", result.toString());
+        L.d("Show page callback: %s", result.toString());
 
         return result;
     }
@@ -312,7 +321,7 @@ public class DownloadHelper {
         String url = getGalleryListURL(base, page);
         List<Gallery> galleryList = new ArrayList<Gallery>();
 
-        L.v("Get gallery list: %s", url);
+        L.d("Get gallery list: %s", url);
 
         HttpClient client = new DefaultHttpClient();
         HttpGet httpGet = new HttpGet(url);
@@ -329,7 +338,7 @@ public class DownloadHelper {
             arr.put(id);
             arr.put(token);
 
-            L.v("Gallery found: {id: %d, token: %s}", id, token);
+            L.d("Gallery found: {id: %d, token: %s}", id, token);
             gidlist.put(arr);
         }
 

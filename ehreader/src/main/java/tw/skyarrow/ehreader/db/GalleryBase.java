@@ -83,7 +83,7 @@ public abstract class GalleryBase {
         String url = String.format(base, getId(), getToken());
         Uri.Builder builder = Uri.parse(url).buildUpon();
 
-        builder.appendQueryParameter("page", Integer.toString(page));
+        builder.appendQueryParameter("p", Integer.toString(page));
 
         return builder.build();
     }

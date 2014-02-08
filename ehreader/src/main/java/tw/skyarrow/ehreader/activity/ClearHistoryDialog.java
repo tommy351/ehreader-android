@@ -17,6 +17,7 @@ import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.DownloadDao;
 import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
+import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.db.PhotoDao;
 
 /**
@@ -63,7 +64,11 @@ public class ClearHistoryDialog extends DialogFragment {
                 if (!gallery.getStarred() && downloadDao.load(gallery.getId()) == null) {
                     QueryBuilder photoQb = photoDao.queryBuilder();
                     photoQb.where(PhotoDao.Properties.GalleryId.eq(gallery.getId()));
-                    photoQb.buildDelete();
+                    List<Photo> photoList = photoQb.list();
+
+                    for (Photo photo : photoList) {
+                        photoDao.deleteInTx(photo);
+                    }
 
                     galleryDao.deleteInTx(gallery);
                 }
