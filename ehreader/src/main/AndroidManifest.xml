@@ -26,7 +26,23 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.GalleryActivity">
+            android:name=".activity.GalleryActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.MainActivity"/>
+        </activity>
+        <activity
+            android:name=".activity.GalleryIntentActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:noHistory="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="http" android:host="g.e-hentai.org" android:pathPrefix="/g/"/>
+                <data android:scheme="http" android:host="exhentai.org" android:pathPrefix="/g/"/>
+            </intent-filter>
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.MainActivity"/>
@@ -38,6 +54,21 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.GalleryActivity"/>
+        </activity>
+        <activity
+            android:name=".activity.PhotoIntentActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:noHistory="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="http" android:host="g.e-hentai.org" android:pathPrefix="/s/"/>
+                <data android:scheme="http" android:host="exhentai.org" android:pathPrefix="/s/"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.MainActivity"/>
         </activity>
         <activity
             android:name=".activity.SearchActivity"
@@ -59,6 +90,11 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.MainActivity"/>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="image/*"/>
+            </intent-filter>
         </activity>
         <activity
             android:name=".activity.PrefActivity"

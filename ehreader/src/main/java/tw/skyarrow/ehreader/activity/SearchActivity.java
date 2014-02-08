@@ -12,14 +12,13 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 
-import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.Fields;
 import com.google.analytics.tracking.android.MapBuilder;
 
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.provider.SearchSuggestionProvider;
-import tw.skyarrow.ehreader.util.SearchHelper;
+import tw.skyarrow.ehreader.util.ActionBarHelper;
 
 /**
  * Created by SkyArrow on 2014/1/28.
@@ -50,7 +49,7 @@ public class SearchActivity extends ActionBarActivity {
             SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
                     SearchSuggestionProvider.AUTHORITY, SearchSuggestionProvider.MODE);
 
-            bundle.putString("base", SearchHelper.buildUrl(query, loggedIn));
+            bundle.putString("base", ActionBarHelper.buildSearchUrl(query, loggedIn));
             fragment.setArguments(bundle);
             suggestions.saveRecentQuery(query, null);
             actionBar.setTitle(query);
@@ -74,7 +73,7 @@ public class SearchActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                ActionBarHelper.upNavigation(this);
                 return true;
         }
 

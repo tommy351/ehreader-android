@@ -14,6 +14,7 @@ import com.google.analytics.tracking.android.MapBuilder;
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.util.ActionBarHelper;
 
 /**
  * Created by SkyArrow on 2014/2/2.
@@ -105,7 +106,7 @@ public class FilterActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                ActionBarHelper.upNavigation(this);
                 return true;
         }
 

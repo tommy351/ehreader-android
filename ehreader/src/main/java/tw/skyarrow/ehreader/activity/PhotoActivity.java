@@ -48,6 +48,7 @@ import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
+import tw.skyarrow.ehreader.util.ActionBarHelper;
 
 /**
  * Created by SkyArrow on 2014/1/31.
@@ -275,12 +276,10 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
     }
 
     private void onBackClick() {
-        Intent intent = new Intent(this, GalleryActivity.class);
         Bundle args = new Bundle();
 
         args.putLong("id", gallery.getId());
-        intent.putExtras(args);
-        NavUtils.navigateUpTo(this, intent);
+        ActionBarHelper.upNavigation(this, args);
     }
 
     public int getCurrent() {

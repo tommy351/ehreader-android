@@ -2,19 +2,13 @@ package tw.skyarrow.ehreader.activity;
 
 import android.app.SearchManager;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NavUtils;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -22,14 +16,16 @@ import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.StyleSpan;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,11 +39,8 @@ import com.google.analytics.tracking.android.MapBuilder;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -61,192 +54,12 @@ import tw.skyarrow.ehreader.db.Download;
 import tw.skyarrow.ehreader.db.DownloadDao;
 import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
-import tw.skyarrow.ehreader.util.ActionBarHelper;
 import tw.skyarrow.ehreader.util.BitmapHelper;
-import tw.skyarrow.ehreader.util.DownloadHelper;
-import tw.skyarrow.ehreader.util.L;
 
 /**
- * Created by SkyArrow on 2014/1/27.
+ * Created by SkyArrow on 2014/2/8.
  */
-public class GalleryActivity extends ActionBarActivity {
-    /*
-    @InjectView(R.id.loading)
-    ProgressBar loadingView;
-
-    @InjectView(R.id.error)
-    TextView errorText;
-
-    @InjectView(R.id.retry)
-    Button retryBtn;
-
-    public static final String TAG = "GalleryActivity";
-
-    private static final Pattern pGalleryUrl = DownloadHelper.pGalleryUrl;
-
-    private SQLiteDatabase db;
-    private DaoMaster daoMaster;
-    private DaoSession daoSession;
-    private GalleryDao galleryDao;
-
-    private Gallery gallery;
-    private DownloadHelper downloadHelper;
-    private long id = 0;
-    private String token = "";
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_gallery);
-        ButterKnife.inject(this);
-
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, Constant.DB_NAME, null);
-        db = helper.getWritableDatabase();
-        daoMaster = new DaoMaster(db);
-        daoSession = daoMaster.newSession();
-        galleryDao = daoSession.getGalleryDao();
-        downloadHelper = new DownloadHelper(this);
-
-        ActionBar actionBar = getSupportActionBar();
-
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(false);
-
-        Intent intent = getIntent();
-        Bundle args = intent.getExtras();
-
-        if (intent.getData() != null) {
-            String url = intent.getData().toString();
-            Matcher matcher = pGalleryUrl.matcher(url);
-
-            L.d("Intent url: %s", url);
-
-            while (matcher.find()) {
-                id = Long.parseLong(matcher.group(2));
-                token = matcher.group(3);
-            }
-
-            if (id == 0 || token.isEmpty()) {
-                errorText.setText(R.string.error_token_invalid);
-            } else {
-                getGalleryInfo();
-            }
-        } else if (args != null) {
-            id = args.getLong("id");
-
-            if (id > 0) {
-                gallery = galleryDao.load(id);
-
-                if (gallery == null) {
-                    token = args.getString("token");
-
-                    getGalleryInfo();
-                } else {
-                    showFragment();
-                }
-            } else {
-                errorText.setText(R.string.error_no_data);
-            }
-        } else {
-            errorText.setText(R.string.error_no_data);
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                ActionBarHelper.upNavigation(this);
-                return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        if (gallery != null) {
-            showFragment();
-        }
-    }
-
-    private void getGalleryInfo() {
-        if (token == null) {
-            errorText.setText(R.string.error_token_invalid);
-            return;
-        }
-
-        gallery = galleryDao.load(id);
-
-        if (gallery == null) {
-            loadingView.setVisibility(View.VISIBLE);
-            errorText.setText("");
-            retryBtn.setVisibility(View.GONE);
-            new GalleryInfoTask(id, token).execute();
-        } else {
-            showFragment();
-        }
-    }
-
-    private class GalleryInfoTask extends AsyncTask<Integer, String, Gallery> {
-        private long id;
-        private String token;
-
-        public GalleryInfoTask(long id, String token) {
-            this.id = id;
-            this.token = token;
-        }
-
-        @Override
-        protected Gallery doInBackground(Integer... integers) {
-            try {
-                Gallery gallery = downloadHelper.getGalleryInfo(id, token);
-
-                return gallery;
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Gallery data) {
-            if (data == null) {
-                loadingView.setVisibility(View.GONE);
-                errorText.setText(R.string.error_fetch_gallery);
-                retryBtn.setVisibility(View.VISIBLE);
-            } else {
-                gallery = data;
-                showFragment();
-            }
-        }
-    }
-
-    private void showFragment() {
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        Fragment fragment = new GalleryFragment();
-        Bundle args = new Bundle();
-
-        loadingView.setVisibility(View.GONE);
-        errorText.setVisibility(View.GONE);
-        retryBtn.setVisibility(View.GONE);
-
-        args.putLong("id", gallery.getId());
-        fragment.setArguments(args);
-        ft.replace(R.id.container, fragment);
-        ft.commit();
-    }
-
-    @OnClick(R.id.retry)
-    void onRetryBtnClick() {
-        getGalleryInfo();
-    }*/
-
+public class GalleryFragment extends Fragment {
     @InjectView(R.id.meta)
     TextView metaView;
 
@@ -280,7 +93,7 @@ public class GalleryActivity extends ActionBarActivity {
     @InjectView(R.id.read)
     Button readBtn;
 
-    public static final String TAG = "GalleryActivity";
+    private static final String TAG = "GalleryFragment";
 
     private SQLiteDatabase db;
     private DaoMaster daoMaster;
@@ -292,33 +105,28 @@ public class GalleryActivity extends ActionBarActivity {
     private Gallery gallery;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_gallery);
-        ButterKnife.inject(this);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_gallery, container, false);
+        ButterKnife.inject(this, view);
+        setHasOptionsMenu(true);
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, Constant.DB_NAME, null);
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
         db = helper.getWritableDatabase();
         daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();
         downloadDao = daoSession.getDownloadDao();
 
-        aq = new AQuery(this);
+        aq = new AQuery(view);
 
-        ActionBar actionBar = getSupportActionBar();
-
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(false);
-
-        Bundle args = getIntent().getExtras();
+        Bundle args = getArguments();
         long galleryId = args.getLong("id");
         gallery = galleryDao.load(galleryId);
 
-        if (gallery != null) {
-            showGallery();
-            invalidateOptionsMenu();
-        }
+        showGallery();
+        getActivity().supportInvalidateOptionsMenu();
+
+        return view;
     }
 
     @Override
@@ -334,14 +142,16 @@ public class GalleryActivity extends ActionBarActivity {
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
         db.close();
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.gallery, menu);
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if (gallery == null) return;
+
+        inflater.inflate(R.menu.gallery, menu);
 
         if (gallery != null && gallery.getStarred()) {
             menu.findItem(R.id.menu_star).setVisible(false);
@@ -353,7 +163,7 @@ public class GalleryActivity extends ActionBarActivity {
         ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
         shareActionProvider.setShareIntent(getShareIntent());
 
-        return true;
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     private Intent getShareIntent() {
@@ -369,10 +179,6 @@ public class GalleryActivity extends ActionBarActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:
-                ActionBarHelper.upNavigation(this);
-                return true;
-
             case R.id.menu_star:
                 starGallery(true);
                 return true;
@@ -451,7 +257,7 @@ public class GalleryActivity extends ActionBarActivity {
             }
 
             Bitmap bg = Bitmap.createScaledBitmap(BitmapHelper.blur(bitmap, 10), (int) (bmWidth * scale), (int) (bmHeight * scale), true);
-            runOnUiThread(new UpdateCoverRunnable(bg, bitmap));
+            getActivity().runOnUiThread(new UpdateCoverRunnable(bg, bitmap));
         }
     };
 
@@ -466,7 +272,7 @@ public class GalleryActivity extends ActionBarActivity {
 
         @Override
         public void run() {
-            Animation fadeIn = AnimationUtils.loadAnimation(GalleryActivity.this, R.anim.cover_fade_in);
+            Animation fadeIn = AnimationUtils.loadAnimation(getActivity(), R.anim.cover_fade_in);
 
             coverBackground.setImageBitmap(background);
             coverBackground.startAnimation(fadeIn);
@@ -542,7 +348,7 @@ public class GalleryActivity extends ActionBarActivity {
 
         @Override
         public void onClick(View view) {
-            Intent intent = new Intent(GalleryActivity.this, SearchActivity.class);
+            Intent intent = new Intent(getActivity(), SearchActivity.class);
 
             intent.setAction(Intent.ACTION_SEARCH);
             intent.putExtra(SearchManager.QUERY, tag);
@@ -578,7 +384,7 @@ public class GalleryActivity extends ActionBarActivity {
             showToast(R.string.notification_unstarred);
         }
 
-        supportInvalidateOptionsMenu();
+        getActivity().supportInvalidateOptionsMenu();
 
         BaseApplication.getTracker().send(MapBuilder.createEvent(
                 "ui_action", "button_press", "star_button", null
@@ -586,7 +392,7 @@ public class GalleryActivity extends ActionBarActivity {
     }
 
     private void showToast(int res) {
-        Toast.makeText(this, res, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), res, Toast.LENGTH_SHORT).show();
     }
 
     private void downloadGallery() {
@@ -607,7 +413,7 @@ public class GalleryActivity extends ActionBarActivity {
         }
 
         dialog.setArguments(args);
-        dialog.show(getSupportFragmentManager(), tag);
+        dialog.show(getActivity().getSupportFragmentManager(), tag);
     }
 
     private void openInBrowser() {
@@ -620,7 +426,7 @@ public class GalleryActivity extends ActionBarActivity {
 
     @OnClick(R.id.read)
     void onReadBtnClick() {
-        Intent intent = new Intent(this, PhotoActivity.class);
+        Intent intent = new Intent(getActivity(), PhotoActivity.class);
         Bundle args = new Bundle();
 
         args.putLong("id", gallery.getId());

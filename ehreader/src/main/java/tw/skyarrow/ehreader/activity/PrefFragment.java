@@ -58,7 +58,7 @@ public class PrefFragment extends PreferenceFragment {
         try {
             PackageManager pm = getActivity().getPackageManager();
             String appVer = pm.getPackageInfo(getActivity().getPackageName(), 0).versionName;
-            aboutPref.setTitle(String.format(getString(R.string.pref_about_title), appVer));
+            aboutPref.setTitle(String.format(getString(R.string.pref_about_ver), appVer));
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }

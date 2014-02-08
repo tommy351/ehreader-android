@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.greenrobot.dao.DaoException;
 import de.greenrobot.dao.query.QueryBuilder;
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
@@ -50,10 +49,11 @@ import tw.skyarrow.ehreader.service.GalleryDownloadService;
  * Created by SkyArrow on 2014/1/30.
  */
 public class DownloadHelper {
-    private static final Pattern pPhotoUrl = Pattern.compile("http://(g\\.e-|ex)hentai\\.org/s/(\\w+?)/(\\d+)-(\\d+)");
-    private static final Pattern pShowkey = Pattern.compile("var showkey.*=.*\"([\\w-]+?)\";");
-    private static final Pattern pImageSrc = Pattern.compile("<img id=\"img\" src=\"(.+)/(.+?)\"");
-    private static final Pattern pGalleryURL = Pattern.compile("<a href=\"http://(g\\.e-|ex)hentai\\.org/g/(\\d+)/(\\w+)/\" onmouseover");
+    public static final Pattern pGalleryUrl = Pattern.compile("http://(g\\.e-|ex)hentai\\.org/g/(\\d+)/(\\w+)");
+    public static final Pattern pPhotoUrl = Pattern.compile("http://(g\\.e-|ex)hentai\\.org/s/(\\w+?)/(\\d+)-(\\d+)");
+    public static final Pattern pShowkey = Pattern.compile("var showkey.*=.*\"([\\w-]+?)\";");
+    public static final Pattern pImageSrc = Pattern.compile("<img id=\"img\" src=\"(.+)/(.+?)\"");
+    public static final Pattern pGalleryURL = Pattern.compile("<a href=\"http://(g\\.e-|ex)hentai\\.org/g/(\\d+)/(\\w+)/\" onmouseover");
 
     private Context context;
 
@@ -313,13 +313,12 @@ public class DownloadHelper {
         return showkey;
     }
 
-    public List<Gallery> getGalleryList(String base) throws IOException, JSONException {
-        return getGalleryList(base, 0);
+    public List<Gallery> getGalleryIndex(String base) throws IOException, JSONException {
+        return getGalleryIndex(base, 0);
     }
 
-    public List<Gallery> getGalleryList(String base, int page) throws IOException, JSONException {
-        String url = getGalleryListURL(base, page);
-        List<Gallery> galleryList = new ArrayList<Gallery>();
+    public List<Gallery> getGalleryIndex(String base, int page) throws IOException, JSONException {
+        String url = getGalleryIndexUrl(base, page);
 
         L.d("Get gallery list: %s", url);
 
@@ -342,6 +341,12 @@ public class DownloadHelper {
             gidlist.put(arr);
         }
 
+        return getGalleryList(gidlist);
+    }
+
+    private List<Gallery> getGalleryList(JSONArray gidlist) throws IOException, JSONException {
+        List<Gallery> galleryList = new ArrayList<Gallery>();
+
         if (gidlist.length() == 0) return galleryList;
 
         JSONObject obj = new JSONObject();
@@ -354,6 +359,8 @@ public class DownloadHelper {
             L.e("Get gallery list error: %s", json.getString("error"));
             return null;
         }
+
+        L.d("Get gallery list callback: %s", json.toString());
 
         JSONArray gmetadata = json.getJSONArray("gmetadata");
 
@@ -399,11 +406,73 @@ public class DownloadHelper {
         return galleryList;
     }
 
-    private String getGalleryListURL(String base, int page) {
+    private String getGalleryIndexUrl(String base, int page) {
         Uri.Builder builder = Uri.parse(base).buildUpon();
         builder.appendQueryParameter("page", Integer.toString(page));
 
         return builder.build().toString();
+    }
+
+    public Gallery getGalleryInfo(long id, String token) throws IOException, JSONException {
+        JSONArray gidlist = new JSONArray();
+        JSONArray arr = new JSONArray();
+
+        L.d("Get gallery info: {id: %d, token: %s}", id, token);
+
+        arr.put(id);
+        arr.put(token);
+        gidlist.put(arr);
+
+        List<Gallery> galleryList = getGalleryList(gidlist);
+
+        if (galleryList == null) {
+            return null;
+        } else {
+            return galleryList.get(0);
+        }
+    }
+
+    public JSONObject getGalleryToken(JSONArray pagelist) throws IOException, JSONException {
+        JSONObject obj = new JSONObject();
+        obj.put("pagelist", pagelist);
+
+        JSONObject json = getAPIResponse("gtoken", obj);
+
+        L.d("Get gallery token callback: %s", json.toString());
+
+        return json;
+    }
+
+    public JSONObject getGalleryToken(long id, String photoToken, int page) throws IOException, JSONException {
+        JSONArray pagelist = new JSONArray();
+        JSONArray arr = new JSONArray();
+
+        arr.put(id);
+        arr.put(photoToken);
+        arr.put(page);
+        pagelist.put(arr);
+
+        return getGalleryToken(pagelist);
+    }
+
+    public Gallery getGalleryByPhotoInfo(long id, String photoToken, int page) throws IOException, JSONException {
+        JSONObject json = getGalleryToken(id, photoToken, page);
+        if (json == null) return null;
+
+        JSONArray tokenlist = json.getJSONArray("tokenlist");
+        if (tokenlist == null || tokenlist.length() == 0) return null;
+
+        JSONObject tokenObj = tokenlist.getJSONObject(0);
+
+        if (tokenObj.has("error")) {
+            L.d("Get gallery token error: %s", tokenObj.getString("error"));
+            return null;
+        }
+
+        String token = tokenObj.getString("token");
+        if (token == null || token.isEmpty()) return null;
+
+        return getGalleryInfo(id, token);
     }
 
     public void startAllDownload() {

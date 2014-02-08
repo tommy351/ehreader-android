@@ -15,4 +15,9 @@
     // Notification
     <string name="notification_starred">Starred</string>
     <string name="notification_unstarred">Unstarred</string>
+
+    // Error
+    <string name="error_token_invalid">Token is invalid.</string>
+    <string name="error_no_data">No data.</string>
+    <string name="error_fetch_gallery">Failed to fetch gallery data.</string>
 </resources>

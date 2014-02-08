@@ -14,14 +14,13 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.SpinnerAdapter;
 
-import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.Fields;
 import com.google.analytics.tracking.android.MapBuilder;
 
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
-import tw.skyarrow.ehreader.util.SearchHelper;
+import tw.skyarrow.ehreader.util.ActionBarHelper;
 
 public class MainActivity extends ActionBarActivity implements ActionBar.OnNavigationListener {
     private static final String TAG = "MainActivity";
@@ -84,7 +83,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-        SearchHelper.createSearchMenu(this, menu.findItem(R.id.menu_search));
+        ActionBarHelper.createSearchMenu(this, menu.findItem(R.id.menu_search));
 
         return true;
     }

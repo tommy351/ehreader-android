@@ -13,6 +13,7 @@ import com.google.analytics.tracking.android.MapBuilder;
 
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.util.ActionBarHelper;
 
 /**
  * Created by SkyArrow on 2014/1/29.
@@ -79,7 +80,7 @@ public class ImageSearchActivity extends ActionBarActivity {
             fm.popBackStack();
             isSelected = false;
         } else {
-            finish();
+            ActionBarHelper.upNavigation(this);
         }
     }
 

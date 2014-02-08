@@ -1,0 +1,22 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <RelativeLayout
+            android:id="@+id/cover_area"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/cover_size"
+            android:background="#000">
+            <include layout="@layout/gallery_cover"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:layout_alignParentBottom="true"
+                android:background="@drawable/cover_border_gradient"/>
+        </RelativeLayout>
+        <include layout="@layout/gallery_info"/>
+    </LinearLayout>
+</ScrollView>

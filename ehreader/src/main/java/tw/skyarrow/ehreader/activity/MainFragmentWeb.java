@@ -143,7 +143,7 @@ public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollL
             int page = integers[0];
 
             try {
-                return infoHelper.getGalleryList(baseUrl, page);
+                return infoHelper.getGalleryIndex(baseUrl, page);
             } catch (JSONException e) {
                 e.printStackTrace();
             } catch (IOException e) {
