@@ -1,5 +1,7 @@
 package tw.skyarrow.ehreader.activity;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -33,12 +35,16 @@ public class ImageSearchActivity extends ActionBarActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        Bundle args = getIntent().getExtras();
+        Intent intent = getIntent();
+        Bundle args = intent.getExtras();
         Fragment fragment;
 
-        if (args == null) {
+        if (Intent.ACTION_SEND.equals(intent.getAction())) {
             fragment = new ImageSearchSelectFragment();
-        } else {
+            Uri uri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+
+            if (uri != null) args.putParcelable("data", uri);
+        } else if (args != null) {
             if (args.getLong("photo") > 0) {
                 fragment = new ImageSearchPhotoFragment();
             } else if (args.getString("base") != null) {
@@ -46,6 +52,8 @@ public class ImageSearchActivity extends ActionBarActivity {
             } else {
                 fragment = new ImageSearchSelectFragment();
             }
+        } else {
+            fragment = new ImageSearchSelectFragment();
         }
 
         fragment.setArguments(args);
@@ -84,7 +92,7 @@ public class ImageSearchActivity extends ActionBarActivity {
         }
     }
 
-    public void displaySelectResult(String base) {
+    public void displaySelectResult(String base, boolean backStack) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         Fragment fragment = new MainFragmentWeb();
         Bundle args = new Bundle();
@@ -95,7 +103,7 @@ public class ImageSearchActivity extends ActionBarActivity {
 
         ft.replace(CONTAINER, fragment);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        ft.addToBackStack(null);
+        if (backStack) ft.addToBackStack(null);
         ft.commit();
     }
 

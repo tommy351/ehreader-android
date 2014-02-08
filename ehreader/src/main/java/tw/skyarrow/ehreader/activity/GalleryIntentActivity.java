@@ -77,7 +77,7 @@ public class GalleryIntentActivity extends ActionBarActivity {
 
         Intent intent = getIntent();
 
-        if (intent.getData() != null) {
+        if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
             String url = intent.getData().toString();
             Matcher matcher = pGalleryUrl.matcher(url);
 

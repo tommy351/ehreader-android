@@ -69,13 +69,22 @@ public class ImageSearchSelectFragment extends Fragment {
 
     private MultiPartPostTask uploadTask;
     private boolean loggedIn;
+    private boolean backStack = true;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.image_search_select, container, false);
         ButterKnife.inject(this, view);
 
+        Bundle args = getArguments();
         loggedIn = BaseApplication.isLoggedIn();
+
+        if (args != null && args.getParcelable("data") != null) {
+            Uri data = args.getParcelable("data");
+            backStack = false;
+
+            fileUpload(data);
+        }
 
         return view;
     }
@@ -179,7 +188,7 @@ public class ImageSearchSelectFragment extends Fragment {
                 builder.appendQueryParameter("fs_covers", "1");
             }
 
-            ((ImageSearchActivity) getActivity()).displaySelectResult(builder.build().toString());
+            ((ImageSearchActivity) getActivity()).displaySelectResult(builder.build().toString(), backStack);
         }
 
         @Override
