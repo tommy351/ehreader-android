@@ -2,40 +2,40 @@
     <string name="label_settings">Settings</string>
 
     // Account
-    <string name="pref_account">account</string>
+    <string name="pref_account" translatable="false">account</string>
     <string name="pref_account_title">Account</string>
 
-    <string name="pref_login">login</string>
+    <string name="pref_login" translatable="false">login</string>
     <string name="pref_login_title">Log in</string>
     <string name="pref_login_summary">Login to E-Hentai</string>
 
-    <string name="pref_logout">logout</string>
+    <string name="pref_logout" translatable="false">logout</string>
     <string name="pref_logout_title">Log out</string>
 
-    <string name="pref_logged_in">logged_in</string>
-    <string name="pref_login_memberid">login_memberid</string>
-    <string name="pref_login_passhash">login_passhash</string>
-    <string name="pref_login_sessionid">login_sessionid</string>
+    <string name="pref_logged_in" translatable="false">logged_in</string>
+    <string name="pref_login_memberid" translatable="false">login_memberid</string>
+    <string name="pref_login_passhash" translatable="false">login_passhash</string>
+    <string name="pref_login_sessionid" translatable="false">login_sessionid</string>
 
     // View
     <string name="pref_view_title">View</string>
 
-    <string name="pref_launch_page">launch_page</string>
+    <string name="pref_launch_page" translatable="false">launch_page</string>
     <string name="pref_launch_page_title">Launch page</string>
-    <string name="pref_launch_page_default">0</string>
-    <string-array name="pref_launch_page_values">
+    <string name="pref_launch_page_default" translatable="false">0</string>
+    <string-array name="pref_launch_page_values" translatable="false">
         <item>0</item>
         <item>1</item>
         <item>2</item>
         <item>3</item>
     </string-array>
 
-    <string name="pref_volume_key_navigation">volume_key_navigation</string>
+    <string name="pref_volume_key_navigation" translatable="false">volume_key_navigation</string>
     <string name="pref_volume_key_navigation_title">Volume key navigation</string>
     <string name="pref_volume_key_navigation_summary">Navigate between pages using volume keys</string>
     <bool name="pref_volume_key_navigation_default">true</bool>
 
-    <string name="pref_keep_screen_on">keep_screen_on</string>
+    <string name="pref_keep_screen_on" translatable="false">keep_screen_on</string>
     <string name="pref_keep_screen_on_title">Keep screen on</string>
     <string name="pref_keep_screen_on_summary">Keep screen on when reading</string>
     <bool name="pref_keep_screen_on_default">true</bool>
@@ -43,12 +43,12 @@
     // Download
     <string name="pref_download_title">Download</string>
 
-    <string name="pref_download_over_wifi">download_over_wifi</string>
+    <string name="pref_download_over_wifi" translatable="false">download_over_wifi</string>
     <string name="pref_download_over_wifi_title">Download over Wi-Fi only</string>
     <string name="pref_download_over_wifi_summary">To reduce carrier data charges, don\'t download over mobile networks</string>
     <bool name="pref_download_over_wifi_default">true</bool>
 
-    <string name="pref_auto_download">auto_download</string>
+    <string name="pref_auto_download" translatable="false">auto_download</string>
     <string name="pref_auto_download_title">Auto download</string>
     <string name="pref_auto_download_summary">Continue unfinished downloads automatically</string>
     <bool name="pref_auto_download_default">true</bool>
@@ -56,23 +56,23 @@
     // Advanced
     <string name="pref_advanced_title">Advanced</string>
 
-    <string name="pref_clear_cache">clear_cache</string>
+    <string name="pref_clear_cache" translatable="false">clear_cache</string>
     <string name="pref_clear_cache_title">Clear cache</string>
     <string name="pref_clear_cache_summary">Last cleared: %s</string>
 
-    <string name="pref_clear_history">clear_history</string>
+    <string name="pref_clear_history" translatable="false">clear_history</string>
     <string name="pref_clear_history_title">Clear history</string>
 
-    <string name="pref_clear_search">clear_search</string>
+    <string name="pref_clear_search" translatable="false">clear_search</string>
     <string name="pref_clear_search_title">Clear search history</string>
 
     // About
-    <string name="pref_about">about</string>
+    <string name="pref_about" translatable="false">about</string>
     <string name="pref_about_title">About</string>
     <string name="pref_about_ver">Version %s</string>
-    <string name="pref_about_summary">SkyArrow &lt;tommy351@gmail.com&gt;</string>
+    <string name="pref_about_summary" translatable="false">SkyArrow &lt;tommy351@gmail.com&gt;</string>
 
-    <string name="pref_open_source_license">open_source_license</string>
+    <string name="pref_open_source_license" translatable="false">open_source_license</string>
     <string name="pref_open_source_license_title">Open source license</string>
 
     // Dialog: Log in

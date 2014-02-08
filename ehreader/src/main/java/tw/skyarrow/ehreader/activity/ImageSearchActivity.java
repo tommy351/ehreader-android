@@ -8,12 +8,18 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
+
+import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
 
 /**
  * Created by SkyArrow on 2014/1/29.
  */
 public class ImageSearchActivity extends ActionBarActivity {
+    private static final String TAG = "ImageSearchActivity";
+
     private boolean isSelected = false;
     private static final int CONTAINER = R.id.container;
 
@@ -44,6 +50,16 @@ public class ImageSearchActivity extends ActionBarActivity {
         fragment.setArguments(args);
         ft.replace(CONTAINER, fragment);
         ft.commit();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        MapBuilder builder = MapBuilder.createAppView();
+        builder.set(Fields.SCREEN_NAME, TAG);
+
+        BaseApplication.getTracker().send(builder.build());
     }
 
     @Override

@@ -75,7 +75,7 @@ public class ImageSearchSelectFragment extends Fragment {
         View view = inflater.inflate(R.layout.image_search_select, container, false);
         ButterKnife.inject(this, view);
 
-        loggedIn = ((BaseApplication) getActivity().getApplicationContext()).isLoggedIn();
+        loggedIn = BaseApplication.isLoggedIn();
 
         return view;
     }

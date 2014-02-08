@@ -26,6 +26,8 @@ import android.widget.Toast;
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxStatus;
 import com.androidquery.callback.BitmapAjaxCallback;
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +36,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import de.greenrobot.event.EventBus;
+import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.db.DaoMaster;
@@ -220,6 +223,10 @@ public class PhotoFragment extends Fragment {
         }
 
         getActivity().supportInvalidateOptionsMenu();
+
+        BaseApplication.getTracker().send(MapBuilder.createEvent(
+                "ui_action", "button_press", "bookmark_button", null
+        ).build());
     }
 
     private void requestPhotoInfo() {
@@ -292,6 +299,10 @@ public class PhotoFragment extends Fragment {
         try {
             WallpaperManager wm = WallpaperManager.getInstance(getActivity());
             wm.setBitmap(bitmap);
+
+            BaseApplication.getTracker().send(MapBuilder.createEvent(
+                    "ui_action", "button_press", "set_wallpaper", null
+            ).build());
         } catch (IOException e) {
             e.printStackTrace();
         }

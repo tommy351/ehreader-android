@@ -1,7 +1,6 @@
 <resources>
     // App info
     <string name="app_name">E-Hentai 閱讀器</string>
-    <string name="version">0.1</string>
 
     // Menu
     <string name="menu_settings">設定</string>

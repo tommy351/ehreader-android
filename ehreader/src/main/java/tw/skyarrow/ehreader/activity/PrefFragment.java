@@ -2,6 +2,7 @@ package tw.skyarrow.ehreader.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -53,8 +54,14 @@ public class PrefFragment extends PreferenceFragment {
 
         Preference aboutPref = findPreferenceByResource(R.string.pref_about);
         aboutPref.setOnPreferenceClickListener(onAboutClick);
-        aboutPref.setTitle(String.format(getString(R.string.pref_about_ver),
-                getString(R.string.version)));
+
+        try {
+            PackageManager pm = getActivity().getPackageManager();
+            String appVer = pm.getPackageInfo(getActivity().getPackageName(), 0).versionName;
+            aboutPref.setTitle(String.format(getString(R.string.pref_about_title), appVer));
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
 
         Preference licensePref = findPreferenceByResource(R.string.pref_open_source_license);
         licensePref.setOnPreferenceClickListener(

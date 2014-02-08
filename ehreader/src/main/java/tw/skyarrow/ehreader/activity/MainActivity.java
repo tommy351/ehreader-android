@@ -15,6 +15,8 @@ import android.widget.ArrayAdapter;
 import android.widget.SpinnerAdapter;
 
 import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
 
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
@@ -22,6 +24,8 @@ import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.util.SearchHelper;
 
 public class MainActivity extends ActionBarActivity implements ActionBar.OnNavigationListener {
+    private static final String TAG = "MainActivity";
+
     public static final int TAB_GALLERY = 0;
     public static final int TAB_STARRED = 1;
     public static final int TAB_HISTORY = 2;
@@ -71,14 +75,10 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     public void onStart() {
         super.onStart();
 
-        EasyTracker.getInstance(this).activityStart(this);
-    }
+        MapBuilder builder = MapBuilder.createAppView();
+        builder.set(Fields.SCREEN_NAME, TAG);
 
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        EasyTracker.getInstance(this).activityStop(this);
+        BaseApplication.getTracker().send(builder.build());
     }
 
     @Override
@@ -114,7 +114,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         Fragment fragment;
         Bundle args = new Bundle();
         String tag;
-        boolean loggedIn = ((BaseApplication) getApplicationContext()).isLoggedIn();
+        boolean loggedIn = BaseApplication.isLoggedIn();
 
         switch (i) {
             case TAB_STARRED:

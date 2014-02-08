@@ -8,6 +8,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
+
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
@@ -16,6 +19,8 @@ import tw.skyarrow.ehreader.R;
  * Created by SkyArrow on 2014/2/2.
  */
 public class FilterActivity extends ActionBarActivity {
+    private static final String TAG = "FilterActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,7 +28,7 @@ public class FilterActivity extends ActionBarActivity {
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        boolean isLoggedIn = ((BaseApplication) getApplicationContext()).isLoggedIn();
+        boolean isLoggedIn = BaseApplication.isLoggedIn();
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         Fragment fragment = new MainFragmentWeb();
@@ -84,6 +89,16 @@ public class FilterActivity extends ActionBarActivity {
 
         ft.replace(R.id.container, fragment);
         ft.commit();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        MapBuilder builder = MapBuilder.createAppView();
+        builder.set(Fields.SCREEN_NAME, TAG);
+
+        BaseApplication.getTracker().send(builder.build());
     }
 
     @Override

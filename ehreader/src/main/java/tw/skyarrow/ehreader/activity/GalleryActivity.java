@@ -32,12 +32,17 @@ import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
+import com.google.analytics.tracking.android.Tracker;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -90,6 +95,8 @@ public class GalleryActivity extends ActionBarActivity {
     @InjectView(R.id.read)
     Button readBtn;
 
+    private static final String TAG = "GalleryActivity";
+
     private SQLiteDatabase db;
     private DaoMaster daoMaster;
     private DaoSession daoSession;
@@ -133,14 +140,12 @@ public class GalleryActivity extends ActionBarActivity {
     public void onStart() {
         super.onStart();
 
-        EasyTracker.getInstance(this).activityStart(this);
-    }
+        MapBuilder builder = MapBuilder.createAppView();
+        builder.set(Fields.SCREEN_NAME, TAG);
+        builder.set(Fields.TITLE, gallery.getTitle());
+        builder.set(Fields.DESCRIPTION, gallery.getId() + "/" + gallery.getToken());
 
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        EasyTracker.getInstance(this).activityStop(this);
+        BaseApplication.getTracker().send(builder.build());
     }
 
     @Override
@@ -168,7 +173,7 @@ public class GalleryActivity extends ActionBarActivity {
 
     private Intent getShareIntent() {
         Intent intent = new Intent(Intent.ACTION_SEND);
-        boolean isLoggedIn = ((BaseApplication) getApplicationContext()).isLoggedIn();
+        boolean isLoggedIn = BaseApplication.isLoggedIn();
 
         intent.putExtra(Intent.EXTRA_TEXT, gallery.getTitle() + " " + gallery.getUrl(isLoggedIn));
         intent.setType("text/plain");
@@ -389,6 +394,10 @@ public class GalleryActivity extends ActionBarActivity {
         }
 
         supportInvalidateOptionsMenu();
+
+        BaseApplication.getTracker().send(MapBuilder.createEvent(
+                "ui_action", "button_press", "star_button", null
+        ).build());
     }
 
     private void downloadGallery() {
@@ -414,7 +423,7 @@ public class GalleryActivity extends ActionBarActivity {
 
     private void openInBrowser() {
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        boolean isLoggedIn = ((BaseApplication) getApplicationContext()).isLoggedIn();
+        boolean isLoggedIn = BaseApplication.isLoggedIn();
 
         intent.setData(gallery.getUri(isLoggedIn));
         startActivity(intent);

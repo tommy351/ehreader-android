@@ -125,8 +125,6 @@ public class LoginDialog extends DialogFragment {
 
         @Override
         protected void onPostExecute(Boolean isSuccess) {
-            BaseApplication application = (BaseApplication) getActivity().getApplication();
-
             if (isSuccess) {
                 EventBus.getDefault().post(new LoginEvent(LoginEvent.LOGIN));
             } else {
@@ -135,7 +133,7 @@ public class LoginDialog extends DialogFragment {
                 dialog.show(getActivity().getSupportFragmentManager(), LoginErrorDialog.TAG);
             }
 
-            application.setLoggedIn(isSuccess);
+            BaseApplication.setLoggedIn(isSuccess);
             dismiss();
         }
     }

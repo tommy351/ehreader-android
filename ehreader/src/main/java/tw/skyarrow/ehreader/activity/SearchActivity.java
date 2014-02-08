@@ -13,7 +13,10 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 
 import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
 
+import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.provider.SearchSuggestionProvider;
 import tw.skyarrow.ehreader.util.SearchHelper;
@@ -22,6 +25,10 @@ import tw.skyarrow.ehreader.util.SearchHelper;
  * Created by SkyArrow on 2014/1/28.
  */
 public class SearchActivity extends ActionBarActivity {
+    private static final String TAG = "SearchActivity";
+
+    private String query;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +46,7 @@ public class SearchActivity extends ActionBarActivity {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             Fragment fragment = new MainFragmentWeb();
             Bundle bundle = new Bundle();
-            String query = intent.getStringExtra(SearchManager.QUERY);
+            query = intent.getStringExtra(SearchManager.QUERY);
             SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
                     SearchSuggestionProvider.AUTHORITY, SearchSuggestionProvider.MODE);
 
@@ -56,14 +63,11 @@ public class SearchActivity extends ActionBarActivity {
     public void onStart() {
         super.onStart();
 
-        EasyTracker.getInstance(this).activityStart(this);
-    }
+        MapBuilder builder = MapBuilder.createAppView();
+        builder.set(Fields.SCREEN_NAME, TAG);
+        builder.set(Fields.TITLE, query);
 
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        EasyTracker.getInstance(this).activityStop(this);
+        BaseApplication.getTracker().send(builder.build());
     }
 
     @Override

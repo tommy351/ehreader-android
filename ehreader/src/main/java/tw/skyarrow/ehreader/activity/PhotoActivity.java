@@ -34,10 +34,14 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
+
 import java.util.Date;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.db.DaoMaster;
@@ -63,6 +67,8 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
 
     @InjectView(R.id.hint)
     TextView hintText;
+
+    private static final String TAG = "PhotoActivity";
 
     private static final int UI_HIDE_DELAY = 3000;
     private static final int HINT_HIDE_DELAY = 500;
@@ -140,6 +146,10 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
             public void onPageSelected(int i) {
                 seekBar.setProgress(i);
                 actionBar.setTitle(String.format("%s / %s", i + 1, total));
+
+                BaseApplication.getTracker().send(MapBuilder.createEvent(
+                        "ui_action", "transition", "view_pager", (long) i
+                ).build());
             }
 
             @Override
@@ -147,6 +157,18 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
                 //
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        MapBuilder builder = MapBuilder.createAppView();
+        builder.set(Fields.SCREEN_NAME, TAG);
+        builder.set(Fields.TITLE, gallery.getTitle());
+        builder.set(Fields.DESCRIPTION, gallery.getId() + "/" + gallery.getToken());
+
+        BaseApplication.getTracker().send(builder.build());
     }
 
     @Override

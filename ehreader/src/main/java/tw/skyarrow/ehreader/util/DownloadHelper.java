@@ -83,7 +83,7 @@ public class DownloadHelper {
     }
 
     public boolean isLoggedIn() {
-        return ((BaseApplication) context.getApplicationContext()).isLoggedIn();
+        return BaseApplication.isLoggedIn();
     }
 
     public static HttpContext setupHttpContext(Context context) {
