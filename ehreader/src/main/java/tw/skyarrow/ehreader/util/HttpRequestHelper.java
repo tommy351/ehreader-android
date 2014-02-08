@@ -1,10 +1,12 @@
 package tw.skyarrow.ehreader.util;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,15 +33,13 @@ public class HttpRequestHelper {
     }
 
     public static String readResponse(HttpResponse response) throws IOException {
-        BufferedReader in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-        StringBuilder builder = new StringBuilder();
-        String line;
+        HttpEntity entity = response.getEntity();
 
-        while ((line = in.readLine()) != null) {
-            builder.append(line);
+        if (entity != null) {
+            return EntityUtils.toString(entity);
+        } else {
+            return null;
         }
-
-        return builder.toString();
     }
 
     public static String getString(String url) throws IOException {

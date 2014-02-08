@@ -49,10 +49,10 @@ import tw.skyarrow.ehreader.service.GalleryDownloadService;
  * Created by SkyArrow on 2014/1/30.
  */
 public class DownloadHelper {
-    private static final Pattern pPhotoUrl = Pattern.compile("http://(g.e-|ex)hentai.org/s/(\\w+?)/(\\d+)-(\\d+)");
+    private static final Pattern pPhotoUrl = Pattern.compile("http://(g\\.e-|ex)hentai\\.org/s/(\\w+?)/(\\d+)-(\\d+)");
     private static final Pattern pShowkey = Pattern.compile("var showkey.*=.*\"([\\w-]+?)\";");
     private static final Pattern pImageSrc = Pattern.compile("<img id=\"img\" src=\"(.+)/(.+?)\"");
-    private static final Pattern pGalleryURL = Pattern.compile("<a href=\"http://(g.e-|ex)hentai.org/g/(\\d+)/(\\w+)/\" onmouseover");
+    private static final Pattern pGalleryURL = Pattern.compile("<a href=\"http://(g\\.e-|ex)hentai\\.org/g/(\\d+)/(\\w+)/\" onmouseover");
 
     private Context context;
 
@@ -279,9 +279,12 @@ public class DownloadHelper {
         QueryBuilder qb = photoDao.queryBuilder();
         qb.where(PhotoDao.Properties.GalleryId.eq(gallery.getId())).limit(1);
         Photo photo = (Photo) qb.list().get(0);
+        String url = photo.getUrl(isLoggedIn());
+
+        L.d("Get show key: %s", url);
 
         HttpClient client = new DefaultHttpClient();
-        HttpGet httpGet = new HttpGet(photo.getUrl(isLoggedIn()));
+        HttpGet httpGet = new HttpGet(url);
         HttpResponse response = client.execute(httpGet, httpContext);
         String content = HttpRequestHelper.readResponse(response);
         Matcher matcher = pShowkey.matcher(content);
@@ -290,6 +293,8 @@ public class DownloadHelper {
         while (matcher.find()) {
             showkey = matcher.group(1);
         }
+
+        L.d("Show key found: %s", showkey);
 
         if (!showkey.isEmpty()) {
             gallery.setShowkey(showkey);
