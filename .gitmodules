@@ -1,3 +1,6 @@
 [submodule "cropper"]
 	path = cropper
 	url = https://github.com/edmodo/cropper.git
+[submodule "android-stackblur"]
+	path = android-stackblur
+	url = https://github.com/kikoso/android-stackblur.git

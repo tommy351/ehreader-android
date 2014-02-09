@@ -1,3 +1,4 @@
 include ':ehreader'
 include ':DaoGenerator'
 include ':cropper:cropper'
+include ':android-stackblur:StackBlur'

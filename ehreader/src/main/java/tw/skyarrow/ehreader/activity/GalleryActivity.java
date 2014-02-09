@@ -31,6 +31,7 @@ import android.widget.Toast;
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
+import com.enrique.stackblur.StackBlurManager;
 import com.google.analytics.tracking.android.Fields;
 import com.google.analytics.tracking.android.MapBuilder;
 
@@ -53,7 +54,6 @@ import tw.skyarrow.ehreader.db.DownloadDao;
 import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
 import tw.skyarrow.ehreader.util.ActionBarHelper;
-import tw.skyarrow.ehreader.util.BitmapHelper;
 
 /**
  * Created by SkyArrow on 2014/1/27.
@@ -262,7 +262,8 @@ public class GalleryActivity extends ActionBarActivity {
                 scale = (float) coverWidth / (float) bmWidth;
             }
 
-            Bitmap bg = Bitmap.createScaledBitmap(BitmapHelper.blur(bitmap, 10), (int) (bmWidth * scale), (int) (bmHeight * scale), true);
+            StackBlurManager blurManager = new StackBlurManager(bitmap);
+            Bitmap bg = Bitmap.createScaledBitmap(blurManager.processNatively(10), (int) (bmWidth * scale), (int) (bmHeight * scale), true);
             runOnUiThread(new UpdateCoverRunnable(bg, bitmap));
         }
     };
