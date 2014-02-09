@@ -1,6 +1,5 @@
 package tw.skyarrow.ehreader.activity;
 
-import android.app.WallpaperManager;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -29,7 +28,6 @@ import com.androidquery.callback.BitmapAjaxCallback;
 import com.google.analytics.tracking.android.MapBuilder;
 
 import java.io.File;
-import java.io.IOException;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -169,7 +167,7 @@ public class PhotoFragment extends Fragment {
                 return true;
 
             case R.id.menu_set_as_wallpaper:
-                setAsWallpaper();
+                setWallpaper();
                 return true;
 
             case R.id.menu_find_similar:
@@ -292,19 +290,21 @@ public class PhotoFragment extends Fragment {
         }
     };
 
-    private void setAsWallpaper() {
-        if (bitmap == null) return;
+    private void setWallpaper() {
+        Intent intent = new Intent(getActivity(), CropActivity.class);
+        Uri uri = null;
 
-        try {
-            WallpaperManager wm = WallpaperManager.getInstance(getActivity());
-            wm.setBitmap(bitmap);
-
-            BaseApplication.getTracker().send(MapBuilder.createEvent(
-                    "ui_action", "button_press", "set_wallpaper", null
-            ).build());
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (photoFile != null) {
+            uri = Uri.fromFile(photoFile);
+        } else {
+            File file = aq.getCachedFile(photo.getSrc());
+            if (file != null && file.exists()) uri = Uri.fromFile(file);
         }
+
+        if (uri == null) return;
+
+        intent.setData(uri);
+        startActivity(intent);
     }
 
     private void findSimilar() {

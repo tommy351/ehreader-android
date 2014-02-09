@@ -70,6 +70,9 @@
                 android:value=".activity.MainActivity"/>
         </activity>
         <activity
+            android:name=".activity.CropActivity"
+            android:theme="@style/Theme.Crop"/>
+        <activity
             android:name=".activity.SearchActivity"
             android:configChanges="orientation|screenSize|keyboardHidden">
             <intent-filter>

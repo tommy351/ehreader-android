@@ -1,1 +1,3 @@
-include 'ehreader', 'DaoGenerator'
+include ':ehreader'
+include ':DaoGenerator'
+include ':cropper:cropper'

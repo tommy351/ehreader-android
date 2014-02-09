@@ -5,6 +5,8 @@
     <string name="menu_bookmark_list">Bookmark list</string>
     <string name="menu_find_similar">Find similar</string>
     <string name="menu_set_as_wallpaper">Set as wallpaper</string>
+    <string name="menu_rotate_left">Rotate left</string>
+    <string name="menu_rotate_right">Rotate right</string>
 
     // Notification
     <string name="notification_bookmark_added">Bookmark added</string>
