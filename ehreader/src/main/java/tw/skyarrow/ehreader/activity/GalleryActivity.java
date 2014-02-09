@@ -2,16 +2,11 @@ package tw.skyarrow.ehreader.activity;
 
 import android.app.SearchManager;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NavUtils;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -29,7 +24,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,11 +37,8 @@ import com.google.analytics.tracking.android.MapBuilder;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -63,8 +54,6 @@ import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
 import tw.skyarrow.ehreader.util.ActionBarHelper;
 import tw.skyarrow.ehreader.util.BitmapHelper;
-import tw.skyarrow.ehreader.util.DownloadHelper;
-import tw.skyarrow.ehreader.util.L;
 
 /**
  * Created by SkyArrow on 2014/1/27.

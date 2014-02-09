@@ -19,7 +19,7 @@
     <string name="category_misc">其他</string>
 
     // Error
-    <string name="error_no_network">網路無法連線，請檢查您的網路連線。</string>
+    <string name="error_no_network">網路無法連線。</string>
 
     // Common buttons
     <string name="retry">重試</string>

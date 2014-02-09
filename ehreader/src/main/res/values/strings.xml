@@ -19,7 +19,7 @@
     <string name="category_misc">Misc</string>
 
     // Error
-    <string name="error_no_network">Can\'t connect to network. Please check your network connection.</string>
+    <string name="error_no_network">No network.</string>
 
     // Common buttons
     <string name="retry">Retry</string>

@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <include layout="@layout/partial_loading"/>
-    <include layout="@layout/partial_error"/>
     <ListView
         android:id="@+id/list"
         android:layout_width="match_parent"
@@ -13,4 +12,5 @@
         android:divider="@null"
         android:dividerHeight="0dp"
         android:listSelector="@drawable/listitem_bg"/>
+    <include layout="@layout/partial_error"/>
 </RelativeLayout>

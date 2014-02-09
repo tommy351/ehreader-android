@@ -9,6 +9,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -26,6 +27,7 @@ import tw.skyarrow.ehreader.adapter.GalleryListAdapter;
 import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.util.DownloadHelper;
 import tw.skyarrow.ehreader.util.InfiniteScrollListener;
+import tw.skyarrow.ehreader.util.NetworkHelper;
 
 /**
  * Created by SkyArrow on 2014/1/26.
@@ -40,6 +42,9 @@ public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollL
     @InjectView(R.id.error)
     TextView errorView;
 
+    @InjectView(R.id.retry)
+    Button retryBtn;
+
     public static final String TAG = "MainFragmentWeb";
 
     private String baseUrl;
@@ -47,13 +52,16 @@ public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollL
     private List<Long> galleryIndex;
     private List<Gallery> galleryList;
     private GalleryListAdapter adapter;
-    private DownloadHelper infoHelper;
+    private DownloadHelper downloadHelper;
+    private NetworkHelper network;
 
     private View footer;
     private ProgressBar footerProgressBar;
     private TextView footerError;
+    private Button footerRetry;
     private boolean firstLoaded = true;
     private GalleryListTask task;
+    private int currentPage = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -62,7 +70,8 @@ public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollL
         setHasOptionsMenu(true);
 
         Context context = getActivity();
-        infoHelper = new DownloadHelper(getActivity());
+        downloadHelper = new DownloadHelper(getActivity());
+        network = new NetworkHelper(getActivity());
 
         Bundle args = getArguments();
         baseUrl = args.getString("base");
@@ -78,6 +87,10 @@ public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollL
         footer = getActivity().getLayoutInflater().inflate(R.layout.gallery_list_footer, null);
         footerProgressBar = (ProgressBar) footer.findViewById(R.id.loading);
         footerError = (TextView) footer.findViewById(R.id.error);
+        footerRetry = (Button) footer.findViewById(R.id.retry);
+
+        retryBtn.setOnClickListener(onRetryBtnClick);
+        footerRetry.setOnClickListener(onRetryBtnClick);
 
         listView.addFooterView(footer);
         listView.setAdapter(adapter);
@@ -131,10 +144,16 @@ public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollL
     }
 
     private void getGalleryList(int page) {
-        task = new GalleryListTask();
+        if (network.isAvailable()) {
+            task = new GalleryListTask();
 
-        startLoading();
-        task.execute(page);
+            startLoading();
+            task.execute(page);
+        } else {
+            currentPage = page;
+            scrollListener.setLoading(true);
+            showError(R.string.error_no_network, true);
+        }
     }
 
     private class GalleryListTask extends AsyncTask<Integer, Integer, List<Gallery>> {
@@ -143,7 +162,7 @@ public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollL
             int page = integers[0];
 
             try {
-                return infoHelper.getGalleryIndex(baseUrl, page);
+                return downloadHelper.getGalleryIndex(baseUrl, page);
             } catch (JSONException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -181,12 +200,20 @@ public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollL
     }
 
     private void showError(int res) {
+        showError(res, false);
+    }
+
+    private void showError(int res, boolean retry) {
         if (galleryList.size() == 0) {
             errorView.setVisibility(View.VISIBLE);
             errorView.setText(res);
+
+            if (retry) retryBtn.setVisibility(View.VISIBLE);
         } else {
             footerError.setVisibility(View.VISIBLE);
             footerError.setText(res);
+
+            if (retry) footerRetry.setVisibility(View.VISIBLE);
         }
     }
 
@@ -229,7 +256,19 @@ public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollL
         adapter.notifyDataSetChanged();
         getActivity().supportInvalidateOptionsMenu();
         errorView.setVisibility(View.GONE);
+        footerRetry.setVisibility(View.GONE);
 
         getGalleryList(0);
     }
+
+    private View.OnClickListener onRetryBtnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            errorView.setVisibility(View.GONE);
+            footerError.setVisibility(View.GONE);
+            retryBtn.setVisibility(View.GONE);
+            footerRetry.setVisibility(View.GONE);
+            getGalleryList(currentPage);
+        }
+    };
 }
