@@ -41,7 +41,7 @@ public class ImageSearchActivity extends ActionBarActivity {
 
         if (Intent.ACTION_SEND.equals(intent.getAction())) {
             fragment = new ImageSearchSelectFragment();
-            Uri uri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+            Uri uri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
 
             if (uri != null) args.putParcelable("data", uri);
         } else if (args != null) {

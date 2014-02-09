@@ -79,8 +79,7 @@ public class MainFragmentDownload extends Fragment {
 
         listView.setAdapter(adapter);
         loadingView.setVisibility(View.GONE);
-
-        isDownloading = downloadHelper.isServiceRunning();
+        downloadHelper.checkServiceStatus();
 
         if (downloadList.size() == 0) {
             errorView.setText(R.string.error_no_download);

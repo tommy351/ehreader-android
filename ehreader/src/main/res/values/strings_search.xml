@@ -13,4 +13,7 @@
     <string name="image_search_similar">Search similar photos</string>
     <string name="image_search_only_cover">Only search covers</string>
     <string name="image_search_uploading">Uploading&#8230;</string>
+
+    // Error
+    <string name="error_upload_image">Failed to upload the image.</string>
 </resources>

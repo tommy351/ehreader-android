@@ -1,5 +1,6 @@
 package tw.skyarrow.ehreader.service;
 
+import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -55,13 +56,14 @@ import tw.skyarrow.ehreader.util.L;
 /**
  * Created by SkyArrow on 2014/2/4.
  */
-public class GalleryDownloadService extends Service {
+public class GalleryDownloadService extends IntentService {
     public static final String TAG = "GalleryDownloadService";
 
     public static final String ACTION_START = "ACTION_START";
     public static final String ACTION_PAUSE = "ACTION_PAUSE";
     public static final String ACTION_RETRY = "ACTION_RETRY";
     public static final String ACTION_STOP = "ACTION_STOP";
+    public static final String ACTION_STATUS = "ACTION_STATUS";
 
     public static final int EVENT_DOWNLOADING = 0;
     public static final int EVENT_PAUSED = 1;
@@ -80,19 +82,16 @@ public class GalleryDownloadService extends Service {
     private PhotoDao photoDao;
     private GalleryDao galleryDao;
     private DownloadDao downloadDao;
-
     private EventBus bus;
 
-    private Handler handler;
     private DownloadHelper downloadHelper;
     private AQuery aq;
     private NotificationManager nm;
-    private Map<Long, Download> downloadMap;
-    private DownloadRunnable runnable;
+    private Map<Long, Download> map;
+    private GalleryDownloadRunnable runnable;
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+    public GalleryDownloadService() {
+        super(TAG);
     }
 
     @Override
@@ -111,13 +110,16 @@ public class GalleryDownloadService extends Service {
         downloadHelper = new DownloadHelper(this);
         aq = new AQuery(this);
         nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        downloadMap = new HashMap<Long, Download>();
+        map = new HashMap<Long, Download>();
 
-        HandlerThread thread = new HandlerThread(TAG, Process.THREAD_PRIORITY_BACKGROUND);
-        thread.start();
+        bus.post(new GalleryDownloadEvent(EVENT_SERVICE_START, null));
+    }
 
-        Looper looper = thread.getLooper();
-        handler = new Handler(looper);
+    @Override
+    public void onDestroy() {
+        bus.post(new GalleryDownloadEvent(EVENT_SERVICE_STOP, null));
+        super.onDestroy();
+        db.close();
     }
 
     @Override
@@ -127,28 +129,32 @@ public class GalleryDownloadService extends Service {
         if (action == null) {
             L.e("Action is undefined.");
         } else if (action.equals(ACTION_START)) {
-            startAction(intent, startId);
+            startAction(intent);
         } else if (action.equals(ACTION_PAUSE)) {
-            pauseAction(intent, startId);
+            pauseAction(intent);
+            return START_NOT_STICKY;
         } else if (action.equals(ACTION_RETRY)) {
-            retryAction(intent, startId);
+            retryAction(intent);
         } else if (action.equals(ACTION_STOP)) {
-            stopAction(intent, startId);
+            stopAction(intent);
+            return START_NOT_STICKY;
+        } else if (action.equals(ACTION_STATUS)) {
+            if (map.size() == 0) {
+                bus.post(new GalleryDownloadEvent(EVENT_SERVICE_STOP, null));
+            } else {
+                bus.post(new GalleryDownloadEvent(EVENT_SERVICE_START, null));
+            }
+
+            return START_NOT_STICKY;
         }
 
-        return START_STICKY;
+        return super.onStartCommand(intent, flags, startId);
     }
 
-    @Override
-    public void onDestroy() {
-        db.close();
-        super.onDestroy();
-    }
-
-    private void startAction(Intent intent, int startId) {
+    private void startAction(Intent intent) {
         long id = intent.getLongExtra(GALLERY_ID, 0);
 
-        if (downloadMap.containsKey(id)) {
+        if (map.containsKey(id)) {
             L.e("Download %d is already in the download queue.", id);
             return;
         }
@@ -175,19 +181,19 @@ public class GalleryDownloadService extends Service {
             downloadDao.updateInTx(download);
         }
 
-        addDownload(download, startId);
+        addDownload(download);
     }
 
-    private void pauseAction(Intent intent, int startId) {
+    private void pauseAction(Intent intent) {
         long id = intent.getLongExtra(GALLERY_ID, 0);
 
         pauseDownload(id);
     }
 
-    private void retryAction(Intent intent, int startId) {
+    private void retryAction(Intent intent) {
         long id = intent.getLongExtra(GALLERY_ID, 0);
 
-        if (downloadMap.containsKey(id)) {
+        if (map.containsKey(id)) {
             L.e("Download %d is already in the download queue.", id);
             return;
         }
@@ -215,54 +221,53 @@ public class GalleryDownloadService extends Service {
         download.setProgress(0);
         downloadDao.updateInTx(download);
 
-        addDownload(download, startId);
+        addDownload(download);
     }
 
-    private void stopAction(Intent intent, int startId) {
-        for (Long key : downloadMap.keySet()) {
+    private void stopAction(Intent intent) {
+        for (Long key : map.keySet()) {
             pauseDownload(key);
         }
     }
 
-    private void addDownload(Download download, int startId) {
-        downloadMap.put(download.getId(), download);
+    private void addDownload(Download download) {
+        map.put(download.getId(), download);
         bus.post(new GalleryDownloadEvent(EVENT_PENDING, download));
-        handler.post(new DownloadRunnable(download.getId(), startId));
-        bus.post(new GalleryDownloadEvent(EVENT_SERVICE_START, null));
     }
 
     private void pauseDownload(long id) {
-        Download download = downloadMap.get(id);
+        Download download = map.get(id);
 
         if (download == null) return;
 
-        if (runnable.getId() == id) {
+        if (runnable != null && runnable.getId() == id) {
             runnable.stop();
         } else {
             download.setStatus(Download.STATUS_PAUSED);
             downloadDao.updateInTx(download);
-            downloadMap.remove(id);
+            map.remove(id);
             bus.post(new GalleryDownloadEvent(EVENT_PAUSED, download));
-        }
-
-        if (downloadMap.size() == 0) {
-            bus.post(new GalleryDownloadEvent(EVENT_SERVICE_STOP, null));
         }
     }
 
-    private class DownloadRunnable implements Runnable {
-        private Download download;
+    @Override
+    protected void onHandleIntent(Intent intent) {
+        long id = intent.getLongExtra(GALLERY_ID, 0);
+        runnable = new GalleryDownloadRunnable(id);
+        runnable.run();
+    }
+
+    private class GalleryDownloadRunnable implements Runnable {
         private long id;
-        private int startId;
+        private Download download;
         private Gallery gallery;
         private int total;
         private NotificationCompat.Builder builder;
         private File galleryFolder;
         private boolean isTerminated = false;
 
-        public DownloadRunnable(long id, int startId) {
+        public GalleryDownloadRunnable(long id) {
             this.id = id;
-            this.startId = startId;
         }
 
         public long getId() {
@@ -271,16 +276,14 @@ public class GalleryDownloadService extends Service {
 
         @Override
         public void run() {
-            if (!downloadMap.containsKey(id)) {
-                stopSelf(startId);
+            download = map.get(id);
+
+            if (download == null) {
+                terminate();
                 return;
             }
 
-            runnable = this;
-
-            download = downloadMap.get(id);
             gallery = download.getGallery();
-            id = gallery.getId().intValue();
             total = gallery.getCount();
             galleryFolder = gallery.getFolder();
 
@@ -303,7 +306,6 @@ public class GalleryDownloadService extends Service {
                     .setContentText(getString(R.string.download_in_progress));
 
             sendNotification();
-            bus.post(new GalleryDownloadEvent(EVENT_DOWNLOADING, download));
 
             for (int i = 1; i <= total; i++) {
                 int status = download.getStatus();
@@ -471,13 +473,7 @@ public class GalleryDownloadService extends Service {
 
         private void terminate() {
             runnable = null;
-
-            downloadMap.remove(id);
-            stopSelf(startId);
-
-            if (downloadMap.size() == 0) {
-                bus.post(new GalleryDownloadEvent(EVENT_SERVICE_STOP, null));
-            }
+            map.remove(id);
         }
 
         private void sendNotification() {

@@ -496,21 +496,10 @@ public class DownloadHelper {
         context.startService(intent);
     }
 
-    public boolean isServiceRunning() {
-        return isServiceRunning(context);
-    }
+    public void checkServiceStatus() {
+        Intent intent = new Intent(context, GalleryDownloadService.class);
 
-    // http://stackoverflow.com/a/5921190
-    public static boolean isServiceRunning(Context context) {
-        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        String className = GalleryDownloadService.class.getName();
-
-        for (ActivityManager.RunningServiceInfo info : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (className.equals(info.service.getClassName())) {
-                return true;
-            }
-        }
-
-        return false;
+        intent.setAction(GalleryDownloadService.ACTION_STATUS);
+        context.startService(intent);
     }
 }

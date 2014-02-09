@@ -13,4 +13,7 @@
     <string name="image_search_similar">搜尋相似圖片</string>
     <string name="image_search_only_cover">僅搜尋封面</string>
     <string name="image_search_uploading">上傳中&#8230;</string>
+
+    // Error
+    <string name="error_upload_image">圖片上傳失敗。</string>
 </resources>

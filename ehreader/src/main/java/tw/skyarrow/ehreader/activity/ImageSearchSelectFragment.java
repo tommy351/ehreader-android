@@ -39,6 +39,9 @@ import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.util.DownloadHelper;
+import tw.skyarrow.ehreader.util.L;
+import tw.skyarrow.ehreader.util.NetworkHelper;
+import tw.skyarrow.ehreader.util.ObservableHttpEntity;
 
 /**
  * Created by SkyArrow on 2014/1/29.
@@ -67,9 +70,17 @@ public class ImageSearchSelectFragment extends Fragment {
     @InjectView(R.id.only_cover)
     CheckBox onlyCover;
 
+    @InjectView(R.id.retry)
+    Button retryBtn;
+
+    @InjectView(R.id.error)
+    TextView errorView;
+
     private MultiPartPostTask uploadTask;
     private boolean loggedIn;
     private boolean backStack = true;
+    private Uri uri;
+    private NetworkHelper network;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -78,12 +89,13 @@ public class ImageSearchSelectFragment extends Fragment {
 
         Bundle args = getArguments();
         loggedIn = BaseApplication.isLoggedIn();
+        network = new NetworkHelper(getActivity());
 
         if (args != null && args.getParcelable("data") != null) {
-            Uri data = args.getParcelable("data");
+            uri = args.getParcelable("data");
             backStack = false;
 
-            fileUpload(data);
+            fileUpload();
         }
 
         return view;
@@ -111,18 +123,25 @@ public class ImageSearchSelectFragment extends Fragment {
         switch (requestCode) {
             case PHOTO_SELECT:
                 if (resultCode == Activity.RESULT_OK) {
-                    fileUpload(data.getData());
+                    uri = data.getData();
+                    fileUpload();
                 }
                 break;
         }
     }
 
-    private void fileUpload(Uri image) {
-        uploadTask = new MultiPartPostTask();
-        uploadTask.execute(image);
+    private void fileUpload() {
+        if (network.isAvailable()) {
+            uploadTask = new MultiPartPostTask();
+            uploadTask.execute(uri);
+        } else {
+            showError(R.string.error_no_network, true);
+        }
     }
 
-    private class MultiPartPostTask extends AsyncTask<Uri, Integer, String> {
+    private class MultiPartPostTask extends AsyncTask<Uri, Integer, String> implements ObservableHttpEntity.OnWriteListener {
+        private long totalSize = 0;
+
         @Override
         protected String doInBackground(Uri... uris) {
             try {
@@ -135,16 +154,27 @@ public class ImageSearchSelectFragment extends Fragment {
                 Uri uri = uris[0];
                 String[] projection = {MediaStore.Images.ImageColumns.DATA};
                 Cursor cursor = getActivity().getContentResolver().query(uri, projection, null, null, null);
-                cursor.moveToFirst();
-                String path = cursor.getString(0);
-                cursor.close();
+                String path = "";
+
+                if (cursor == null) {
+                    path = uri.getPath();
+                } else {
+                    cursor.moveToFirst();
+                    int idx = cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATA);
+                    path = cursor.getString(idx);
+                    cursor.close();
+                }
+
+                if (path.isEmpty()) return null;
 
                 File file = new File(path);
+                totalSize = file.length();
 
                 entityBuilder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
                 entityBuilder.addBinaryBody("sfile", file);
 
-                HttpEntity entity = entityBuilder.build();
+                ObservableHttpEntity entity = new ObservableHttpEntity(entityBuilder.build());
+                entity.setOnWriteListener(this);
                 httpPost.setEntity(entity);
                 params.setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, false);
 
@@ -170,6 +200,11 @@ public class ImageSearchSelectFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String url) {
+            if (url == null) {
+                showError(R.string.error_upload_image, true);
+                return;
+            }
+
             Uri uri = Uri.parse(url);
             String hash = uri.getQueryParameter("f_shash");
             String from = uri.getQueryParameter("fs_from");
@@ -207,6 +242,11 @@ public class ImageSearchSelectFragment extends Fragment {
         protected void onCancelled() {
             hideProgressBar();
         }
+
+        @Override
+        public void onWrite(long totalSent) {
+            publishProgress((int) (totalSent * 100f / totalSize));
+        }
     }
 
     private void showProgressBar() {
@@ -219,5 +259,24 @@ public class ImageSearchSelectFragment extends Fragment {
         selectBtn.setVisibility(View.VISIBLE);
         cancelBtn.setVisibility(View.GONE);
         progressView.setVisibility(View.GONE);
+    }
+
+    private void showError(int res, boolean retry) {
+        selectBtn.setVisibility(View.GONE);
+        cancelBtn.setVisibility(View.GONE);
+        progressView.setVisibility(View.GONE);
+        errorView.setVisibility(View.VISIBLE);
+        errorView.setText(res);
+
+        if (retry) {
+            retryBtn.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @OnClick(R.id.retry)
+    void onRetryBtnClick() {
+        errorView.setVisibility(View.GONE);
+        retryBtn.setVisibility(View.GONE);
+        fileUpload();
     }
 }

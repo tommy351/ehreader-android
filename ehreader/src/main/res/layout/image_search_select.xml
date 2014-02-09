@@ -67,4 +67,23 @@
             android:text="@string/image_search_uploading"
             android:layout_alignParentBottom="true"/>
     </RelativeLayout>
+    <Button
+        android:id="@+id/retry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/only_cover"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:visibility="gone"
+        android:text="@string/retry"/>
+    <TextView
+        android:id="@+id/error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_alignTop="@+id/retry"
+        android:layout_alignBottom="@+id/retry"
+        android:layout_toRightOf="@+id/retry"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:gravity="center_vertical"
+        android:visibility="gone"/>
 </RelativeLayout>

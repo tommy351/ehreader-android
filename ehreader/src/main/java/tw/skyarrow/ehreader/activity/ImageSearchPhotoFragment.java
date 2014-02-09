@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -20,6 +21,7 @@ import java.util.regex.Pattern;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.db.DaoMaster;
@@ -30,6 +32,7 @@ import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.db.PhotoDao;
 import tw.skyarrow.ehreader.util.DownloadHelper;
 import tw.skyarrow.ehreader.util.L;
+import tw.skyarrow.ehreader.util.NetworkHelper;
 
 /**
  * Created by SkyArrow on 2014/2/4.
@@ -41,6 +44,9 @@ public class ImageSearchPhotoFragment extends Fragment {
     @InjectView(R.id.error)
     TextView errorView;
 
+    @InjectView(R.id.retry)
+    Button retryBtn;
+
     private static final Pattern pSearchUrl = Pattern.compile("<a href=\"http://(g.e-|ex)hentai.org/\\?f_shash=(.+?)\">");
 
     private SQLiteDatabase db;
@@ -49,14 +55,17 @@ public class ImageSearchPhotoFragment extends Fragment {
     private GalleryDao galleryDao;
     private PhotoDao photoDao;
     private DownloadHelper downloadHelper;
+    private NetworkHelper network;
+
+    private long photoId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.image_search_photo, container, false);
+        View view = inflater.inflate(R.layout.activity_intent, container, false);
         ButterKnife.inject(this, view);
 
         Bundle args = getArguments();
-        long photoId = args.getLong("photo");
+        photoId = args.getLong("photo");
 
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
         db = helper.getWritableDatabase();
@@ -65,14 +74,23 @@ public class ImageSearchPhotoFragment extends Fragment {
         galleryDao = daoSession.getGalleryDao();
         photoDao = daoSession.getPhotoDao();
         downloadHelper = new DownloadHelper(getActivity());
+        network = new NetworkHelper(getActivity());
 
-        new GetPhotoSearchURLTask().execute(photoId);
+        searchPhoto();
 
         return view;
     }
 
-    private class GetPhotoSearchURLTask extends AsyncTask<Long, Integer, String> {
+    private void searchPhoto() {
+        if (network.isAvailable()) {
+            loadingView.setVisibility(View.VISIBLE);
+            new SearchPhotoTask().execute(photoId);
+        } else {
+            showError(R.string.error_no_network, true);
+        }
+    }
 
+    private class SearchPhotoTask extends AsyncTask<Long, Integer, String> {
         @Override
         protected String doInBackground(Long... longs) {
             try {
@@ -112,7 +130,7 @@ public class ImageSearchPhotoFragment extends Fragment {
         protected void onPostExecute(String url) {
             if (url == null) {
                 loadingView.setVisibility(View.GONE);
-                errorView.setText(R.string.error_load_gallery_list);
+                showError(R.string.error_load_gallery_list, true);
                 return;
             }
 
@@ -128,5 +146,21 @@ public class ImageSearchPhotoFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         db.close();
+    }
+
+    private void showError(int res, boolean retry) {
+        errorView.setVisibility(View.VISIBLE);
+        errorView.setText(res);
+
+        if (retry) {
+            retryBtn.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @OnClick(R.id.retry)
+    void onRetryBtnClick() {
+        errorView.setVisibility(View.GONE);
+        retryBtn.setVisibility(View.GONE);
+        searchPhoto();
     }
 }
