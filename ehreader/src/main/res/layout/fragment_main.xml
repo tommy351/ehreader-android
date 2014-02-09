@@ -11,6 +11,8 @@
         android:footerDividersEnabled="false"
         android:divider="@null"
         android:dividerHeight="0dp"
-        android:listSelector="@drawable/listitem_bg"/>
+        android:listSelector="@drawable/listitem_bg"
+        android:animationCache="false"
+        android:scrollingCache="false"/>
     <include layout="@layout/partial_error"/>
 </RelativeLayout>
