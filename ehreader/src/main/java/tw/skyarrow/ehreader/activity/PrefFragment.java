@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
@@ -15,6 +17,7 @@ import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.event.LoginEvent;
+import tw.skyarrow.ehreader.util.L;
 
 /**
  * Created by SkyArrow on 2014/2/3.
@@ -23,6 +26,11 @@ public class PrefFragment extends PreferenceFragment {
     private PreferenceCategory accountCategory;
     private Preference loginPref;
     private Preference logoutPref;
+
+    private static final int CLICK_THRESHOLD = 5;
+    private static final long RESET_DELAY = 500;
+
+    private int clickCount = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,20 +60,22 @@ public class PrefFragment extends PreferenceFragment {
         clearSearchPref.setOnPreferenceClickListener(
                 new OpenDialogPreference(new ClearSearchDialog(), ClearSearchDialog.TAG));
 
-        Preference aboutPref = findPreferenceByResource(R.string.pref_about);
-        aboutPref.setOnPreferenceClickListener(onAboutClick);
+        Preference versionPref = findPreferenceByResource(R.string.pref_version);
+        versionPref.setOnPreferenceClickListener(onVersionClick);
 
         try {
             PackageManager pm = getActivity().getPackageManager();
             String appVer = pm.getPackageInfo(getActivity().getPackageName(), 0).versionName;
-            aboutPref.setTitle(String.format(getString(R.string.pref_about_ver), appVer));
+            versionPref.setSummary(appVer);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
 
-        Preference licensePref = findPreferenceByResource(R.string.pref_open_source_license);
-        licensePref.setOnPreferenceClickListener(
-                new OpenDialogPreference(new LicenseDialog(), LicenseDialog.TAG));
+        Preference authorPref = findPreferenceByResource(R.string.pref_author);
+        authorPref.setOnPreferenceClickListener(onAuthorClick);
+
+        Preference sourceCodePref = findPreferenceByResource(R.string.pref_source_code);
+        sourceCodePref.setOnPreferenceClickListener(onSourceCodeClick);
 
         SharedPreferences preferences = getPreferenceManager().getSharedPreferences();
         boolean loggedIn = preferences.getBoolean(getString(R.string.pref_logged_in), false);
@@ -105,7 +115,49 @@ public class PrefFragment extends PreferenceFragment {
         accountCategory.addPreference(loginPref);
     }
 
-    private Preference.OnPreferenceClickListener onAboutClick = new Preference.OnPreferenceClickListener() {
+    private Preference.OnPreferenceClickListener onVersionClick = new Preference.OnPreferenceClickListener() {
+        @Override
+        public boolean onPreferenceClick(Preference preference) {
+            L.d("on version click: %d", clickCount);
+            versionClickHandler.removeMessages(0);
+
+            if (clickCount < CLICK_THRESHOLD) {
+                clickCount++;
+                versionClickHandler.sendEmptyMessageDelayed(0, RESET_DELAY);
+            } else {
+                Intent intent = new Intent(getActivity(), AboutActivity.class);
+                clickCount = 0;
+
+                versionClickHandler.removeMessages(0);
+                startActivity(intent);
+            }
+
+            return true;
+        }
+    };
+
+    private Handler versionClickHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            L.d("reset version count");
+            versionClickHandler.removeMessages(0);
+            clickCount = 0;
+        }
+    };
+
+    private Preference.OnPreferenceClickListener onAuthorClick = new Preference.OnPreferenceClickListener() {
+        @Override
+        public boolean onPreferenceClick(Preference preference) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+
+            intent.setData(Uri.parse(Constant.AUTHOR_PAGE));
+            startActivity(intent);
+
+            return true;
+        }
+    };
+
+    private Preference.OnPreferenceClickListener onSourceCodeClick = new Preference.OnPreferenceClickListener() {
         @Override
         public boolean onPreferenceClick(Preference preference) {
             Intent intent = new Intent(Intent.ACTION_VIEW);

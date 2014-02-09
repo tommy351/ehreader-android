@@ -110,6 +110,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.MainActivity"/>
         </activity>
+        <activity
+            android:name=".activity.AboutActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:theme="@style/Theme.About">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.PrefActivity"/>
+        </activity>
         <provider
             android:name=".provider.SearchSuggestionProvider"
             android:authorities="tw.skyarrow.ehreader.provider.SearchSuggestionProvider"/>

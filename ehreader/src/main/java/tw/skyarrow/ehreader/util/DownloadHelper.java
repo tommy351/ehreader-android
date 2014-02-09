@@ -1,6 +1,5 @@
 package tw.skyarrow.ehreader.util;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;

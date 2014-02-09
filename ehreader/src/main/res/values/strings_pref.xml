@@ -69,11 +69,17 @@
     // About
     <string name="pref_about" translatable="false">about</string>
     <string name="pref_about_title">About</string>
-    <string name="pref_about_ver">Version %s</string>
-    <string name="pref_about_summary" translatable="false">SkyArrow &lt;tommy351@gmail.com&gt;</string>
 
-    <string name="pref_open_source_license" translatable="false">open_source_license</string>
-    <string name="pref_open_source_license_title">Open source license</string>
+    <string name="pref_version" translatable="false">version</string>
+    <string name="pref_version_title">Version</string>
+
+    <string name="pref_author" translatable="false">author</string>
+    <string name="pref_author_title">Author</string>
+    <string name="pref_author_summary" translatable="false">SkyArrow (@tommy351)</string>
+
+    <string name="pref_source_code" translatable="false">source_code</string>
+    <string name="pref_source_code_title">Source code</string>
+    <string name="pref_source_code_summary" translatable="false">GitHub</string>
 
     // Dialog: Log in
     <string name="login_title">Log in</string>

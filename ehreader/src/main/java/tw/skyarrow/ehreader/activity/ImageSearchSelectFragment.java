@@ -17,7 +17,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.apache.http.Header;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -39,7 +38,6 @@ import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.util.DownloadHelper;
-import tw.skyarrow.ehreader.util.L;
 import tw.skyarrow.ehreader.util.NetworkHelper;
 import tw.skyarrow.ehreader.util.ObservableHttpEntity;
 

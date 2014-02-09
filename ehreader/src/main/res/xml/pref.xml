@@ -58,11 +58,15 @@
     <PreferenceCategory
         android:title="@string/pref_about_title">
         <PreferenceScreen
-            android:key="@string/pref_about"
-            android:title="@string/pref_about_title"
-            android:summary="@string/pref_about_summary"/>
+            android:key="@string/pref_version"
+            android:title="@string/pref_version_title"/>
         <PreferenceScreen
-            android:key="@string/pref_open_source_license"
-            android:title="@string/pref_open_source_license_title"/>
+            android:key="@string/pref_author"
+            android:title="@string/pref_author_title"
+            android:summary="@string/pref_author_summary"/>
+        <PreferenceScreen
+            android:key="@string/pref_source_code"
+            android:title="@string/pref_source_code_title"
+            android:summary="@string/pref_source_code_summary"/>
     </PreferenceCategory>
 </PreferenceScreen>
