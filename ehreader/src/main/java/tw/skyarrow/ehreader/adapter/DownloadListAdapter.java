@@ -1,13 +1,12 @@
 package tw.skyarrow.ehreader.adapter;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -28,33 +27,12 @@ import tw.skyarrow.ehreader.db.Gallery;
 /**
  * Created by SkyArrow on 2014/1/31.
  */
-public class DownloadListAdapter extends BaseAdapter {
+public class DownloadListAdapter extends BaseListAdapter<Download> {
     private static final boolean MEM_CACHE = true;
     private static final boolean FILE_CACHE = true;
 
-    private FragmentActivity activity;
-    private LayoutInflater inflater;
-    private List<Download> list;
-
-    public DownloadListAdapter(FragmentActivity activity, List<Download> list) {
-        this.activity = activity;
-        this.inflater = LayoutInflater.from(activity);
-        this.list = list;
-    }
-
-    @Override
-    public int getCount() {
-        return list.size();
-    }
-
-    @Override
-    public Download getItem(int i) {
-        return list.get(i);
-    }
-
-    @Override
-    public long getItemId(int i) {
-        return i;
+    public DownloadListAdapter(Context context, List<Download> list) {
+        super(context, list);
     }
 
     @Override
@@ -64,7 +42,7 @@ public class DownloadListAdapter extends BaseAdapter {
         Gallery gallery = download.getGallery();
 
         if (view == null) {
-            view = inflater.inflate(R.layout.download_list_item, null);
+            view = getInflater().inflate(R.layout.download_list_item, null);
             holder = new ViewHolder(view);
             view.setTag(holder);
             view.setClickable(true);
@@ -79,10 +57,11 @@ public class DownloadListAdapter extends BaseAdapter {
         view.setOnClickListener(new OnClickListener(download));
         view.setOnLongClickListener(new OnLongClickListener(download));
         holder.title.setText(gallery.getTitle());
-        aq.id(holder.cover).image(gallery.getThumbnail(), MEM_CACHE, FILE_CACHE);
         holder.progressBar.setMax(total);
         holder.progressBar.setProgress(progress);
         holder.featureBtn.setOnClickListener(new OnFeatureClickListener(download));
+
+        if (!isScrolling()) aq.id(holder.cover).image(gallery.getThumbnail(), MEM_CACHE, FILE_CACHE);
 
         switch (download.getStatus()) {
             case Download.STATUS_DOWNLOADING:
@@ -139,12 +118,12 @@ public class DownloadListAdapter extends BaseAdapter {
 
         @Override
         public void onClick(View view) {
-            Intent intent = new Intent(activity, GalleryActivity.class);
+            Intent intent = new Intent(getContext(), GalleryActivity.class);
             Bundle args = new Bundle();
 
             args.putLong("id", download.getId());
             intent.putExtras(args);
-            activity.startActivity(intent);
+            getContext().startActivity(intent);
         }
     }
 
@@ -183,6 +162,6 @@ public class DownloadListAdapter extends BaseAdapter {
         args.putString("title", download.getGallery().getTitle());
 
         dialog.setArguments(args);
-        dialog.show(activity.getSupportFragmentManager(), DownloadContextMenu.TAG);
+        dialog.show(((FragmentActivity) getContext()).getSupportFragmentManager(), DownloadContextMenu.TAG);
     }
 }

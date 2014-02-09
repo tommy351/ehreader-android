@@ -27,64 +27,35 @@ import tw.skyarrow.ehreader.db.GalleryDao;
  * Created by SkyArrow on 2014/1/26.
  */
 public class MainFragmentStar extends MainFragmentBase {
-    @InjectView(R.id.list)
-    ListView listView;
-
     @InjectView(R.id.error)
     TextView errorView;
-
-    @InjectView(R.id.loading)
-    ProgressBar loadingView;
 
     public static final String TAG = "MainFragmentStar";
 
     private SQLiteDatabase db;
-    private DaoMaster daoMaster;
-    private DaoSession daoSession;
-    private GalleryDao galleryDao;
-
-    private List<Gallery> galleryList;
-    private GalleryListAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_main, container, false);
+        View view = super.onCreateView(inflater, container, savedInstanceState);
         ButterKnife.inject(this, view);
 
-        Context context = getActivity();
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, Constant.DB_NAME, null);
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
         db = helper.getWritableDatabase();
-        daoMaster = new DaoMaster(db);
-        daoSession = daoMaster.newSession();
-        galleryDao = daoSession.getGalleryDao();
+        DaoMaster daoMaster = new DaoMaster(db);
+        DaoSession daoSession = daoMaster.newSession();
+        GalleryDao galleryDao = daoSession.getGalleryDao();
 
         QueryBuilder qb = galleryDao.queryBuilder();
         qb.where(GalleryDao.Properties.Starred.eq(true));
         qb.orderDesc(GalleryDao.Properties.Lastread);
+        getList().addAll(qb.list());
+        notifyDataSetChanged();
 
-        galleryList = qb.list();
-        adapter = new GalleryListAdapter(context, galleryList);
-
-        loadingView.setVisibility(View.GONE);
-        listView.setAdapter(adapter);
-        listView.setOnItemClickListener(this);
-
-        if (galleryList.size() == 0) {
+        if (getCount() == 0) {
             errorView.setText(R.string.error_no_starred);
         }
 
-        if (savedInstanceState != null) {
-            listView.setSelection(savedInstanceState.getInt("position"));
-        }
-
         return view;
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putInt("position", listView.getSelectedItemPosition());
     }
 
     @Override

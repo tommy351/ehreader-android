@@ -1,14 +1,17 @@
 package tw.skyarrow.ehreader.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -32,7 +35,9 @@ import tw.skyarrow.ehreader.util.NetworkHelper;
 /**
  * Created by SkyArrow on 2014/1/26.
  */
-public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollListener.OnScrollToEndListener {
+public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.OnScrollToEndListener,
+        InfiniteScrollListener.OnScrollStateChangedListener, AdapterView.OnItemClickListener {
+
     @InjectView(R.id.list)
     ListView listView;
 
@@ -78,6 +83,7 @@ public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollL
 
         scrollListener = new InfiniteScrollListener();
         scrollListener.setOnScrollToEndListener(this);
+        scrollListener.setOnScrollStateChangedListener(this);
         scrollListener.setLoading(true);
 
         galleryIndex = new ArrayList<Long>();
@@ -154,6 +160,20 @@ public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollL
             scrollListener.setLoading(true);
             showError(R.string.error_no_network, true);
         }
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        Gallery gallery = (Gallery) adapterView.getAdapter().getItem(i);
+
+        if (gallery == null) return;
+
+        Intent intent = new Intent(getActivity(), GalleryActivity.class);
+        Bundle args = new Bundle();
+
+        args.putLong("id", gallery.getId());
+        intent.putExtras(args);
+        startActivity(intent);
     }
 
     private class GalleryListTask extends AsyncTask<Integer, Integer, List<Gallery>> {
@@ -242,6 +262,16 @@ public class MainFragmentWeb extends MainFragmentBase implements InfiniteScrollL
     @Override
     public void onScrollToEnd(int page) {
         getGalleryList(page);
+    }
+
+    @Override
+    public void onScrollStateChanged(int state) {
+        if (state == InfiniteScrollListener.SCROLL_STATE_IDLE) {
+            adapter.setScrolling(false);
+            adapter.notifyDataSetChanged();
+        } else {
+            adapter.setScrolling(true);
+        }
     }
 
     private void refresh() {

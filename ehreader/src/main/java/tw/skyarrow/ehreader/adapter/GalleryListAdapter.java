@@ -1,10 +1,8 @@
 package tw.skyarrow.ehreader.adapter;
 
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -21,33 +19,12 @@ import tw.skyarrow.ehreader.db.Gallery;
 /**
  * Created by SkyArrow on 2014/1/26.
  */
-public class GalleryListAdapter extends BaseAdapter {
+public class GalleryListAdapter extends BaseListAdapter<Gallery> {
     private static final boolean MEM_CACHE = true;
     private static final boolean FILE_CACHE = true;
 
-    private Context context;
-    private LayoutInflater inflater;
-    private List<Gallery> list;
-
     public GalleryListAdapter(Context context, List<Gallery> list) {
-        this.context = context;
-        this.inflater = LayoutInflater.from(context);
-        this.list = list;
-    }
-
-    @Override
-    public int getCount() {
-        return list.size();
-    }
-
-    @Override
-    public Gallery getItem(int i) {
-        return list.get(i);
-    }
-
-    @Override
-    public long getItemId(int i) {
-        return i;
+        super(context, list);
     }
 
     @Override
@@ -56,7 +33,7 @@ public class GalleryListAdapter extends BaseAdapter {
         Gallery gallery = getItem(i);
 
         if (view == null) {
-            view = inflater.inflate(R.layout.gallery_list_item, null);
+            view = getInflater().inflate(R.layout.gallery_list_item, null);
             holder = new ViewHolder(view);
             view.setTag(holder);
         } else {
@@ -65,12 +42,17 @@ public class GalleryListAdapter extends BaseAdapter {
 
         AQuery aq = new AQuery(view);
         int categoryRes = gallery.getCategoryResource();
-        String meta = context.getString(categoryRes) + " / " + gallery.getCount() + "P";
+        String meta = getContext().getString(categoryRes) + " / " + gallery.getCount() + "P";
 
         holder.title.setText(gallery.getTitle());
         holder.meta.setText(meta);
         holder.rating.setRating(gallery.getRating());
-        aq.id(holder.cover).image(gallery.getThumbnail(), MEM_CACHE, FILE_CACHE);
+
+        if (isScrolling()) {
+            holder.cover.setImageBitmap(null);
+        } else {
+            aq.id(holder.cover).image(gallery.getThumbnail(), MEM_CACHE, FILE_CACHE);
+        }
 
         return view;
     }

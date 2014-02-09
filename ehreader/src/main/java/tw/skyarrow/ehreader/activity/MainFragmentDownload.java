@@ -9,6 +9,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -30,11 +31,12 @@ import tw.skyarrow.ehreader.event.GalleryDeleteEvent;
 import tw.skyarrow.ehreader.event.GalleryDownloadEvent;
 import tw.skyarrow.ehreader.service.GalleryDownloadService;
 import tw.skyarrow.ehreader.util.DownloadHelper;
+import tw.skyarrow.ehreader.util.InfiniteScrollListener;
 
 /**
  * Created by SkyArrow on 2014/1/26.
  */
-public class MainFragmentDownload extends Fragment {
+public class MainFragmentDownload extends Fragment implements AbsListView.OnScrollListener {
     @InjectView(R.id.list)
     ListView listView;
 
@@ -78,6 +80,7 @@ public class MainFragmentDownload extends Fragment {
         adapter = new DownloadListAdapter(getActivity(), downloadList);
 
         listView.setAdapter(adapter);
+        listView.setOnScrollListener(this);
         loadingView.setVisibility(View.GONE);
         downloadHelper.checkServiceStatus();
 
@@ -201,5 +204,20 @@ public class MainFragmentDownload extends Fragment {
 
     private void pauseAll() {
         downloadHelper.pauseAllDownload();
+    }
+
+    @Override
+    public void onScrollStateChanged(AbsListView absListView, int state) {
+        if (state == InfiniteScrollListener.SCROLL_STATE_IDLE) {
+            adapter.setScrolling(false);
+            adapter.notifyDataSetChanged();
+        } else {
+            adapter.setScrolling(true);
+        }
+    }
+
+    @Override
+    public void onScroll(AbsListView absListView, int i, int i2, int i3) {
+
     }
 }

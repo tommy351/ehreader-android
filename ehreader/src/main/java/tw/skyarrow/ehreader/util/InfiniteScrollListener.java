@@ -11,9 +11,18 @@ public class InfiniteScrollListener implements AbsListView.OnScrollListener {
     private boolean isEnd = false;
     private boolean isLoading = false;
     private OnScrollToEndListener onScrollToEndListener;
+    private OnScrollStateChangedListener onScrollStateChangedListener;
+
+    public static final int SCROLL_STATE_FLING = AbsListView.OnScrollListener.SCROLL_STATE_FLING;
+    public static final int SCROLL_STATE_IDLE = AbsListView.OnScrollListener.SCROLL_STATE_IDLE;
+    public static final int SCROLL_STATE_TOUCH_SCROLL = AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL;
 
     public interface OnScrollToEndListener {
         void onScrollToEnd(int page);
+    }
+
+    public interface OnScrollStateChangedListener {
+        void onScrollStateChanged(int state);
     }
 
     public int getThreshold() {
@@ -36,6 +45,10 @@ public class InfiniteScrollListener implements AbsListView.OnScrollListener {
         this.onScrollToEndListener = onScrollToEndListener;
     }
 
+    public void setOnScrollStateChangedListener(OnScrollStateChangedListener onScrollStateChangedListener) {
+        this.onScrollStateChangedListener = onScrollStateChangedListener;
+    }
+
     public boolean isEnd() {
         return isEnd;
     }
@@ -53,8 +66,10 @@ public class InfiniteScrollListener implements AbsListView.OnScrollListener {
     }
 
     @Override
-    public void onScrollStateChanged(AbsListView absListView, int i) {
-
+    public void onScrollStateChanged(AbsListView absListView, int state) {
+        if (onScrollStateChangedListener != null) {
+            onScrollStateChangedListener.onScrollStateChanged(state);
+        }
     }
 
     @Override
