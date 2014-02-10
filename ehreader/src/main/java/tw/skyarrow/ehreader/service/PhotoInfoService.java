@@ -4,10 +4,6 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 
-import org.json.JSONException;
-
-import java.io.IOException;
-
 import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.db.DaoMaster;
@@ -79,11 +75,11 @@ public class PhotoInfoService extends IntentService {
         try {
             Photo photo = infoHelper.getPhotoInfo(gallery, page);
 
-            bus.post(new PhotoInfoEvent(photo));
-        } catch (IOException e) {
+            bus.post(new PhotoInfoEvent(galleryId, page, photo));
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
+
+            bus.post(new PhotoInfoEvent(galleryId, page, null));
         }
     }
 }

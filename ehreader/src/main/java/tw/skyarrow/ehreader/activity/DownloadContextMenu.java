@@ -8,6 +8,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
+
+import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.db.DaoMaster;
@@ -32,7 +36,7 @@ public class DownloadContextMenu extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
         Bundle args = getArguments();
         galleryId = args.getLong("id");
 
@@ -66,15 +70,20 @@ public class DownloadContextMenu extends DialogFragment {
                 break;
         }
 
-        builder.setTitle(args.getString("title"))
+        dialog.setTitle(args.getString("title"))
                 .setItems(menu, onItemClick);
 
-        return builder.create();
+        MapBuilder builder = MapBuilder.createAppView();
+        builder.set(Fields.SCREEN_NAME, TAG);
+
+        BaseApplication.getTracker().send(builder.build());
+
+        return dialog.create();
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
         db.close();
     }
 

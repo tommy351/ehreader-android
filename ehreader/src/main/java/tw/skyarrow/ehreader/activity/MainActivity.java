@@ -71,16 +71,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-
-        MapBuilder builder = MapBuilder.createAppView();
-        builder.set(Fields.SCREEN_NAME, TAG);
-
-        BaseApplication.getTracker().send(builder.build());
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         ActionBarHelper.createSearchMenu(this, menu.findItem(R.id.menu_search));

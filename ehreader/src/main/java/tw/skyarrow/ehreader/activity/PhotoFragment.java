@@ -22,16 +22,20 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.androidquery.AQuery;
-import com.androidquery.callback.AjaxStatus;
-import com.androidquery.callback.BitmapAjaxCallback;
 import com.google.analytics.tracking.android.MapBuilder;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.assist.ImageLoadingProgressListener;
+import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 
 import java.io.File;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import de.greenrobot.dao.query.QueryBuilder;
 import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
@@ -61,28 +65,26 @@ public class PhotoFragment extends Fragment {
     @InjectView(R.id.retry)
     Button retryBtn;
 
+    private SQLiteDatabase db;
+    private PhotoDao photoDao;
+
+    private ImageLoader imageLoader;
+    private DisplayImageOptions displayOptions;
+
     private long galleryId;
     private int page;
-
-    private AQuery aq;
-
-    private SQLiteDatabase db;
-    private DaoMaster daoMaster;
-    private DaoSession daoSession;
-    private PhotoDao photoDao;
-    private EventBus bus;
-
-    private Photo photo;
-    private boolean isLoaded = false;
-    private File photoFile = null;
     private String galleryTitle;
-    private Bitmap bitmap;
+    private Photo photo;
+
+    private boolean isLoaded = false;
+    private boolean isServiceCalled = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_photo, container, false);
         ButterKnife.inject(this, view);
         setHasOptionsMenu(true);
+        EventBus.getDefault().register(this);
 
         view.setClickable(true);
         view.setOnTouchListener(new View.OnTouchListener() {
@@ -94,18 +96,22 @@ public class PhotoFragment extends Fragment {
 
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
         db = helper.getWritableDatabase();
-        daoMaster = new DaoMaster(db);
-        daoSession = daoMaster.newSession();
+        DaoMaster daoMaster = new DaoMaster(db);
+        DaoSession daoSession = daoMaster.newSession();
         photoDao = daoSession.getPhotoDao();
+
+        imageLoader = ImageLoader.getInstance();
+        displayOptions = new DisplayImageOptions.Builder()
+                .cacheOnDisc(true)
+                .build();
 
         Bundle args = getArguments();
         galleryId = args.getLong("id");
         page = args.getInt("page");
         galleryTitle = args.getString("title");
-        aq = new AQuery(view);
 
         pageText.setText(Integer.toString(page));
-        requestPhotoInfo();
+        displayPhoto();
 
         return view;
     }
@@ -120,36 +126,29 @@ public class PhotoFragment extends Fragment {
             });
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        bus = EventBus.getDefault();
-        bus.register(this);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        bus.unregister(this);
+    public void onDestroyView() {
+        super.onDestroyView();
+        imageLoader.cancelDisplayTask(imageView);
+        EventBus.getDefault().unregister(this);
         db.close();
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (isLoaded) {
-            inflater.inflate(R.menu.photo_fragment, menu);
+        if (!isLoaded) return;
 
-            MenuItem shareItem = menu.findItem(R.id.menu_share);
-            ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
-            shareActionProvider.setShareIntent(getShareIntent());
+        inflater.inflate(R.menu.photo_fragment, menu);
 
-            if (photo.getBookmarked()) {
-                menu.findItem(R.id.menu_add_bookmark).setVisible(false);
-                menu.findItem(R.id.menu_remove_bookmark).setVisible(true);
-            } else {
-                menu.findItem(R.id.menu_add_bookmark).setVisible(true);
-                menu.findItem(R.id.menu_remove_bookmark).setVisible(false);
-            }
+        MenuItem shareItem = menu.findItem(R.id.menu_share);
+        ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
+        shareActionProvider.setShareIntent(getShareIntent());
+
+        if (photo.getBookmarked()) {
+            menu.findItem(R.id.menu_add_bookmark).setVisible(false);
+            menu.findItem(R.id.menu_remove_bookmark).setVisible(true);
+        } else {
+            menu.findItem(R.id.menu_add_bookmark).setVisible(true);
+            menu.findItem(R.id.menu_remove_bookmark).setVisible(false);
         }
 
         super.onCreateOptionsMenu(menu, inflater);
@@ -159,15 +158,15 @@ public class PhotoFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_add_bookmark:
-                bookmarkPhoto(true);
+                setBookmark(true);
                 return true;
 
             case R.id.menu_remove_bookmark:
-                bookmarkPhoto(false);
+                setBookmark(false);
                 return true;
 
             case R.id.menu_set_as_wallpaper:
-                setWallpaper();
+                setAsWallpaper();
                 return true;
 
             case R.id.menu_find_similar:
@@ -182,52 +181,58 @@ public class PhotoFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    public void onEventMainThread(PhotoInfoEvent event) {
+        if (event.getGalleryId() != galleryId || event.getPage() != page) return;
+
+        Photo photo = event.getPhoto();
+
+        if (photo == null) {
+            showRetryBtn();
+            return;
+        }
+
+        this.photo = photo;
+        getActivity().supportInvalidateOptionsMenu();
+        loadImage();
+    }
+
     private Intent getShareIntent() {
         Intent intent = new Intent(Intent.ACTION_SEND);
         String filename = photo.getFilename();
 
-        if (photoFile == null) {
-            photoFile = aq.makeSharedFile(photo.getSrc(), filename);
-        }
-
         intent.setType(FileInfoHelper.getMimeType(filename));
         intent.putExtra(Intent.EXTRA_TEXT, galleryTitle + " " + photo.getUrl());
-        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(photoFile));
+        intent.putExtra(Intent.EXTRA_STREAM, imageLoader.getLoadingUriForView(imageView));
 
         return intent;
     }
 
-    public void onEventMainThread(PhotoInfoEvent event) {
-        Photo photo = event.getPhoto();
+    private void displayPhoto() {
+        QueryBuilder qb = photoDao.queryBuilder();
+        qb.where(qb.and(
+                PhotoDao.Properties.GalleryId.eq(galleryId),
+                PhotoDao.Properties.Page.eq(page)
+        ));
+        List<Photo> photoList = qb.list();
 
-        if (photo == null) return;
+        if (photoList.size() > 0) {
+            photo = photoList.get(0);
+            String src = photo.getSrc();
 
-        if (photo.getGalleryId() == galleryId && photo.getPage() == page) {
-            this.photo = photo;
-            getActivity().supportInvalidateOptionsMenu();
-            loadImage();
-        }
-    }
-
-    private void bookmarkPhoto(boolean isBookmarked) {
-        photo.setBookmarked(isBookmarked);
-        photoDao.update(photo);
-
-        if (isBookmarked) {
-            Toast.makeText(getActivity(), R.string.notification_bookmark_added, Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(getActivity(), R.string.notification_bookmark_removed, Toast.LENGTH_SHORT).show();
+            if (src != null && !src.isEmpty() && !photo.getInvalid()) {
+                loadImage();
+                return;
+            } else {
+                photo = null;
+            }
         }
 
-        getActivity().supportInvalidateOptionsMenu();
-
-        BaseApplication.getTracker().send(MapBuilder.createEvent(
-                "ui_action", "button_press", "bookmark_button", null
-        ).build());
+        callService();
     }
 
-    private void requestPhotoInfo() {
+    private void callService() {
         Intent intent = new Intent(getActivity(), PhotoInfoService.class);
+        isServiceCalled = true;
 
         intent.putExtra(PhotoInfoService.GALLERY_ID, galleryId);
         intent.putExtra(PhotoInfoService.PHOTO_PAGE, page);
@@ -235,51 +240,69 @@ public class PhotoFragment extends Fragment {
         getActivity().startService(intent);
     }
 
-    @OnClick(R.id.retry)
-    void onRetryClick() {
-        retryBtn.setVisibility(View.GONE);
-
-        requestPhotoInfo();
-    }
-
     private void loadImage() {
         if (photo.getDownloaded()) {
-            photoFile = photo.getFile();
-            if (!photoFile.exists()) photoFile = null;
+            File photoFile = photo.getFile();
+
+            if (photoFile.exists()) {
+                imageLoader.displayImage("file://" + photoFile.getAbsolutePath(), imageView, displayOptions,
+                        imageLoadingListener, imageProgressListener);
+                return;
+            }
         }
 
-        if (photoFile == null) {
-            loadImageCallback.url(photo.getSrc());
-        } else {
-            loadImageCallback.file(photoFile);
-        }
-
-        progressBar.setIndeterminate(false);
-        loadImageCallback.progress(progressBar);
-        aq.id(R.id.image).image(loadImageCallback);
+        imageLoader.displayImage(photo.getSrc(), imageView, displayOptions, imageLoadingListener, imageProgressListener);
     }
 
-    private BitmapAjaxCallback loadImageCallback = new BitmapAjaxCallback() {
+    private void showRetryBtn() {
+        progressBar.setVisibility(View.GONE);
+        retryBtn.setVisibility(View.VISIBLE);
+    }
+
+    private SimpleImageLoadingListener imageLoadingListener = new SimpleImageLoadingListener() {
+        private long startLoadAt;
+
         @Override
-        protected void callback(String url, ImageView iv, Bitmap bm, AjaxStatus status) {
-            if (bm == null && status.getCode() != 200) {
+        public void onLoadingStarted(String imageUri, View view) {
+            startLoadAt = System.currentTimeMillis();
+
+            progressBar.setIndeterminate(false);
+            progressBar.setProgress(0);
+        }
+
+        @Override
+        public void onLoadingComplete(String imageUri, View view, Bitmap bitmap) {
+            pageText.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
+            imageView.setImageBitmap(bitmap);
+
+            PhotoViewAttacher attacher = new PhotoViewAttacher(imageView);
+            attacher.setOnViewTapListener(onPhotoTap);
+
+            isLoaded = true;
+            getActivity().supportInvalidateOptionsMenu();
+
+            BaseApplication.getTracker().send(MapBuilder.createTiming(
+                    "resources", System.currentTimeMillis() - startLoadAt, "load photo", null
+            ).build());
+        }
+
+        @Override
+        public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+            if (isServiceCalled) {
+                showRetryBtn();
+            } else {
                 photo.setInvalid(true);
                 photoDao.update(photo);
-                retryBtn.setVisibility(View.VISIBLE);
-                progressBar.setVisibility(View.GONE);
-            } else if (iv != null) {
-                bitmap = bm;
-
-                pageText.setVisibility(View.GONE);
-                progressBar.setVisibility(View.GONE);
-                iv.setImageBitmap(bm);
-                PhotoViewAttacher attacher = new PhotoViewAttacher(iv);
-
-                attacher.setOnViewTapListener(onPhotoTap);
-
-                isLoaded = true;
-                getActivity().supportInvalidateOptionsMenu();
+                callService();
             }
+        }
+    };
+
+    private ImageLoadingProgressListener imageProgressListener = new ImageLoadingProgressListener() {
+        @Override
+        public void onProgressUpdate(String s, View view, int current, int total) {
+            progressBar.setProgress((int) (current * 100f / total));
         }
     };
 
@@ -290,18 +313,49 @@ public class PhotoFragment extends Fragment {
         }
     };
 
-    private void setWallpaper() {
-        Intent intent = new Intent(getActivity(), CropActivity.class);
-        Uri uri = null;
+    @OnClick(R.id.retry)
+    void onRetryBtnClick() {
+        retryBtn.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
+        progressBar.setIndeterminate(true);
 
-        if (photoFile != null) {
-            uri = Uri.fromFile(photoFile);
+        photo.setInvalid(true);
+        photoDao.update(photo);
+        callService();
+
+        BaseApplication.getTracker().send(MapBuilder.createEvent(
+                "UI", "button", "retry loading photo", null
+        ).build());
+    }
+
+    private void setBookmark(boolean mark) {
+        photo.setBookmarked(mark);
+        photoDao.update(photo);
+
+        if (mark) {
+            showToast(R.string.notification_bookmark_added);
         } else {
-            File file = aq.getCachedFile(photo.getSrc());
-            if (file != null && file.exists()) uri = Uri.fromFile(file);
+            showToast(R.string.notification_bookmark_removed);
         }
 
-        if (uri == null) return;
+        getActivity().supportInvalidateOptionsMenu();
+
+        BaseApplication.getTracker().send(MapBuilder.createEvent(
+                "UI", "button", "bookmark", null
+        ).build());
+    }
+
+    private void showToast(int res) {
+        Toast.makeText(getActivity(), res, Toast.LENGTH_SHORT).show();
+    }
+
+    private void setAsWallpaper() {
+        Intent intent = new Intent(getActivity(), CropActivity.class);
+        Uri uri = Uri.parse(imageLoader.getLoadingUriForView(imageView));
+
+        BaseApplication.getTracker().send(MapBuilder.createEvent(
+                "UI", "button", "set as wallpaper", null
+        ).build());
 
         intent.setData(uri);
         startActivity(intent);
@@ -311,6 +365,10 @@ public class PhotoFragment extends Fragment {
         Intent intent = new Intent(getActivity(), ImageSearchActivity.class);
         Bundle args = new Bundle();
 
+        BaseApplication.getTracker().send(MapBuilder.createEvent(
+                "UI", "button", "find similar", null
+        ).build());
+
         args.putLong("photo", photo.getId());
         intent.putExtras(args);
         startActivity(intent);
@@ -318,6 +376,10 @@ public class PhotoFragment extends Fragment {
 
     private void openInBrowser() {
         Intent intent = new Intent(Intent.ACTION_VIEW);
+
+        BaseApplication.getTracker().send(MapBuilder.createEvent(
+                "UI", "button", "open in browser", null
+        ).build());
 
         intent.setData(photo.getUri());
         startActivity(intent);

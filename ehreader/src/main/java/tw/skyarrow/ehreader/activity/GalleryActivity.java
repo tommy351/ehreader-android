@@ -24,16 +24,18 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.androidquery.AQuery;
-import com.androidquery.callback.AjaxCallback;
-import com.androidquery.callback.AjaxStatus;
 import com.enrique.stackblur.StackBlurManager;
 import com.google.analytics.tracking.android.Fields;
 import com.google.analytics.tracking.android.MapBuilder;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,6 +56,7 @@ import tw.skyarrow.ehreader.db.DownloadDao;
 import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
 import tw.skyarrow.ehreader.util.ActionBarHelper;
+import tw.skyarrow.ehreader.util.L;
 
 /**
  * Created by SkyArrow on 2014/1/27.
@@ -92,6 +95,9 @@ public class GalleryActivity extends ActionBarActivity {
     @InjectView(R.id.read)
     Button readBtn;
 
+    @InjectView(R.id.cover_loading)
+    ProgressBar coverLoading;
+
     public static final String TAG = "GalleryActivity";
 
     private SQLiteDatabase db;
@@ -100,8 +106,9 @@ public class GalleryActivity extends ActionBarActivity {
     private GalleryDao galleryDao;
     private DownloadDao downloadDao;
 
-    private AQuery aq;
     private Gallery gallery;
+    private ImageLoader imageLoader;
+    private DisplayImageOptions displayOptions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,7 +123,11 @@ public class GalleryActivity extends ActionBarActivity {
         galleryDao = daoSession.getGalleryDao();
         downloadDao = daoSession.getDownloadDao();
 
-        aq = new AQuery(this);
+        imageLoader = ImageLoader.getInstance();
+        displayOptions = new DisplayImageOptions.Builder()
+                .cacheInMemory(true)
+                .cacheOnDisc(true)
+                .build();
 
         ActionBar actionBar = getSupportActionBar();
 
@@ -139,8 +150,6 @@ public class GalleryActivity extends ActionBarActivity {
 
         MapBuilder builder = MapBuilder.createAppView();
         builder.set(Fields.SCREEN_NAME, TAG);
-        builder.set(Fields.TITLE, gallery.getTitle());
-        builder.set(Fields.DESCRIPTION, gallery.getId() + "/" + gallery.getToken());
 
         BaseApplication.getTracker().send(builder.build());
     }
@@ -226,15 +235,34 @@ public class GalleryActivity extends ActionBarActivity {
     }
 
     private void displayCover(String url) {
-        aq.ajax(url, Bitmap.class, 1000 * 60 * 60 * 12, new AjaxCallback<Bitmap>() {
+        imageLoader.loadImage(url, displayOptions, new SimpleImageLoadingListener() {
             @Override
-            public void callback(String url, Bitmap bm, AjaxStatus status) {
+            public void onLoadingStarted(String imageUri, View view) {
+                coverLoading.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
                 // http://www.sherif.mobi/2013/01/how-to-get-widthheight-of-view.html
                 coverArea.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
                 int coverWidth = coverArea.getMeasuredWidth();
                 int coverHeight = coverArea.getMeasuredHeight();
 
-                new Thread(new BlurCoverRunnable(bm, coverWidth, coverHeight)).start();
+                new Thread(new BlurCoverRunnable(loadedImage, coverWidth, coverHeight)).start();
+            }
+
+            @Override
+            public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+                hideLoadingView();
+            }
+
+            @Override
+            public void onLoadingCancelled(String imageUri, View view) {
+                hideLoadingView();
+            }
+
+            private void hideLoadingView() {
+                coverLoading.setVisibility(View.GONE);
             }
         });
     }
@@ -254,38 +282,40 @@ public class GalleryActivity extends ActionBarActivity {
         public void run() {
             int bmWidth = bitmap.getWidth();
             int bmHeight= bitmap.getHeight();
-            float scale;
-
-            if (bmWidth * coverHeight > bmHeight * coverWidth) {
-                scale = (float) coverHeight / (float) bmHeight;
-            } else {
-                scale = (float) coverWidth / (float) bmWidth;
-            }
+            float scale = getScale(bmWidth, bmHeight, coverWidth, coverHeight);
 
             StackBlurManager blurManager = new StackBlurManager(bitmap);
             Bitmap bg = Bitmap.createScaledBitmap(blurManager.processNatively(10), (int) (bmWidth * scale), (int) (bmHeight * scale), true);
-            runOnUiThread(new UpdateCoverRunnable(bg, bitmap));
+            runOnUiThread(new UpdateCoverRunnable(bitmap, bg));
         }
     };
 
     private class UpdateCoverRunnable implements Runnable {
+        private Bitmap bitmap;
         private Bitmap background;
-        private Bitmap foreground;
 
-        public UpdateCoverRunnable(Bitmap background, Bitmap foreground) {
+        public UpdateCoverRunnable(Bitmap bitmap, Bitmap background) {
+            this.bitmap = bitmap;
             this.background = background;
-            this.foreground = foreground;
         }
 
         @Override
         public void run() {
             Animation fadeIn = AnimationUtils.loadAnimation(GalleryActivity.this, R.anim.cover_fade_in);
 
+            coverForeground.setImageBitmap(bitmap);
+            coverForeground.startAnimation(fadeIn);
+
             coverBackground.setImageBitmap(background);
             coverBackground.startAnimation(fadeIn);
+        }
+    }
 
-            coverForeground.setImageBitmap(foreground);
-            coverForeground.startAnimation(fadeIn);
+    private float getScale(int width, int height, int containerWidth, int containerHeight) {
+        if (width * containerHeight > height * containerWidth) {
+            return (float) height / containerHeight;
+        } else {
+            return (float) width / containerWidth;
         }
     }
 
@@ -394,7 +424,7 @@ public class GalleryActivity extends ActionBarActivity {
         supportInvalidateOptionsMenu();
 
         BaseApplication.getTracker().send(MapBuilder.createEvent(
-                "ui_action", "button_press", "star_button", null
+                "UI", "button", "star", null
         ).build());
     }
 
@@ -427,6 +457,10 @@ public class GalleryActivity extends ActionBarActivity {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         boolean isLoggedIn = BaseApplication.isLoggedIn();
 
+        BaseApplication.getTracker().send(MapBuilder.createEvent(
+                "UI", "button", "open in browser", null
+        ).build());
+
         intent.setData(gallery.getUri(isLoggedIn));
         startActivity(intent);
     }
@@ -437,6 +471,10 @@ public class GalleryActivity extends ActionBarActivity {
         Bundle args = new Bundle();
 
         args.putLong("id", gallery.getId());
+
+        BaseApplication.getTracker().send(MapBuilder.createEvent(
+                "UI", "button", "read", null
+        ).build());
 
         intent.putExtras(args);
         startActivity(intent);

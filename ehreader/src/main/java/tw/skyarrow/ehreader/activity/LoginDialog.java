@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 
+import com.google.analytics.tracking.android.MapBuilder;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.CookieStore;
@@ -64,6 +66,8 @@ public class LoginDialog extends DialogFragment {
     }
 
     private class LoginTask extends AsyncTask<String, Integer, Boolean> {
+        private long startLoadAt;
+
         @Override
         protected Boolean doInBackground(String... strings) {
             try {
@@ -124,6 +128,11 @@ public class LoginDialog extends DialogFragment {
         }
 
         @Override
+        protected void onPreExecute() {
+            startLoadAt = System.currentTimeMillis();
+        }
+
+        @Override
         protected void onPostExecute(Boolean isSuccess) {
             if (isSuccess) {
                 EventBus.getDefault().post(new LoginEvent(LoginEvent.LOGIN));
@@ -132,6 +141,10 @@ public class LoginDialog extends DialogFragment {
 
                 dialog.show(getActivity().getSupportFragmentManager(), LoginErrorDialog.TAG);
             }
+
+            BaseApplication.getTracker().send(MapBuilder.createTiming(
+                    "resources", System.currentTimeMillis() - startLoadAt, "login", null
+            ).build());
 
             BaseApplication.setLoggedIn(isSuccess);
             dismiss();

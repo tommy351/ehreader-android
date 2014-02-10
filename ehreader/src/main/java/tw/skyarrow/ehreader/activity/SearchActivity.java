@@ -64,7 +64,6 @@ public class SearchActivity extends ActionBarActivity {
 
         MapBuilder builder = MapBuilder.createAppView();
         builder.set(Fields.SCREEN_NAME, TAG);
-        builder.set(Fields.TITLE, query);
 
         BaseApplication.getTracker().send(builder.build());
     }

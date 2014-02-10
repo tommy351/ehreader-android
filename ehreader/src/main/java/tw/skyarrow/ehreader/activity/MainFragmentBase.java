@@ -8,16 +8,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.adapter.GalleryListAdapter;
 import tw.skyarrow.ehreader.db.Gallery;

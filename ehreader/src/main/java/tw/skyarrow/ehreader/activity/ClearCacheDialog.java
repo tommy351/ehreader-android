@@ -6,8 +6,11 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
-import com.androidquery.util.AQUtility;
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
+import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
 
 /**
@@ -18,20 +21,28 @@ public class ClearCacheDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
 
-        builder.setTitle(R.string.clear_cache_title)
+        dialog.setTitle(R.string.clear_cache_title)
                 .setMessage(R.string.clear_cache_msg)
                 .setPositiveButton(R.string.ok, onSubmitClick)
                 .setNegativeButton(R.string.cancel, null);
 
-        return builder.create();
+        MapBuilder builder = MapBuilder.createAppView();
+        builder.set(Fields.SCREEN_NAME, TAG);
+
+        BaseApplication.getTracker().send(builder.build());
+
+        return dialog.create();
     }
 
     private DialogInterface.OnClickListener onSubmitClick = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialogInterface, int i) {
-            AQUtility.cleanCacheAsync(getActivity());
+            ImageLoader imageLoader = ImageLoader.getInstance();
+
+            imageLoader.clearMemoryCache();
+            imageLoader.clearDiscCache();
         }
     };
 }

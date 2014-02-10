@@ -6,6 +6,10 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
+
+import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
 
 /**
@@ -16,14 +20,19 @@ public class LoginErrorDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
 
-        builder.setTitle(R.string.login_failed_title)
+        dialog.setTitle(R.string.login_failed_title)
                 .setMessage(R.string.login_failed_msg)
                 .setPositiveButton(R.string.retry, onSubmitClick)
                 .setNegativeButton(R.string.cancel, null);
 
-        return builder.create();
+        MapBuilder builder = MapBuilder.createAppView();
+        builder.set(Fields.SCREEN_NAME, TAG);
+
+        BaseApplication.getTracker().send(builder.build());
+
+        return dialog.create();
     }
 
     private DialogInterface.OnClickListener onSubmitClick = new DialogInterface.OnClickListener() {

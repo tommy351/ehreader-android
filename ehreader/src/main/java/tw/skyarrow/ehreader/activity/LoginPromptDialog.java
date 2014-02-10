@@ -8,8 +8,12 @@ import android.support.v4.app.DialogFragment;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
 
 /**
@@ -39,6 +43,11 @@ public class LoginPromptDialog extends DialogFragment {
 
         dialog.show();
         dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(onSubmitClick);
+
+        MapBuilder mapBuilder = MapBuilder.createAppView();
+        mapBuilder.set(Fields.SCREEN_NAME, TAG);
+
+        BaseApplication.getTracker().send(mapBuilder.build());
 
         return dialog;
     }

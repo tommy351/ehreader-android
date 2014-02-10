@@ -118,7 +118,6 @@ public class PrefFragment extends PreferenceFragment {
     private Preference.OnPreferenceClickListener onVersionClick = new Preference.OnPreferenceClickListener() {
         @Override
         public boolean onPreferenceClick(Preference preference) {
-            L.d("on version click: %d", clickCount);
             versionClickHandler.removeMessages(0);
 
             if (clickCount < CLICK_THRESHOLD) {
@@ -139,7 +138,6 @@ public class PrefFragment extends PreferenceFragment {
     private Handler versionClickHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            L.d("reset version count");
             versionClickHandler.removeMessages(0);
             clickCount = 0;
         }

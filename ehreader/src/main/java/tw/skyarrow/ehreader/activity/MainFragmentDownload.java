@@ -14,12 +14,16 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
+
 import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import de.greenrobot.dao.query.QueryBuilder;
 import de.greenrobot.event.EventBus;
+import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.adapter.DownloadListAdapter;
@@ -66,6 +70,9 @@ public class MainFragmentDownload extends Fragment implements AbsListView.OnScro
         ButterKnife.inject(this, view);
         setHasOptionsMenu(true);
 
+        bus = EventBus.getDefault();
+        bus.register(this);
+
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
         db = helper.getWritableDatabase();
         daoMaster = new DaoMaster(db);
@@ -96,6 +103,23 @@ public class MainFragmentDownload extends Fragment implements AbsListView.OnScro
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+
+        MapBuilder builder = MapBuilder.createAppView();
+        builder.set(Fields.SCREEN_NAME, TAG);
+
+        BaseApplication.getTracker().send(builder.build());
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        bus.unregister(this);
+        db.close();
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.download, menu);
 
@@ -123,21 +147,6 @@ public class MainFragmentDownload extends Fragment implements AbsListView.OnScro
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        bus = EventBus.getDefault();
-        bus.register(this);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        bus.unregister(this);
-        db.close();
     }
 
     @Override
@@ -199,11 +208,17 @@ public class MainFragmentDownload extends Fragment implements AbsListView.OnScro
     }
 
     private void startAll() {
+        isDownloading = true;
+
         downloadHelper.startAllDownload();
+        getActivity().supportInvalidateOptionsMenu();
     }
 
     private void pauseAll() {
+        isDownloading = false;
+
         downloadHelper.pauseAllDownload();
+        getActivity().supportInvalidateOptionsMenu();
     }
 
     @Override

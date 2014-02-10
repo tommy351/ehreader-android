@@ -9,7 +9,8 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
-import com.androidquery.AQuery;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.DiscCacheUtil;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -79,7 +80,7 @@ public class GalleryDownloadService extends IntentService {
     private EventBus bus;
 
     private DownloadHelper downloadHelper;
-    private AQuery aq;
+    private ImageLoader imageLoader;
     private NotificationManager nm;
     private Map<Long, Download> map;
     private GalleryDownloadRunnable runnable;
@@ -102,7 +103,7 @@ public class GalleryDownloadService extends IntentService {
         downloadDao = daoSession.getDownloadDao();
 
         downloadHelper = new DownloadHelper(this);
-        aq = new AQuery(this);
+        imageLoader = ImageLoader.getInstance();
         nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         map = new HashMap<Long, Download>();
 
@@ -334,7 +335,7 @@ public class GalleryDownloadService extends IntentService {
 
                     String src = photo.getSrc();
                     File dest = photo.getFile();
-                    File cache = aq.getCachedFile(src);
+                    File cache = DiscCacheUtil.findInCache(src, imageLoader.getDiscCache());
 
                     if (cache == null) {
                         HttpClient httpClient = new DefaultHttpClient();

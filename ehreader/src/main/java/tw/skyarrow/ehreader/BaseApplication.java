@@ -4,10 +4,11 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.androidquery.callback.BitmapAjaxCallback;
 import com.google.analytics.tracking.android.GoogleAnalytics;
 import com.google.analytics.tracking.android.Logger;
 import com.google.analytics.tracking.android.Tracker;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 /**
  * Created by SkyArrow on 2014/1/25.
@@ -23,11 +24,12 @@ public class BaseApplication extends Application {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         loggedIn = preferences.getBoolean(getString(R.string.pref_logged_in), false);
         initTracker();
+        initImageLoader();
     }
 
     @Override
     public void onLowMemory() {
-        BitmapAjaxCallback.clearCache();
+        ImageLoader.getInstance().clearMemoryCache();
     }
 
     public static boolean isLoggedIn() {
@@ -51,5 +53,12 @@ public class BaseApplication extends Application {
 
     public static Tracker getTracker() {
         return tracker;
+    }
+
+    private void initImageLoader() {
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
+                .build();
+
+        ImageLoader.getInstance().init(config);
     }
 }

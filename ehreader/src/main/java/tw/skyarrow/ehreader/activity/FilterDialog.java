@@ -7,6 +7,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
+
+import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
 
 /**
@@ -19,7 +23,7 @@ public class FilterDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
 
         int[] categories = {
                 R.string.category_doujinshi,
@@ -40,11 +44,16 @@ public class FilterDialog extends DialogFragment {
             filter[i] = false;
         }
 
-        builder.setMultiChoiceItems(buildResourceArray(categories), null, onChoose)
+        dialog.setMultiChoiceItems(buildResourceArray(categories), null, onChoose)
                 .setPositiveButton(R.string.ok, onSubmitClick)
                 .setNegativeButton(R.string.cancel, null);
 
-        return builder.create();
+        MapBuilder builder = MapBuilder.createAppView();
+        builder.set(Fields.SCREEN_NAME, TAG);
+
+        BaseApplication.getTracker().send(builder.build());
+
+        return dialog.create();
     }
 
     private String[] buildResourceArray(int[] arr) {

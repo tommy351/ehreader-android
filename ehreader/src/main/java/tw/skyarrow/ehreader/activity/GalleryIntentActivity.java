@@ -12,6 +12,8 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.analytics.tracking.android.MapBuilder;
+
 import org.json.JSONException;
 
 import java.io.IOException;
@@ -21,6 +23,7 @@ import java.util.regex.Pattern;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.db.DaoMaster;
@@ -136,6 +139,7 @@ public class GalleryIntentActivity extends ActionBarActivity {
     private class GalleryInfoTask extends AsyncTask<Integer, String, Gallery> {
         private long id;
         private String token;
+        private long startLoadAt;
 
         public GalleryInfoTask(long id, String token) {
             this.id = id;
@@ -158,6 +162,11 @@ public class GalleryIntentActivity extends ActionBarActivity {
         }
 
         @Override
+        protected void onPreExecute() {
+            startLoadAt = System.currentTimeMillis();
+        }
+
+        @Override
         protected void onPostExecute(Gallery gallery) {
             if (gallery == null) {
                 loadingView.setVisibility(View.GONE);
@@ -165,6 +174,10 @@ public class GalleryIntentActivity extends ActionBarActivity {
                 retryBtn.setVisibility(View.VISIBLE);
             } else {
                 showGallery(gallery);
+
+                BaseApplication.getTracker().send(MapBuilder.createTiming(
+                        "resources", System.currentTimeMillis() - startLoadAt, "load gallery info", null
+                ).build());
             }
         }
     }
@@ -181,5 +194,9 @@ public class GalleryIntentActivity extends ActionBarActivity {
     @OnClick(R.id.retry)
     void onRetryBtnClick() {
         getGalleryInfo();
+
+        BaseApplication.getTracker().send(MapBuilder.createEvent(
+                "UI", "button", "retry loading gallery info", null
+        ).build());
     }
 }

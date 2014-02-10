@@ -131,8 +131,10 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
         seekBar.setOnSeekBarChangeListener(onSeekBarChangeListener);
         if (isKitkat) headerView.setVisibility(View.VISIBLE);
 
-        boolean keepScreenOn = preferences.getBoolean(getString(R.string.pref_keep_screen_on), true);
-        isVolumeNavEnabled = preferences.getBoolean(getString(R.string.pref_volume_key_navigation), false);
+        boolean keepScreenOn = preferences.getBoolean(getString(R.string.pref_keep_screen_on),
+                getBoolean(R.bool.pref_keep_screen_on_default));
+        isVolumeNavEnabled = preferences.getBoolean(getString(R.string.pref_volume_key_navigation),
+                getBoolean(R.bool.pref_volume_key_navigation_default));
         pager.setKeepScreenOn(keepScreenOn);
 
         pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -147,7 +149,7 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
                 actionBar.setTitle(String.format("%s / %s", i + 1, total));
 
                 BaseApplication.getTracker().send(MapBuilder.createEvent(
-                        "ui_action", "transition", "view_pager", (long) i
+                        "UI", "transition", "view pager", (long) i
                 ).build());
             }
 
@@ -164,8 +166,6 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
 
         MapBuilder builder = MapBuilder.createAppView();
         builder.set(Fields.SCREEN_NAME, TAG);
-        builder.set(Fields.TITLE, gallery.getTitle());
-        builder.set(Fields.DESCRIPTION, gallery.getId() + "/" + gallery.getToken());
 
         BaseApplication.getTracker().send(builder.build());
     }
@@ -271,6 +271,10 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
         }
 
         return super.onKeyUp(keyCode, event);
+    }
+
+    private boolean getBoolean(int res) {
+        return getResources().getBoolean(res);
     }
 
     private void onBackClick() {

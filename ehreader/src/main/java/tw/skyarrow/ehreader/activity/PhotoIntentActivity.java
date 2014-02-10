@@ -12,6 +12,8 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.analytics.tracking.android.MapBuilder;
+
 import org.json.JSONException;
 
 import java.io.IOException;
@@ -21,6 +23,7 @@ import java.util.regex.Pattern;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.db.DaoMaster;
@@ -136,6 +139,7 @@ public class PhotoIntentActivity extends ActionBarActivity {
         private long id;
         private String token;
         private int page;
+        private long startLoadAt;
 
         public GalleryInfoTask(long id, String token, int page) {
             this.id = id;
@@ -159,6 +163,11 @@ public class PhotoIntentActivity extends ActionBarActivity {
         }
 
         @Override
+        protected void onPreExecute() {
+            startLoadAt = System.currentTimeMillis();
+        }
+
+        @Override
         protected void onPostExecute(Gallery gallery) {
             if (gallery == null) {
                 loadingView.setVisibility(View.GONE);
@@ -166,6 +175,10 @@ public class PhotoIntentActivity extends ActionBarActivity {
                 retryBtn.setVisibility(View.VISIBLE);
             } else {
                 showPhoto();
+
+                BaseApplication.getTracker().send(MapBuilder.createTiming(
+                        "resources", System.currentTimeMillis() - startLoadAt, "load gallery info", null
+                ).build());
             }
         }
     }
@@ -183,5 +196,9 @@ public class PhotoIntentActivity extends ActionBarActivity {
     @OnClick(R.id.retry)
     void onRetryBtnClick() {
         getGalleryInfo();
+
+        BaseApplication.getTracker().send(MapBuilder.createEvent(
+                "UI", "button", "retry loading gallery info", null
+        ).build());
     }
 }

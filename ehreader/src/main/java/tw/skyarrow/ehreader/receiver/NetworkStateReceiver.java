@@ -19,8 +19,10 @@ public class NetworkStateReceiver extends BroadcastReceiver {
         NetworkHelper network = new NetworkHelper(context);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         DownloadHelper downloadHelper = new DownloadHelper(context);
-        boolean autoDownload = preferences.getBoolean(context.getString(R.string.pref_auto_download), true);
-        boolean downloadOverWifi = preferences.getBoolean(context.getString(R.string.pref_download_over_wifi), true);
+        boolean autoDownload = preferences.getBoolean(context.getString(R.string.pref_auto_download),
+                context.getResources().getBoolean(R.bool.pref_auto_download_default));
+        boolean downloadOverWifi = preferences.getBoolean(context.getString(R.string.pref_download_over_wifi),
+                context.getResources().getBoolean(R.bool.pref_download_over_wifi_default));
         boolean networkAvailable = false;
 
         if (downloadOverWifi && network.isWifiAvailable()) {

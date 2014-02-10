@@ -17,6 +17,9 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
+
 import org.json.JSONException;
 
 import java.io.IOException;
@@ -25,6 +28,7 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.adapter.GalleryListAdapter;
 import tw.skyarrow.ehreader.db.Gallery;
@@ -113,8 +117,18 @@ public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
+    public void onStart() {
+        super.onStart();
+
+        MapBuilder builder = MapBuilder.createAppView();
+        builder.set(Fields.SCREEN_NAME, TAG);
+
+        BaseApplication.getTracker().send(builder.build());
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
 
         if (task != null && !task.isCancelled()) {
             task.cancel(true);
@@ -177,6 +191,8 @@ public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.
     }
 
     private class GalleryListTask extends AsyncTask<Integer, Integer, List<Gallery>> {
+        private long startLoadAt;
+
         @Override
         protected List<Gallery> doInBackground(Integer... integers) {
             int page = integers[0];
@@ -190,6 +206,11 @@ public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.
             }
 
             return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            startLoadAt = System.currentTimeMillis();
         }
 
         @Override
@@ -216,6 +237,10 @@ public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.
             }
 
             stopLoading();
+
+            BaseApplication.getTracker().send(MapBuilder.createTiming(
+                    "resources", System.currentTimeMillis() - startLoadAt, "load index", null
+            ).build());
         }
     }
 

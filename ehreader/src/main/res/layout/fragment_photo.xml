@@ -16,7 +16,8 @@
         android:layout_below="@+id/page"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:indeterminate="true"/>
+        android:indeterminate="true"
+        android:max="100"/>
     <Button
         android:id="@+id/retry"
         android:layout_width="wrap_content"

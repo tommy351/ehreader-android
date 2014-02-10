@@ -12,7 +12,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.androidquery.AQuery;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.List;
 
@@ -28,11 +29,17 @@ import tw.skyarrow.ehreader.db.Gallery;
  * Created by SkyArrow on 2014/1/31.
  */
 public class DownloadListAdapter extends BaseListAdapter<Download> {
-    private static final boolean MEM_CACHE = true;
-    private static final boolean FILE_CACHE = true;
+    private ImageLoader imageLoader;
+    private DisplayImageOptions displayOptions;
 
     public DownloadListAdapter(Context context, List<Download> list) {
         super(context, list);
+
+        imageLoader = ImageLoader.getInstance();
+        displayOptions = new DisplayImageOptions.Builder()
+                .cacheInMemory(true)
+                .cacheOnDisc(true)
+                .build();
     }
 
     @Override
@@ -50,7 +57,6 @@ public class DownloadListAdapter extends BaseListAdapter<Download> {
             holder = (ViewHolder) view.getTag();
         }
 
-        AQuery aq = new AQuery(view);
         int progress = download.getProgress();
         int total = gallery.getCount();
 
@@ -61,7 +67,11 @@ public class DownloadListAdapter extends BaseListAdapter<Download> {
         holder.progressBar.setProgress(progress);
         holder.featureBtn.setOnClickListener(new OnFeatureClickListener(download));
 
-        if (!isScrolling()) aq.id(holder.cover).image(gallery.getThumbnail(), MEM_CACHE, FILE_CACHE);
+        if (isScrolling()) {
+            holder.cover.setImageBitmap(null);
+        } else {
+            imageLoader.displayImage(gallery.getThumbnail(), holder.cover, displayOptions);
+        }
 
         switch (download.getStatus()) {
             case Download.STATUS_DOWNLOADING:

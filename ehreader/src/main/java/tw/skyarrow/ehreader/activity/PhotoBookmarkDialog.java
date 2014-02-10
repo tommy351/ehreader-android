@@ -7,9 +7,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
+
 import java.util.List;
 
 import de.greenrobot.dao.query.QueryBuilder;
+import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.db.DaoMaster;
@@ -33,7 +37,7 @@ public class PhotoBookmarkDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
         Bundle args = getArguments();
         galleryId = args.getLong("id");
 
@@ -56,19 +60,24 @@ public class PhotoBookmarkDialog extends DialogFragment {
                         photoList.get(i).getPage());
             }
 
-            builder.setItems(menuItems, onItemClick);
+            dialog.setItems(menuItems, onItemClick);
         } else {
-            builder.setMessage(R.string.no_bookmarks);
+            dialog.setMessage(R.string.no_bookmarks);
         }
 
-        builder.setTitle(R.string.bookmark_list);
+        dialog.setTitle(R.string.bookmark_list);
 
-        return builder.create();
+        MapBuilder builder = MapBuilder.createAppView();
+        builder.set(Fields.SCREEN_NAME, TAG);
+
+        BaseApplication.getTracker().send(builder.build());
+
+        return dialog.create();
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
         db.close();
     }
 

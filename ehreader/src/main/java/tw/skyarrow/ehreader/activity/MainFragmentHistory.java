@@ -1,26 +1,23 @@
 package tw.skyarrow.ehreader.activity;
 
-import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.util.List;
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import de.greenrobot.dao.query.QueryBuilder;
+import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
-import tw.skyarrow.ehreader.adapter.GalleryListAdapter;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
-import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
 
 /**
@@ -56,6 +53,16 @@ public class MainFragmentHistory extends MainFragmentBase {
         }
 
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        MapBuilder builder = MapBuilder.createAppView();
+        builder.set(Fields.SCREEN_NAME, TAG);
+
+        BaseApplication.getTracker().send(builder.build());
     }
 
     @Override

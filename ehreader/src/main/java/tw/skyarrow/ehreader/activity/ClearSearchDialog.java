@@ -7,6 +7,10 @@ import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.support.v4.app.DialogFragment;
 
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
+
+import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.provider.SearchSuggestionProvider;
 
@@ -18,14 +22,19 @@ public class ClearSearchDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
 
-        builder.setTitle(R.string.clear_search_title)
+        dialog.setTitle(R.string.clear_search_title)
                 .setMessage(R.string.clear_search_msg)
                 .setPositiveButton(R.string.ok, onSubmitClick)
                 .setNegativeButton(R.string.cancel, null);
 
-        return builder.create();
+        MapBuilder builder = MapBuilder.createAppView();
+        builder.set(Fields.SCREEN_NAME, TAG);
+
+        BaseApplication.getTracker().send(builder.build());
+
+        return dialog.create();
     }
 
     private DialogInterface.OnClickListener onSubmitClick = new DialogInterface.OnClickListener() {

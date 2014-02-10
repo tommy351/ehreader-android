@@ -16,14 +16,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.edmodo.cropper.CropImageView;
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.util.L;
 
@@ -83,6 +85,16 @@ public class CropActivity extends ActionBarActivity {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        MapBuilder builder = MapBuilder.createAppView();
+        builder.set(Fields.SCREEN_NAME, TAG);
+
+        BaseApplication.getTracker().send(builder.build());
     }
 
     @Override
