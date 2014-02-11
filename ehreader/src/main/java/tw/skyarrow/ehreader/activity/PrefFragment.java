@@ -17,7 +17,6 @@ import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.event.LoginEvent;
-import tw.skyarrow.ehreader.util.L;
 
 /**
  * Created by SkyArrow on 2014/2/3.

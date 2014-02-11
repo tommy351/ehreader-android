@@ -313,6 +313,10 @@ public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.
         errorView.setVisibility(View.GONE);
         footerRetry.setVisibility(View.GONE);
 
+        BaseApplication.getTracker().send(MapBuilder.createEvent(
+                "UI", "button", "refresh", null
+        ).build());
+
         getGalleryList(0);
     }
 

@@ -1,5 +1,6 @@
 package tw.skyarrow.ehreader.activity;
 
+import android.content.ContentUris;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -45,6 +46,7 @@ import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.db.PhotoDao;
 import tw.skyarrow.ehreader.event.PhotoInfoEvent;
+import tw.skyarrow.ehreader.provider.PhotoProvider;
 import tw.skyarrow.ehreader.service.PhotoInfoService;
 import tw.skyarrow.ehreader.util.FileInfoHelper;
 import uk.co.senab.photoview.PhotoViewAttacher;
@@ -202,9 +204,13 @@ public class PhotoFragment extends Fragment {
 
         intent.setType(FileInfoHelper.getMimeType(filename));
         intent.putExtra(Intent.EXTRA_TEXT, galleryTitle + " " + photo.getUrl());
-        intent.putExtra(Intent.EXTRA_STREAM, imageLoader.getLoadingUriForView(imageView));
+        intent.putExtra(Intent.EXTRA_STREAM, getPhotoUri());
 
         return intent;
+    }
+
+    private Uri getPhotoUri() {
+        return ContentUris.withAppendedId(PhotoProvider.PHOTO_URI, photo.getId());
     }
 
     private void displayPhoto() {
@@ -351,13 +357,12 @@ public class PhotoFragment extends Fragment {
 
     private void setAsWallpaper() {
         Intent intent = new Intent(getActivity(), CropActivity.class);
-        Uri uri = Uri.parse(imageLoader.getLoadingUriForView(imageView));
 
         BaseApplication.getTracker().send(MapBuilder.createEvent(
                 "UI", "button", "set as wallpaper", null
         ).build());
 
-        intent.setData(uri);
+        intent.setData(getPhotoUri());
         startActivity(intent);
     }
 

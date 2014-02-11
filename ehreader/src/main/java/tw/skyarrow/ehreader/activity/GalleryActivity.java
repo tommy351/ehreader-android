@@ -56,7 +56,6 @@ import tw.skyarrow.ehreader.db.DownloadDao;
 import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
 import tw.skyarrow.ehreader.util.ActionBarHelper;
-import tw.skyarrow.ehreader.util.L;
 
 /**
  * Created by SkyArrow on 2014/1/27.
