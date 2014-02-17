@@ -242,12 +242,7 @@ public class GalleryActivity extends ActionBarActivity {
 
             @Override
             public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                // http://www.sherif.mobi/2013/01/how-to-get-widthheight-of-view.html
-                coverArea.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-                int coverWidth = coverArea.getMeasuredWidth();
-                int coverHeight = coverArea.getMeasuredHeight();
-
-                new Thread(new BlurCoverRunnable(loadedImage, coverWidth, coverHeight)).start();
+                new Thread(new BlurCoverRunnable(loadedImage)).start();
             }
 
             @Override
@@ -268,24 +263,15 @@ public class GalleryActivity extends ActionBarActivity {
 
     private class BlurCoverRunnable implements Runnable {
         private Bitmap bitmap;
-        private int coverWidth;
-        private int coverHeight;
 
-        public BlurCoverRunnable(Bitmap bitmap, int coverWidth, int coverHeight) {
+        public BlurCoverRunnable(Bitmap bitmap) {
             this.bitmap = bitmap;
-            this.coverWidth = coverWidth;
-            this.coverHeight = coverHeight;
         }
 
         @Override
         public void run() {
-            int bmWidth = bitmap.getWidth();
-            int bmHeight= bitmap.getHeight();
-            float scale = getScale(bmWidth, bmHeight, coverWidth, coverHeight);
-
             StackBlurManager blurManager = new StackBlurManager(bitmap);
-            Bitmap bg = Bitmap.createScaledBitmap(blurManager.processNatively(10), (int) (bmWidth * scale), (int) (bmHeight * scale), true);
-            runOnUiThread(new UpdateCoverRunnable(bitmap, bg));
+            runOnUiThread(new UpdateCoverRunnable(bitmap, blurManager.processNatively(10)));
         }
     };
 
@@ -300,7 +286,16 @@ public class GalleryActivity extends ActionBarActivity {
 
         @Override
         public void run() {
+            // http://www.sherif.mobi/2013/01/how-to-get-widthheight-of-view.html
+            coverArea.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+            int coverWidth = coverArea.getMeasuredWidth();
+            int coverHeight = coverArea.getMeasuredHeight();
+            int bmWidth = bitmap.getWidth();
+            int bmHeight = bitmap.getHeight();
+            float scale = getScale(bmWidth, bmHeight, coverWidth, coverHeight);
+
             Animation fadeIn = AnimationUtils.loadAnimation(GalleryActivity.this, R.anim.cover_fade_in);
+            Bitmap bg = Bitmap.createScaledBitmap(background, (int) (bmWidth * scale), (int) (bmHeight * scale), true);
 
             coverForeground.setImageBitmap(bitmap);
             coverForeground.startAnimation(fadeIn);

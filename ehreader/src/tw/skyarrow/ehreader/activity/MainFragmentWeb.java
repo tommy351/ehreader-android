@@ -291,11 +291,11 @@ public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.
 
     @Override
     public void onScrollStateChanged(int state) {
-        if (state == InfiniteScrollListener.SCROLL_STATE_IDLE) {
+        if (state == InfiniteScrollListener.SCROLL_STATE_FLING) {
+            adapter.setScrolling(true);
+        } else {
             adapter.setScrolling(false);
             adapter.notifyDataSetChanged();
-        } else {
-            adapter.setScrolling(true);
         }
     }
 

@@ -9,9 +9,7 @@ dependencies {
 
 sourceSets {
     main {
-        java {
-            srcDir 'src'
-        }
+        java.srcDir 'src'
     }
 }
 

@@ -147,10 +147,6 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
             public void onPageSelected(int i) {
                 seekBar.setProgress(i);
                 actionBar.setTitle(String.format("%s / %s", i + 1, total));
-
-                BaseApplication.getTracker().send(MapBuilder.createEvent(
-                        "UI", "transition", "view pager", (long) i
-                ).build());
             }
 
             @Override

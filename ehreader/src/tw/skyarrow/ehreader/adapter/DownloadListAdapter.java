@@ -39,6 +39,7 @@ public class DownloadListAdapter extends BaseListAdapter<Download> {
         displayOptions = new DisplayImageOptions.Builder()
                 .cacheInMemory(true)
                 .cacheOnDisc(true)
+                .resetViewBeforeLoading(true)
                 .build();
     }
 

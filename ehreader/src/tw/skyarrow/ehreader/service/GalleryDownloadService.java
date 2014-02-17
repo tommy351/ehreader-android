@@ -298,7 +298,8 @@ public class GalleryDownloadService extends IntentService {
                     .setContentTitle(gallery.getTitle())
                     .setContentIntent(pendingIntent)
                     .setProgress(0, 0, true)
-                    .setContentText(getString(R.string.download_in_progress));
+                    .setContentText(getString(R.string.download_in_progress))
+                    .setTicker(getString(R.string.download_in_progress));
 
             sendNotification();
 
@@ -410,6 +411,7 @@ public class GalleryDownloadService extends IntentService {
                     .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
             builder.setContentText(getString(R.string.download_success))
+                    .setTicker(getString(R.string.download_success))
                     .setProgress(0, 0, false)
                     .setAutoCancel(true)
                     .setContentIntent(pendingIntent);
@@ -426,6 +428,7 @@ public class GalleryDownloadService extends IntentService {
             isTerminated = true;
 
             builder.setContentText(getString(R.string.download_failed))
+                    .setTicker(getString(R.string.download_failed))
                     .setProgress(0, 0, false)
                     .setAutoCancel(true);
 
@@ -457,6 +460,7 @@ public class GalleryDownloadService extends IntentService {
             isTerminated = true;
 
             builder.setContentText(getString(R.string.download_paused))
+                    .setTicker(getString(R.string.download_paused))
                     .setProgress(0, 0, false)
                     .setAutoCancel(true);
 

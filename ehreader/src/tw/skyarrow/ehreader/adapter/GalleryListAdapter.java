@@ -31,6 +31,7 @@ public class GalleryListAdapter extends BaseListAdapter<Gallery> {
         displayOptions = new DisplayImageOptions.Builder()
                 .cacheInMemory(true)
                 .cacheOnDisc(true)
+                .resetViewBeforeLoading(true)
                 .build();
     }
 

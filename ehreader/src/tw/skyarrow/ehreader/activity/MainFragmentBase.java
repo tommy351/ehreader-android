@@ -101,11 +101,11 @@ public class MainFragmentBase extends Fragment implements AdapterView.OnItemClic
 
     @Override
     public void onScrollStateChanged(AbsListView absListView, int state) {
-        if (state == AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
+        if (state == AbsListView.OnScrollListener.SCROLL_STATE_FLING) {
+            adapter.setScrolling(true);
+        } else {
             adapter.setScrolling(false);
             adapter.notifyDataSetChanged();
-        } else {
-            adapter.setScrolling(true);
         }
     }
 

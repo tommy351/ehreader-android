@@ -223,11 +223,11 @@ public class MainFragmentDownload extends Fragment implements AbsListView.OnScro
 
     @Override
     public void onScrollStateChanged(AbsListView absListView, int state) {
-        if (state == InfiniteScrollListener.SCROLL_STATE_IDLE) {
+        if (state == InfiniteScrollListener.SCROLL_STATE_FLING) {
+            adapter.setScrolling(true);
+        } else {
             adapter.setScrolling(false);
             adapter.notifyDataSetChanged();
-        } else {
-            adapter.setScrolling(true);
         }
     }
 
