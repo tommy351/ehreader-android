@@ -20,8 +20,8 @@ import java.util.List;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import tw.skyarrow.ehreader.R;
-import tw.skyarrow.ehreader.activity.DownloadContextMenu;
-import tw.skyarrow.ehreader.activity.GalleryActivity;
+import tw.skyarrow.ehreader.app.download.DownloadContextMenu;
+import tw.skyarrow.ehreader.app.gallery.GalleryActivity;
 import tw.skyarrow.ehreader.db.Download;
 import tw.skyarrow.ehreader.db.Gallery;
 
