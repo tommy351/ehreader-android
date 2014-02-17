@@ -56,6 +56,12 @@
             android:key="@string/pref_clear_search"/>
     </PreferenceCategory>
     <PreferenceCategory
+        android:title="@string/pref_update_title">
+        <PreferenceScreen
+            android:title="@string/pref_check_update_title"
+            android:key="@string/pref_check_update"/>
+    </PreferenceCategory>
+    <PreferenceCategory
         android:title="@string/pref_about_title">
         <PreferenceScreen
             android:key="@string/pref_version"

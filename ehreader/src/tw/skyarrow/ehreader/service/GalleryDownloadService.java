@@ -294,7 +294,7 @@ public class GalleryDownloadService extends IntentService {
             PendingIntent pendingIntent = PendingIntent.getActivity(GalleryDownloadService.this, 0,
                     intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-            builder.setSmallIcon(R.drawable.ic_launcher)
+            builder.setSmallIcon(R.drawable.ic_notification_download)
                     .setContentTitle(gallery.getTitle())
                     .setContentIntent(pendingIntent)
                     .setProgress(0, 0, true)

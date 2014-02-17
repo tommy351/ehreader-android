@@ -68,4 +68,5 @@ dependencies {
     compile project(':cropper:cropper')
     compile project(':android-stackblur:StackBlur')
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.1'
+    compile 'com.github.zafarkhaja:java-semver:0.7.2'
 }

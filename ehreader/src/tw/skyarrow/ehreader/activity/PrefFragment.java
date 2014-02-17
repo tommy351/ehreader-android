@@ -17,6 +17,7 @@ import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.event.LoginEvent;
+import tw.skyarrow.ehreader.util.UpdateChecker;
 
 /**
  * Created by SkyArrow on 2014/2/3.
@@ -59,16 +60,14 @@ public class PrefFragment extends PreferenceFragment {
         clearSearchPref.setOnPreferenceClickListener(
                 new OpenDialogPreference(new ClearSearchDialog(), ClearSearchDialog.TAG));
 
-        Preference versionPref = findPreferenceByResource(R.string.pref_version);
-        versionPref.setOnPreferenceClickListener(onVersionClick);
+        Preference checkUpdatePref = findPreferenceByResource(R.string.pref_check_update);
+        checkUpdatePref.setOnPreferenceClickListener(
+                new OpenDialogPreference(new CheckUpdateDialog(), CheckUpdateDialog.TAG));
 
-        try {
-            PackageManager pm = getActivity().getPackageManager();
-            String appVer = pm.getPackageInfo(getActivity().getPackageName(), 0).versionName;
-            versionPref.setSummary(appVer);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
+        Preference versionPref = findPreferenceByResource(R.string.pref_version);
+        UpdateChecker updateChecker = new UpdateChecker(getActivity());
+        versionPref.setOnPreferenceClickListener(onVersionClick);
+        versionPref.setSummary(updateChecker.getVersionCode());
 
         Preference authorPref = findPreferenceByResource(R.string.pref_author);
         authorPref.setOnPreferenceClickListener(onAuthorClick);

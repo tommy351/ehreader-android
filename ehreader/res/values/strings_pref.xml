@@ -66,6 +66,12 @@
     <string name="pref_clear_search" translatable="false">clear_search</string>
     <string name="pref_clear_search_title">Clear search history</string>
 
+    // Update
+    <string name="pref_update_title">Update</string>
+
+    <string name="pref_check_update" translatable="false">check_update</string>
+    <string name="pref_check_update_title">Check for update</string>
+
     // About
     <string name="pref_about" translatable="false">about</string>
     <string name="pref_about_title">About</string>
@@ -108,6 +114,13 @@
     <string name="clear_search_title">Clear search history</string>
     <string name="clear_search_msg">Do you want to clear search history?</string>
 
-    // Dialog: Open source license
-    <string name="open_source_license">Open source license</string>
+    // Dialog: Check for update
+    <string name="checking_update">Checking for update&#8230;</string>
+    <string name="check_update_failed_title">Check failed</string>
+    <string name="check_update_failed_msg">Failed to fetch update information. Please try again.</string>
+    <string name="check_update_available_title">Update available</string>
+    <string name="check_update_available_msg">New version %s is available. Do you want to update now?</string>
+    <string name="check_update_latest_title">You\'re up to date!</string>
+    <string name="check_update_latest_msg">Version %s is currently the latest version.</string>
+    <string name="update">Update</string>
 </resources>

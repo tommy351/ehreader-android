@@ -72,6 +72,13 @@
     <string name="clear_search_title">清除搜尋記錄</string>
     <string name="clear_search_msg">您要清除搜尋記錄嗎？</string>
 
-    // Dialog: Open source license
-    <string name="open_source_license">開放原始碼授權</string>
+    // Dialog: Check for update
+    <string name="checking_update">正在檢查更新&#8230;</string>
+    <string name="check_update_failed_title">檢查失敗</string>
+    <string name="check_update_failed_msg">更新資訊獲取失敗，請再試一次。</string>
+    <string name="check_update_available_title">可用更新</string>
+    <string name="check_update_available_msg">新版本 %s 已推出，您要立刻更新嗎？</string>
+    <string name="check_update_latest_title">已是最新版本！</string>
+    <string name="check_update_latest_msg">版本 %s 已是目前最新的版本。</string>
+    <string name="update">更新</string>
 </resources>
