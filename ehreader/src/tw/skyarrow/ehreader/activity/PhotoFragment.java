@@ -105,6 +105,7 @@ public class PhotoFragment extends Fragment {
         imageLoader = ImageLoader.getInstance();
         displayOptions = new DisplayImageOptions.Builder()
                 .cacheOnDisc(true)
+                .bitmapConfig(Bitmap.Config.RGB_565)
                 .build();
 
         Bundle args = getArguments();
