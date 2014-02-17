@@ -106,7 +106,7 @@
                 android:value=".activity.MainActivity"/>
         </activity>
         <activity
-            android:name=".app.filter.FilterActivity"
+            android:name=".app.search.FilterActivity"
             android:label="@string/menu_filter"
             android:configChanges="orientation|screenSize|keyboardHidden">
             <meta-data

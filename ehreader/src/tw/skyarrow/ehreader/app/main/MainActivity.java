@@ -17,7 +17,7 @@ import android.widget.SpinnerAdapter;
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
-import tw.skyarrow.ehreader.app.filter.FilterDialog;
+import tw.skyarrow.ehreader.app.search.FilterDialog;
 import tw.skyarrow.ehreader.app.pref.PrefActivity;
 import tw.skyarrow.ehreader.app.search.ImageSearchActivity;
 import tw.skyarrow.ehreader.util.ActionBarHelper;

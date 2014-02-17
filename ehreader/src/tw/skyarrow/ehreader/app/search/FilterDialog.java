@@ -1,4 +1,4 @@
-package tw.skyarrow.ehreader.app.filter;
+package tw.skyarrow.ehreader.app.search;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

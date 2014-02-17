@@ -1,4 +1,4 @@
-package tw.skyarrow.ehreader.app.filter;
+package tw.skyarrow.ehreader.app.search;
 
 import android.net.Uri;
 import android.os.Bundle;
