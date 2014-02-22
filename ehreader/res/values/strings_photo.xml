@@ -7,6 +7,7 @@
     <string name="menu_set_as_wallpaper">Set as wallpaper</string>
     <string name="menu_rotate_left">Rotate left</string>
     <string name="menu_rotate_right">Rotate right</string>
+    <string name="menu_slideshow">Slideshow</string>
 
     // Notification
     <string name="notification_bookmark_added">Bookmark added</string>

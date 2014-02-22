@@ -44,6 +44,25 @@
             android:summary="@string/pref_japanese_title_summary"
             android:defaultValue="@bool/pref_japanese_title_default"/>
     </PreferenceCategory>
+    <!-- Slideshow -->
+    <!--
+    <PreferenceCategory
+        android:title="@string/pref_slideshow_title">
+        <tw.skyarrow.ehreader.widget.ListPreferenceWithSummary
+            android:key="@string/pref_slideshow_interval"
+            android:title="@string/pref_slideshow_interval_title"
+            android:entries="@array/pref_slideshow_interval_entries"
+            android:defaultValue="@string/pref_slideshow_interval_default"
+            android:dialogTitle="@string/pref_slideshow_interval_title"
+            android:entryValues="@array/pref_slideshow_interval_values"/>
+        <tw.skyarrow.ehreader.widget.ListPreferenceWithSummary
+            android:key="@string/pref_slideshow_animation"
+            android:title="@string/pref_slideshow_animation_title"
+            android:entries="@array/pref_slideshow_animation_entries"
+            android:defaultValue="@string/pref_slideshow_animation_default"
+            android:dialogTitle="@string/pref_slideshow_animation_title"
+            android:entryValues="@array/pref_slideshow_animation_values"/>
+    </PreferenceCategory>-->
     <!-- Download -->
     <PreferenceCategory
         android:title="@string/pref_download_title">

@@ -46,6 +46,45 @@
         <item>landscape</item>
     </string-array>
 
+    // Slideshow
+    <string name="pref_slideshow_title">Slideshow</string>
+
+    <string name="pref_slideshow_interval" translatable="false">slideshow_interval</string>
+    <string name="pref_slideshow_interval_title">Slideshow interval</string>
+    <string name="pref_slideshow_interval_default" translatable="false">5</string>
+    <string-array name="pref_slideshow_interval_entries">
+        <item>5 seconds</item>
+        <item>10 seconds</item>
+        <item>20 seconds</item>
+        <item>30 seconds</item>
+        <item>60 seconds</item>
+    </string-array>
+    <string-array name="pref_slideshow_interval_values" translatable="false">
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+        <item>60</item>
+    </string-array>
+
+    <string name="pref_slideshow_animation" translatable="false">slideshow_animation</string>
+    <string name="pref_slideshow_animation_title">Transition animation</string>
+    <string name="pref_slideshow_animation_default" translatable="false">random</string>
+    <string-array name="pref_slideshow_animation_entries">
+        <item>Random</item>
+        <item>Fade</item>
+        <item>Slide</item>
+        <item>Flip</item>
+        <item>Cube</item>
+    </string-array>
+    <string-array name="pref_slideshow_animation_values" translatable="false">
+        <item>random</item>
+        <item>fade</item>
+        <item>slide</item>
+        <item>flip</item>
+        <item>cube</item>
+    </string-array>
+
     <string name="pref_volume_key_navigation" translatable="false">volume_key_navigation</string>
     <string name="pref_volume_key_navigation_title">Volume key navigation</string>
     <string name="pref_volume_key_navigation_summary">Navigate between pages using volume keys</string>

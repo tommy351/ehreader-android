@@ -78,8 +78,6 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
     private static final int HINT_HIDE_DELAY = 500;
 
     private SQLiteDatabase db;
-    private DaoMaster daoMaster;
-    private DaoSession daoSession;
     private GalleryDao galleryDao;
     private SharedPreferences preferences;
 
@@ -103,8 +101,8 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
 
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, Constant.DB_NAME, null);
         db = helper.getWritableDatabase();
-        daoMaster = new DaoMaster(db);
-        daoSession = daoMaster.newSession();
+        DaoMaster daoMaster = new DaoMaster(db);
+        DaoSession daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 

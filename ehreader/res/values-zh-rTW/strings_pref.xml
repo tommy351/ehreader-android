@@ -30,6 +30,27 @@
     <string name="pref_japanese_title_title">顯示日文標題</string>
     <string name="pref_japanese_title_summary">顯示日文標題而非原標題</string>
 
+    // Slideshow
+    <string name="pref_slideshow_title">投影片</string>
+
+    <string name="pref_slideshow_interval_title">投影片間隔</string>
+    <string-array name="pref_slideshow_interval_entries">
+        <item>5 秒</item>
+        <item>10 秒</item>
+        <item>20 秒</item>
+        <item>30 秒</item>
+        <item>60 秒</item>
+    </string-array>
+
+    <string name="pref_slideshow_animation_title">過渡動畫</string>
+    <string-array name="pref_slideshow_animation_entries">
+        <item>隨機</item>
+        <item>淡入</item>
+        <item>平移</item>
+        <item>翻轉</item>
+        <item>旋轉</item>
+    </string-array>
+
     // Download
     <string name="pref_download_title">下載</string>
 
