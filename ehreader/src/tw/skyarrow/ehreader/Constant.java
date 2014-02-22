@@ -24,7 +24,7 @@ public class Constant {
     public static final String HATHDL_URL = "http://g.e-hentai.org/hathdler.php?gid=%d&t=%s";
     public static final String THUMBNAIL_URL = "http://ehgt.org/t/%s/%s/%s_l.jpg";
 
-    public static final int PHOTO_PER_PAGE = 20;
+    public static final int PHOTO_PER_PAGE = 40;
     public static final String FOLDER_NAME = "ehreader";
 
     public static final String AUTHOR_PAGE = "https://twitter.com/tommy351";

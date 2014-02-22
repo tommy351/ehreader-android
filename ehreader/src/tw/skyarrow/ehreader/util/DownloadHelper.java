@@ -55,7 +55,7 @@ public class DownloadHelper {
             Intent intent = new Intent(context, GalleryDownloadService.class);
 
             intent.setAction(GalleryDownloadService.ACTION_START);
-            intent.putExtra(GalleryDownloadService.GALLERY_ID, download.getId());
+            intent.putExtra(GalleryDownloadService.EXTRA_GALLERY, download.getId());
             context.startService(intent);
         }
     }

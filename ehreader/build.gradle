@@ -42,8 +42,10 @@ android {
             assets.srcDirs = ['assets']
         }
 
-        instrumentTest.setRoot('tests')
-        instrumentTest.java.srcDirs = ['tests/src']
+        instrumentTest {
+            setRoot('tests')
+            java.srcDirs = ['tests/src']
+        }
     }
 
     packagingOptions {

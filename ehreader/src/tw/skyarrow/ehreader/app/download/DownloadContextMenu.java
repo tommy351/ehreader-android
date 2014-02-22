@@ -152,7 +152,7 @@ public class DownloadContextMenu extends DialogFragment {
         Intent intent = new Intent(getActivity(), GalleryDownloadService.class);
 
         intent.setAction(GalleryDownloadService.ACTION_START);
-        intent.putExtra(GalleryDownloadService.GALLERY_ID, download.getId());
+        intent.putExtra(GalleryDownloadService.EXTRA_GALLERY, download.getId());
         getActivity().startService(intent);
     }
 
@@ -160,7 +160,7 @@ public class DownloadContextMenu extends DialogFragment {
         Intent intent = new Intent(getActivity(), GalleryDownloadService.class);
 
         intent.setAction(GalleryDownloadService.ACTION_PAUSE);
-        intent.putExtra(GalleryDownloadService.GALLERY_ID, download.getId());
+        intent.putExtra(GalleryDownloadService.EXTRA_GALLERY, download.getId());
         getActivity().startService(intent);
     }
 

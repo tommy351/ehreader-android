@@ -21,8 +21,8 @@ import tw.skyarrow.ehreader.util.L;
 public class PhotoInfoService extends IntentService {
     private static final String CLASS_NAME = "PhotoInfoService";
 
-    public static final String GALLERY_ID = "galleryId";
-    public static final String PHOTO_PAGE = "photoPage";
+    public static final String EXTRA_GALLERY = "galleryId";
+    public static final String EXTRA_PAGE = "photoPage";
 
     private SQLiteDatabase db;
     private DaoMaster daoMaster;
@@ -52,8 +52,8 @@ public class PhotoInfoService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        long galleryId = intent.getLongExtra(GALLERY_ID, 0);
-        int page = intent.getIntExtra(PHOTO_PAGE, 0);
+        long galleryId = intent.getLongExtra(EXTRA_GALLERY, 0);
+        int page = intent.getIntExtra(EXTRA_PAGE, 0);
 
         if (galleryId <= 0) {
             L.e("Gallery ID must be a positive number.");

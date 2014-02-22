@@ -74,7 +74,7 @@ public class DownloadDeleteDialog extends DialogFragment {
         Intent intent = new Intent(getActivity(), GalleryDownloadService.class);
 
         intent.setAction(GalleryDownloadService.ACTION_PAUSE);
-        intent.putExtra(GalleryDownloadService.GALLERY_ID, galleryId);
+        intent.putExtra(GalleryDownloadService.EXTRA_GALLERY, galleryId);
 
         getActivity().startService(intent);
 

@@ -5,9 +5,12 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.app.TaskStackBuilder;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
+import android.media.ThumbnailUtils;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -66,7 +69,7 @@ public class GalleryDownloadService extends Service {
     public static final String ACTION_PAUSE = "ACTION_PAUSE";
     public static final String ACTION_RETRY = "ACTION_RETRY";
 
-    public static final String GALLERY_ID = "galleryId";
+    public static final String EXTRA_GALLERY = "galleryId";
 
     public static final int EVENT_DOWNLOADING = 0;
     public static final int EVENT_PAUSED = 1;
@@ -77,6 +80,7 @@ public class GalleryDownloadService extends Service {
     public static final int EVENT_SERVICE_STOP = 11;
 
     private static final int MAX_RETRY = 2;
+    private static final int GLOBAL_NOTIFICATION_ID = 0;
 
     private volatile Looper serviceLooper;
     private volatile ServiceHandler serviceHandler;
@@ -102,6 +106,7 @@ public class GalleryDownloadService extends Service {
 
         @Override
         public void handleMessage(Message msg) {
+            L.i("Download %d is started", msg.what);
             downloadTask = new DownloadTask(msg.what);
             downloadTask.start();
             stopSelf(msg.arg1);
@@ -113,6 +118,8 @@ public class GalleryDownloadService extends Service {
         super.onCreate();
         HandlerThread thread = new HandlerThread(TAG);
         thread.start();
+
+        L.i("%s is created", TAG);
 
         serviceLooper = thread.getLooper();
         serviceHandler = new ServiceHandler(serviceLooper);
@@ -154,9 +161,33 @@ public class GalleryDownloadService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        boolean hasPendings = downloadTask != null || pendingDownloads.size() > 0;
+
+        if (downloadTask != null) {
+            downloadTask.pause();
+        }
+
+        for (Long id : pendingDownloads.keySet()) {
+            pauseDownload(id);
+        }
+
+        if (hasPendings) {
+            notification.setAutoCancel(true)
+                    .setContentText(getString(R.string.download_paused))
+                    .setTicker(getString(R.string.download_paused))
+                    .setProgress(0, 0, false);
+
+            sendNotification();
+        } else {
+            nm.cancel(TAG, GLOBAL_NOTIFICATION_ID);
+        }
+
         bus.post(new GalleryDownloadEvent(EVENT_SERVICE_STOP, null));
         serviceLooper.quit();
         db.close();
+
+        L.d("%s is destroyed", TAG);
     }
 
     @Override
@@ -165,7 +196,7 @@ public class GalleryDownloadService extends Service {
     }
 
     private void handleStartAction(Intent intent, int startId) {
-        long id = intent.getLongExtra(GALLERY_ID, 0);
+        long id = intent.getLongExtra(EXTRA_GALLERY, 0);
 
         if (pendingDownloads.containsKey(id)) {
             L.e("Download %d is downloading or pending", id);
@@ -193,7 +224,7 @@ public class GalleryDownloadService extends Service {
     }
 
     private void handlePauseAction(Intent intent, int startId) {
-        long id = intent.getLongExtra(GALLERY_ID, 0);
+        long id = intent.getLongExtra(EXTRA_GALLERY, 0);
 
         if (downloadTask != null) {
             if (downloadTask.getId() == id) {
@@ -207,7 +238,7 @@ public class GalleryDownloadService extends Service {
     }
 
     private void handleRetryAction(Intent intent, int startId) {
-        long id = intent.getLongExtra(GALLERY_ID, 0);
+        long id = intent.getLongExtra(EXTRA_GALLERY, 0);
 
         if (pendingDownloads.containsKey(id)) {
             L.e("Download %d is pending or downloading", id);
@@ -239,9 +270,12 @@ public class GalleryDownloadService extends Service {
         msg.what = download.getId().intValue();
         msg.arg1 = startId;
 
+        L.i("Download %d is added to the queue", download.getId());
+
         download.setStatus(Download.STATUS_PENDING);
         downloadDao.updateInTx(download);
         pendingDownloads.put(download.getId(), download);
+        serviceHandler.sendMessage(msg);
         bus.post(new GalleryDownloadEvent(EVENT_PENDING, download));
         updateNotificationCount(notificationCount + 1);
     }
@@ -258,6 +292,8 @@ public class GalleryDownloadService extends Service {
             bus.post(new GalleryDownloadEvent(EVENT_PAUSED, download));
             updateNotificationCount(notificationCount - 1);
         }
+
+        L.i("Download %d is paused", id);
     }
 
     private void buildNotification() {
@@ -286,7 +322,7 @@ public class GalleryDownloadService extends Service {
     }
 
     private void sendNotification() {
-        nm.notify(TAG, 0, notification.build());
+        nm.notify(TAG, GLOBAL_NOTIFICATION_ID, notification.build());
     }
 
     private final class DownloadTask {
@@ -314,7 +350,7 @@ public class GalleryDownloadService extends Service {
 
             if (!galleryFolder.exists()) galleryFolder.mkdirs();
 
-            notification.setContentTitle(gallery.getTitle())
+            notification.setContentTitle(gallery.getTitles(GalleryDownloadService.this)[0])
                     .setProgress(0, 0, true)
                     .setContentText(getString(R.string.download_in_progress));
 
@@ -366,21 +402,33 @@ public class GalleryDownloadService extends Service {
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(GalleryDownloadService.this);
 
-            builder.setContentTitle(gallery.getTitle())
+            builder.setContentTitle(gallery.getTitles(GalleryDownloadService.this)[0])
                     .setTicker(getString(R.string.download_success))
                     .setContentText(getString(R.string.download_success))
                     .setSmallIcon(R.drawable.ic_notification_download)
                     .setContentIntent(pendingIntent)
                     .setAutoCancel(true);
 
-            try {
-                FileInputStream in = new FileInputStream(cover.getFile());
-                Bitmap bitmap = BitmapFactory.decodeStream(in);
+            if (cover != null) {
+                try {
+                    File file = cover.getFile();
 
-                builder.setLargeIcon(bitmap);
-            } catch (IOException e) {
-                e.printStackTrace();
+                    if (file.exists()) {
+                        FileInputStream in = new FileInputStream(cover.getFile());
+                        BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inSampleSize = getSampleSize(cover.getWidth(), cover.getHeight());
+                        Rect rect = new Rect(0, 0, 0, 0);
+                        Bitmap bitmap = BitmapFactory.decodeStream(in, rect, options);
+
+                        builder.setLargeIcon(getNotificationLargeIcon(bitmap));
+                        bitmap.recycle();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+
+            L.i("Download %d download success", id);
 
             setStatus(Download.STATUS_SUCCESS);
             sendEvent(EVENT_SUCCESS);
@@ -392,6 +440,8 @@ public class GalleryDownloadService extends Service {
             if (isTerminated) return;
 
             isTerminated = true;
+
+            L.i("Download %d download failed", id);
 
             setStatus(Download.STATUS_ERROR);
             sendEvent(EVENT_ERROR);
@@ -414,6 +464,8 @@ public class GalleryDownloadService extends Service {
 
             download.setProgress(progress);
             downloadDao.updateInTx(download);
+
+            L.i("Download %d progress %d / %d", id, progress, total);
 
             sendNotification();
             sendEvent(EVENT_DOWNLOADING);
@@ -505,6 +557,33 @@ public class GalleryDownloadService extends Service {
 
         private void sendEvent(int event) {
             bus.post(new GalleryDownloadEvent(event, download));
+        }
+
+        private Bitmap getNotificationLargeIcon(Bitmap bitmap) {
+            Resources res = getResources();
+            int width = (int) res.getDimension(android.R.dimen.notification_large_icon_width);
+            int height = (int) res.getDimension(android.R.dimen.notification_large_icon_height);
+
+            return ThumbnailUtils.extractThumbnail(bitmap, width, height);
+        }
+
+        // http://developer.android.com/training/displaying-bitmaps/load-bitmap.html#load-bitmap
+        private int getSampleSize(int width, int height) {
+            Resources res = getResources();
+            int reqWidth = (int) res.getDimension(android.R.dimen.notification_large_icon_width);
+            int reqHeight = (int) res.getDimension(android.R.dimen.notification_large_icon_height);
+            int scale = 1;
+
+            if (height > reqHeight || width > reqWidth) {
+                final int halfHeight = height / 2;
+                final int halfWidth = width / 2;
+
+                while ((halfHeight / scale) > reqHeight && (halfWidth / scale) > reqWidth) {
+                    scale *= 2;
+                }
+            }
+
+            return scale;
         }
     }
 }

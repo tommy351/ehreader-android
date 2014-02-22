@@ -28,6 +28,7 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.ImageLoadingProgressListener;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 
 import java.io.File;
@@ -84,6 +85,7 @@ public class PhotoFragment extends Fragment {
     private int page;
     private String galleryTitle;
     private Photo photo;
+    private Bitmap mBitmap;
 
     private boolean isLoaded = false;
     private boolean isServiceCalled = false;
@@ -112,6 +114,7 @@ public class PhotoFragment extends Fragment {
         imageLoader = ImageLoader.getInstance();
         displayOptions = new DisplayImageOptions.Builder()
                 .cacheOnDisc(true)
+                .imageScaleType(ImageScaleType.EXACTLY)
                 .bitmapConfig(Bitmap.Config.RGB_565)
                 .build();
 
@@ -141,6 +144,10 @@ public class PhotoFragment extends Fragment {
         imageLoader.cancelDisplayTask(imageView);
         EventBus.getDefault().unregister(this);
         db.close();
+
+        if (mBitmap != null && !mBitmap.isRecycled()) {
+            mBitmap.recycle();
+        }
     }
 
     @Override
@@ -248,8 +255,8 @@ public class PhotoFragment extends Fragment {
         Intent intent = new Intent(getActivity(), PhotoInfoService.class);
         isServiceCalled = true;
 
-        intent.putExtra(PhotoInfoService.GALLERY_ID, galleryId);
-        intent.putExtra(PhotoInfoService.PHOTO_PAGE, page);
+        intent.putExtra(PhotoInfoService.EXTRA_GALLERY, galleryId);
+        intent.putExtra(PhotoInfoService.EXTRA_PAGE, page);
 
         getActivity().startService(intent);
     }
@@ -291,6 +298,7 @@ public class PhotoFragment extends Fragment {
             imageView.setImageBitmap(bitmap);
 
             PhotoViewAttacher attacher = new PhotoViewAttacher(imageView);
+            mBitmap = bitmap;
             attacher.setOnViewTapListener(onPhotoTap);
 
             isLoaded = true;
