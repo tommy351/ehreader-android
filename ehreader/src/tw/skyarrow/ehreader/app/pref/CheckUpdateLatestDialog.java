@@ -17,11 +17,13 @@ import tw.skyarrow.ehreader.R;
 public class CheckUpdateLatestDialog extends DialogFragment {
     public static final String TAG = "CheckUpdateLatestDialog";
 
+    public static final String EXTRA_VERSION = "version";
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
         Bundle args = getArguments();
-        String version = args.getString("version");
+        String version = args.getString(EXTRA_VERSION);
 
         dialog.setTitle(R.string.check_update_latest_title)
                 .setMessage(getString(R.string.check_update_latest_msg, version))

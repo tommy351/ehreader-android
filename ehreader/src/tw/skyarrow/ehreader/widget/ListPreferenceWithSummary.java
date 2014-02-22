@@ -24,7 +24,7 @@ public class ListPreferenceWithSummary extends ListPreference {
         setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object o) {
-                preference.setSummary(getEntry());
+                updateSummary();
                 return true;
             }
         });
@@ -33,5 +33,9 @@ public class ListPreferenceWithSummary extends ListPreference {
     @Override
     public CharSequence getSummary() {
         return super.getEntry();
+    }
+
+    public void updateSummary() {
+        setSummary(getEntry());
     }
 }

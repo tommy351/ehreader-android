@@ -17,7 +17,6 @@ import com.google.analytics.tracking.android.MapBuilder;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,13 +26,13 @@ import butterknife.OnClick;
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.api.DataLoader;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
 import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.db.PhotoDao;
-import tw.skyarrow.ehreader.util.DownloadHelper;
 import tw.skyarrow.ehreader.util.L;
 import tw.skyarrow.ehreader.util.NetworkHelper;
 
@@ -53,11 +52,9 @@ public class ImageSearchPhotoFragment extends Fragment {
     private static final Pattern pSearchUrl = Pattern.compile("<a href=\"http://(g.e-|ex)hentai.org/\\?f_shash=(.+?)\">");
 
     private SQLiteDatabase db;
-    private DaoMaster daoMaster;
-    private DaoSession daoSession;
     private GalleryDao galleryDao;
     private PhotoDao photoDao;
-    private DownloadHelper downloadHelper;
+    private DataLoader dataLoader;
     private NetworkHelper network;
 
     private long photoId;
@@ -72,11 +69,11 @@ public class ImageSearchPhotoFragment extends Fragment {
 
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
         db = helper.getWritableDatabase();
-        daoMaster = new DaoMaster(db);
-        daoSession = daoMaster.newSession();
+        DaoMaster daoMaster = new DaoMaster(db);
+        DaoSession daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();
         photoDao = daoSession.getPhotoDao();
-        downloadHelper = new DownloadHelper(getActivity());
+        dataLoader = DataLoader.getInstance();
         network = new NetworkHelper(getActivity());
 
         searchPhoto();
@@ -101,7 +98,7 @@ public class ImageSearchPhotoFragment extends Fragment {
             try {
                 Photo photo = photoDao.load(longs[0]);
                 Gallery gallery = galleryDao.load(photo.getGalleryId());
-                JSONObject json = downloadHelper.getPhotoInfoRaw(gallery, photo);
+                JSONObject json = dataLoader.getPhotoRaw(gallery, photo);
 
                 if (json.has("error")) {
                     L.e("error: %s", json.getString("error"));
@@ -122,8 +119,6 @@ public class ImageSearchPhotoFragment extends Fragment {
                 } else {
                     return "http://" + prefix + "hentai.org/?f_shash=" + hash;
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
             } catch (JSONException e) {
                 e.printStackTrace();
             }

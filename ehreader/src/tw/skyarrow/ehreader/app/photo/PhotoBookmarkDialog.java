@@ -27,28 +27,28 @@ import tw.skyarrow.ehreader.db.PhotoDao;
 public class PhotoBookmarkDialog extends DialogFragment {
     public static final String TAG = "PhotoBookmarkDialog";
 
-    private SQLiteDatabase db;
-    private DaoMaster daoMaster;
-    private DaoSession daoSession;
-    private PhotoDao photoDao;
+    public static final String EXTRA_GALLERY = "id";
 
-    private long galleryId;
+    private SQLiteDatabase db;
     private List<Photo> photoList;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
         Bundle args = getArguments();
-        galleryId = args.getLong("id");
+        long galleryId = args.getLong(EXTRA_GALLERY);
 
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
         db = helper.getReadableDatabase();
-        daoMaster = new DaoMaster(db);
-        daoSession = daoMaster.newSession();
-        photoDao = daoSession.getPhotoDao();
+        DaoMaster daoMaster = new DaoMaster(db);
+        DaoSession daoSession = daoMaster.newSession();
+        PhotoDao photoDao = daoSession.getPhotoDao();
 
-        QueryBuilder qb = photoDao.queryBuilder();
-        qb.where(qb.and(PhotoDao.Properties.GalleryId.eq(galleryId), PhotoDao.Properties.Bookmarked.eq(true)));
+        QueryBuilder<Photo> qb = photoDao.queryBuilder();
+        qb.where(qb.and(
+                PhotoDao.Properties.GalleryId.eq(galleryId),
+                PhotoDao.Properties.Bookmarked.eq(true)
+        ));
         photoList = qb.list();
 
         if (photoList.size() > 0) {

@@ -103,9 +103,9 @@ public class GalleryActivity extends ActionBarActivity {
 
     public static final String TAG = "GalleryActivity";
 
+    public static final String EXTRA_GALLERY = "id";
+
     private SQLiteDatabase db;
-    private DaoMaster daoMaster;
-    private DaoSession daoSession;
     private GalleryDao galleryDao;
     private DownloadDao downloadDao;
 
@@ -121,8 +121,8 @@ public class GalleryActivity extends ActionBarActivity {
 
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, Constant.DB_NAME, null);
         db = helper.getWritableDatabase();
-        daoMaster = new DaoMaster(db);
-        daoSession = daoMaster.newSession();
+        DaoMaster daoMaster = new DaoMaster(db);
+        DaoSession daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();
         downloadDao = daoSession.getDownloadDao();
 
@@ -137,13 +137,12 @@ public class GalleryActivity extends ActionBarActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
 
-        Bundle args = getIntent().getExtras();
-        long galleryId = args.getLong("id");
+        long galleryId = getIntent().getLongExtra(EXTRA_GALLERY, 0);
         gallery = galleryDao.load(galleryId);
 
         if (gallery != null) {
             showGallery();
-            invalidateOptionsMenu();
+            supportInvalidateOptionsMenu();
         }
     }
 
@@ -221,14 +220,18 @@ public class GalleryActivity extends ActionBarActivity {
         int categoryRes = gallery.getCategoryResource();
         String meta = getString(categoryRes) + " / " + gallery.getCount() + "P";
 
-        metaView.setText(meta);
-        titleView.setText(gallery.getTitle());
-        ratingBar.setRating(gallery.getRating());
+        String[] titles = gallery.getTitles(this);
+        String title = titles[0];
+        String subtitle = titles[1];
 
-        if (gallery.getSubtitle().isEmpty()) {
+        metaView.setText(meta);
+        ratingBar.setRating(gallery.getRating());
+        titleView.setText(title);
+
+        if (subtitle.isEmpty()) {
             subtitleView.setVisibility(View.GONE);
         } else {
-            subtitleView.setText(gallery.getSubtitle());
+            subtitleView.setText(subtitle);
         }
 
         displayCover(gallery.getThumbnail());
@@ -304,7 +307,7 @@ public class GalleryActivity extends ActionBarActivity {
             coverForeground.setImageBitmap(bitmap);
             coverForeground.startAnimation(fadeIn);
 
-            coverBackground.setImageBitmap(background);
+            coverBackground.setImageBitmap(bg);
             coverBackground.startAnimation(fadeIn);
         }
     }
@@ -436,15 +439,17 @@ public class GalleryActivity extends ActionBarActivity {
         DialogFragment dialog;
         String tag;
 
-        args.putLong("id", gallery.getId());
-        args.putLong("size", gallery.getSize());
-
         if (download == null) {
             dialog = new DownloadConfirmDialog();
             tag = DownloadConfirmDialog.TAG;
+
+            args.putLong(DownloadConfirmDialog.EXTRA_GALLERY, gallery.getId());
+            args.putLong(DownloadConfirmDialog.EXTRA_SIZE, gallery.getSize());
         } else {
             dialog = new RedownloadDialog();
             tag = RedownloadDialog.TAG;
+
+            args.putLong(RedownloadDialog.EXTRA_GALLERY, gallery.getId());
         }
 
         dialog.setArguments(args);

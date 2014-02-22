@@ -2,18 +2,16 @@ package tw.skyarrow.ehreader.app.pref;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.os.AsyncTask;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
 import com.github.zafarkhaja.semver.Version;
 
-import org.json.JSONException;
-
-import java.io.IOException;
-
+import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.R;
-import tw.skyarrow.ehreader.util.UpdateChecker;
+import tw.skyarrow.ehreader.event.UpdateCheckEvent;
+import tw.skyarrow.ehreader.service.UpdateCheckService;
 
 /**
  * Created by SkyArrow on 2014/2/17.
@@ -21,11 +19,13 @@ import tw.skyarrow.ehreader.util.UpdateChecker;
 public class CheckUpdateDialog extends DialogFragment {
     public static final String TAG = "CheckUpdateDialog";
 
-    private UpdateCheckTask task;
+    private EventBus bus;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         ProgressDialog dialog = new ProgressDialog(getActivity());
+        bus = EventBus.getDefault();
+        bus.register(this);
 
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
@@ -33,64 +33,52 @@ public class CheckUpdateDialog extends DialogFragment {
         dialog.setMessage(getString(R.string.checking_update));
         dialog.setIndeterminate(true);
 
-        task = new UpdateCheckTask();
-        task.execute("");
+        Intent intent = new Intent(getActivity(), UpdateCheckService.class);
+
+        intent.setAction(UpdateCheckService.ACTION_CHECK_UPDATE);
+        getActivity().startService(intent);
 
         return dialog;
+    }
+
+    public void onEventMainThread(UpdateCheckEvent event) {
+        DialogFragment dialog = null;
+        String tag = "";
+        Bundle args = new Bundle();
+        Version version = event.getVersion();
+
+        switch (event.getCode()) {
+            case UpdateCheckService.EVENT_AVAILABLE:
+                dialog = new CheckUpdateAvailableDialog();
+                tag = CheckUpdateAvailableDialog.TAG;
+
+                args.putString(CheckUpdateAvailableDialog.EXTRA_VERSION, version.toString());
+                break;
+
+            case UpdateCheckService.EVENT_LATEST:
+                dialog = new CheckUpdateLatestDialog();
+                tag = CheckUpdateLatestDialog.TAG;
+
+                args.putString(CheckUpdateLatestDialog.EXTRA_VERSION, version.toString());
+                break;
+
+            case UpdateCheckService.EVENT_ERROR:
+                dialog = new CheckUpdateErrorDialog();
+                tag = CheckUpdateErrorDialog.TAG;
+
+                break;
+        }
+
+        if (dialog != null) {
+            dialog.setArguments(args);
+            dialog.show(getActivity().getSupportFragmentManager(), tag);
+            dismiss();
+        }
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (!task.isCancelled()) task.cancel(true);
-    }
-
-    private class UpdateCheckTask extends AsyncTask<String, Integer, Version> {
-        private UpdateChecker updateChecker;
-
-        public UpdateCheckTask() {
-            this.updateChecker = new UpdateChecker(getActivity());
-        }
-
-        @Override
-        protected Version doInBackground(String... strings) {
-            try {
-                return updateChecker.getLatestVersion();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Version version) {
-            DialogFragment dialog;
-            String tag;
-            Bundle args = new Bundle();
-
-            if (version == null) {
-                dialog = new CheckUpdateErrorDialog();
-                tag = CheckUpdateErrorDialog.TAG;
-            } else {
-                args.putString("version", version.toString());
-
-                if (updateChecker.compare(version)) {
-                    dialog = new CheckUpdateAvailableDialog();
-                    tag = CheckUpdateAvailableDialog.TAG;
-
-                    args.putString("current", updateChecker.getVersionCode());
-                } else {
-                    dialog = new CheckUpdateLatestDialog();
-                    tag = CheckUpdateLatestDialog.TAG;
-                }
-            }
-
-            dialog.setArguments(args);
-            dialog.show(getActivity().getSupportFragmentManager(), tag);
-            dismiss();
-        }
+        bus.unregister(this);
     }
 }

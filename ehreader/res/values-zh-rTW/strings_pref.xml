@@ -14,11 +14,21 @@
 
     <string name="pref_launch_page_title">首頁</string>
 
+    <string name="pref_screen_orientation_title">螢幕方向</string>
+    <string-array name="pref_screen_orientation_entries">
+        <item>系統預設</item>
+        <item>直向</item>
+        <item>橫向</item>
+    </string-array>
+
     <string name="pref_volume_key_navigation_title">音量鍵導覽</string>
     <string name="pref_volume_key_navigation_summary">使用音量鍵翻頁</string>
 
     <string name="pref_keep_screen_on_title">保持螢幕開啟</string>
     <string name="pref_keep_screen_on_summary">閱讀時保持螢幕開啟</string>
+
+    <string name="pref_japanese_title_title">顯示日文標題</string>
+    <string name="pref_japanese_title_summary">顯示日文標題而非原標題</string>
 
     // Download
     <string name="pref_download_title">下載</string>
@@ -28,6 +38,20 @@
 
     <string name="pref_auto_download_title">自動下載</string>
     <string name="pref_auto_download_summary">自動繼續未完成的下載</string>
+
+    // Update
+    <string name="pref_update_title">更新</string>
+
+    <string name="pref_check_update_title">檢查更新</string>
+    <string name="pref_check_update_summary">上次檢查日期：%s</string>
+
+    <string name="pref_auto_check_update_title">自動檢查更新</string>
+    <string-array name="pref_auto_check_update_entries">
+        <item>關閉</item>
+        <item>每天</item>
+        <item>每週</item>
+        <item>每月</item>
+    </string-array>
 
     // Advanced
     <string name="pref_advanced_title">進階</string>

@@ -21,14 +21,17 @@ import tw.skyarrow.ehreader.util.FileInfoHelper;
 public class DownloadConfirmDialog extends DialogFragment {
     public static final String TAG = "DownloadConfirmDialog";
 
+    public static final String EXTRA_GALLERY = "id";
+    public static final String EXTRA_SIZE = "size";
+
     private long galleryId;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
         Bundle args = getArguments();
-        galleryId = args.getLong("id");
-        long gallerySize = args.getLong("size");
+        galleryId = args.getLong(EXTRA_GALLERY);
+        long gallerySize = args.getLong(EXTRA_SIZE);
         String message = String.format(getString(R.string.download_confirm), FileInfoHelper.toBytes(gallerySize));
 
         dialog.setMessage(message)

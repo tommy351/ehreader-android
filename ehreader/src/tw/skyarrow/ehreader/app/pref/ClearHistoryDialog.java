@@ -31,8 +31,6 @@ public class ClearHistoryDialog extends DialogFragment {
     public static final String TAG = "ClearHistoryDialog";
 
     private SQLiteDatabase db;
-    private DaoMaster daoMaster;
-    private DaoSession daoSession;
     private GalleryDao galleryDao;
     private DownloadDao downloadDao;
     private PhotoDao photoDao;
@@ -43,8 +41,8 @@ public class ClearHistoryDialog extends DialogFragment {
 
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
         db = helper.getWritableDatabase();
-        daoMaster = new DaoMaster(db);
-        daoSession = daoMaster.newSession();
+        DaoMaster daoMaster = new DaoMaster(db);
+        DaoSession daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();
         downloadDao = daoSession.getDownloadDao();
         photoDao = daoSession.getPhotoDao();
@@ -71,13 +69,13 @@ public class ClearHistoryDialog extends DialogFragment {
     private DialogInterface.OnClickListener onSubmitClick = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialogInterface, int n) {
-            QueryBuilder galleryQb = galleryDao.queryBuilder();
+            QueryBuilder<Gallery> galleryQb = galleryDao.queryBuilder();
             galleryQb.where(GalleryDao.Properties.Starred.notEq(true));
             List<Gallery> galleryList = galleryQb.list();
 
             for (Gallery gallery : galleryList) {
                 if (!gallery.getStarred() && downloadDao.load(gallery.getId()) == null) {
-                    QueryBuilder photoQb = photoDao.queryBuilder();
+                    QueryBuilder<Photo> photoQb = photoDao.queryBuilder();
                     photoQb.where(PhotoDao.Properties.GalleryId.eq(gallery.getId()));
                     List<Photo> photoList = photoQb.list();
 

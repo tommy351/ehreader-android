@@ -1,4 +1,4 @@
-package tw.skyarrow.ehreader.util;
+package tw.skyarrow.ehreader.api;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import tw.skyarrow.ehreader.db.Photo;
+import tw.skyarrow.ehreader.util.L;
 
 /**
  * Created by SkyArrow on 2014/2/8.

@@ -1,6 +1,8 @@
 package tw.skyarrow.ehreader.app.photo;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
@@ -67,7 +69,10 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
     @InjectView(R.id.hint)
     TextView hintText;
 
-    private static final String TAG = "PhotoActivity";
+    public static final String TAG = "PhotoActivity";
+
+    public static final String EXTRA_GALLERY = "id";
+    public static final String EXTRA_PAGE = "page";
 
     private static final int UI_HIDE_DELAY = 3000;
     private static final int HINT_HIDE_DELAY = 500;
@@ -103,9 +108,15 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
         galleryDao = daoSession.getGalleryDao();
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        Bundle args = getIntent().getExtras();
-        long galleryId = args.getLong("id");
+        Intent intent = getIntent();
+        long galleryId = intent.getLongExtra(EXTRA_GALLERY, 0);
         gallery = galleryDao.load(galleryId);
+
+        if (gallery == null) {
+            // TODO error handling
+            return;
+        }
+
         final ActionBar actionBar = getSupportActionBar();
         int page;
         final int total = gallery.getCount();
@@ -115,11 +126,9 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         if (savedInstanceState != null) {
-            page = savedInstanceState.getInt("page");
-        } else if (args.containsKey("page")) {
-            page = args.getInt("page");
+            page = savedInstanceState.getInt(EXTRA_PAGE);
         } else {
-            page = gallery.getProgress();
+            page = intent.getIntExtra(EXTRA_PAGE, gallery.getProgress());
         }
 
         if (page < 0 || page >= total) page = 0;
@@ -154,6 +163,15 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
                 //
             }
         });
+
+        String orientation = preferences.getString(getString(R.string.pref_screen_orientation),
+                getString(R.string.pref_screen_orientation_default));
+
+        if (orientation.equals("landscape")) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        } else if (orientation.equals("portrait")) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
     }
 
     @Override
@@ -204,7 +222,7 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putInt("page", getCurrent());
+        outState.putInt(EXTRA_PAGE, getCurrent());
     }
 
     @Override
@@ -311,9 +329,9 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
             Fragment fragment = new PhotoFragment();
             Bundle args = new Bundle();
 
-            args.putLong("id", gallery.getId());
-            args.putInt("page", i + 1);
-            args.putString("title", gallery.getTitle());
+            args.putLong(PhotoFragment.EXTRA_GALLERY, gallery.getId());
+            args.putInt(PhotoFragment.EXTRA_PAGE, i + 1);
+            args.putString(PhotoFragment.EXTRA_TITLE, gallery.getTitle());
             fragment.setArguments(args);
 
             return fragment;
@@ -329,7 +347,7 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
         DialogFragment dialog = new PhotoBookmarkDialog();
         Bundle args = new Bundle();
 
-        args.putLong("id", gallery.getId());
+        args.putLong(PhotoBookmarkDialog.EXTRA_GALLERY, gallery.getId());
 
         dialog.setArguments(args);
         dialog.show(getSupportFragmentManager(), PhotoBookmarkDialog.TAG);

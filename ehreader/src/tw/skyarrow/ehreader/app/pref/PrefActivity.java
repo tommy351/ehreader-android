@@ -12,7 +12,6 @@ import com.google.analytics.tracking.android.MapBuilder;
 
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
-import tw.skyarrow.ehreader.util.ActionBarHelper;
 
 /**
  * Created by SkyArrow on 2014/1/29.
@@ -49,7 +48,8 @@ public class PrefActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                ActionBarHelper.upNavigation(this);
+                setResult(RESULT_OK);
+                finish();
                 return true;
         }
 

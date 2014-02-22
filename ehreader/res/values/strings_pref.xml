@@ -1,6 +1,8 @@
 <resources>
     <string name="label_settings">Settings</string>
 
+    <string name="pref_first_installed" translatable="false">first_installed</string>
+
     // Account
     <string name="pref_account" translatable="false">account</string>
     <string name="pref_account_title">Account</string>
@@ -30,6 +32,20 @@
         <item>3</item>
     </string-array>
 
+    <string name="pref_screen_orientation" translatable="false">screen_orientation</string>
+    <string name="pref_screen_orientation_title">Screen orientation</string>
+    <string name="pref_screen_orientation_default" translatable="false">default</string>
+    <string-array name="pref_screen_orientation_entries">
+        <item>System default</item>
+        <item>Portrait</item>
+        <item>Landscape</item>
+    </string-array>
+    <string-array name="pref_screen_orientation_values" translatable="false">
+        <item>default</item>
+        <item>portrait</item>
+        <item>landscape</item>
+    </string-array>
+
     <string name="pref_volume_key_navigation" translatable="false">volume_key_navigation</string>
     <string name="pref_volume_key_navigation_title">Volume key navigation</string>
     <string name="pref_volume_key_navigation_summary">Navigate between pages using volume keys</string>
@@ -39,6 +55,11 @@
     <string name="pref_keep_screen_on_title">Keep screen on</string>
     <string name="pref_keep_screen_on_summary">Keep screen on when reading</string>
     <bool name="pref_keep_screen_on_default">true</bool>
+
+    <string name="pref_japanese_title" translatable="false">japanese_title</string>
+    <string name="pref_japanese_title_title">Display the Japanese title</string>
+    <string name="pref_japanese_title_summary">Display the japanese title instead of the original one</string>
+    <bool name="pref_japanese_title_default">false</bool>
 
     // Download
     <string name="pref_download_title">Download</string>
@@ -53,6 +74,31 @@
     <string name="pref_auto_download_summary">Continue unfinished downloads automatically</string>
     <bool name="pref_auto_download_default">true</bool>
 
+    // Update
+    <string name="pref_update_title">Update</string>
+
+    <string name="pref_check_update" translatable="false">check_update</string>
+    <string name="pref_check_update_title">Check for updates</string>
+    <string name="pref_check_update_summary">Last checked: %s</string>
+    <string name="pref_update_checked_at" translatable="false">update_checked_at</string>
+    <string name="pref_update_is_interrupted" translatable="false">update_is_interrupted</string>
+
+    <string name="pref_auto_check_update" translatable="false">auto_check_update</string>
+    <string name="pref_auto_check_update_title">Automatically check for updates</string>
+    <string name="pref_auto_check_update_default" translatable="false">168</string>
+    <string-array name="pref_auto_check_update_values" translatable="false">
+        <item>0</item>
+        <item>24</item>
+        <item>168</item>
+        <item>720</item>
+    </string-array>
+    <string-array name="pref_auto_check_update_entries">
+        <item>Off</item>
+        <item>Every day</item>
+        <item>Every week</item>
+        <item>Every month</item>
+    </string-array>
+
     // Advanced
     <string name="pref_advanced_title">Advanced</string>
 
@@ -65,12 +111,6 @@
 
     <string name="pref_clear_search" translatable="false">clear_search</string>
     <string name="pref_clear_search_title">Clear search history</string>
-
-    // Update
-    <string name="pref_update_title">Update</string>
-
-    <string name="pref_check_update" translatable="false">check_update</string>
-    <string name="pref_check_update_title">Check for update</string>
 
     // About
     <string name="pref_about" translatable="false">about</string>
@@ -115,7 +155,7 @@
     <string name="clear_search_msg">Do you want to clear search history?</string>
 
     // Dialog: Check for update
-    <string name="checking_update">Checking for update&#8230;</string>
+    <string name="checking_update">Checking for updates&#8230;</string>
     <string name="check_update_failed_title">Check failed</string>
     <string name="check_update_failed_msg">Failed to fetch update information. Please try again.</string>
     <string name="check_update_available_title">Update available</string>
@@ -123,4 +163,8 @@
     <string name="check_update_latest_title">You\'re up to date!</string>
     <string name="check_update_latest_msg">Version %s is currently the latest version.</string>
     <string name="update">Update</string>
+
+    // Notification: Update
+    <string name="notification_update_title">Update available</string>
+    <string name="notification_update_msg">New version %s of E-Hentai Reader is available.</string>
 </resources>

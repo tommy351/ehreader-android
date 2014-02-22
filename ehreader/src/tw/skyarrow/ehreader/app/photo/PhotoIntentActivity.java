@@ -14,9 +14,6 @@ import android.widget.TextView;
 
 import com.google.analytics.tracking.android.MapBuilder;
 
-import org.json.JSONException;
-
-import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,12 +23,13 @@ import butterknife.OnClick;
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.api.ApiCallException;
+import tw.skyarrow.ehreader.api.DataLoader;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
 import tw.skyarrow.ehreader.util.ActionBarHelper;
-import tw.skyarrow.ehreader.util.DownloadHelper;
 
 /**
  * Created by SkyArrow on 2014/2/9.
@@ -48,14 +46,14 @@ public class PhotoIntentActivity extends ActionBarActivity {
 
     public static final String TAG = "PhotoIntentActivity";
 
-    private Pattern pPhotoUrl = DownloadHelper.pPhotoUrl;
+    private Pattern pPhotoUrl = DataLoader.pPhotoUrl;
 
     private SQLiteDatabase db;
     private DaoMaster daoMaster;
     private DaoSession daoSession;
     private GalleryDao galleryDao;
 
-    private DownloadHelper downloadHelper;
+    private DataLoader dataLoader;
     private long id = 0;
     private String token = "";
     private int page = 0;
@@ -71,7 +69,7 @@ public class PhotoIntentActivity extends ActionBarActivity {
         daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();
-        downloadHelper = new DownloadHelper(this);
+        dataLoader = DataLoader.getInstance();
 
         ActionBar actionBar = getSupportActionBar();
 
@@ -150,12 +148,8 @@ public class PhotoIntentActivity extends ActionBarActivity {
         @Override
         protected Gallery doInBackground(Integer... integers) {
             try {
-                Gallery gallery = downloadHelper.getGalleryByPhotoInfo(id, token, page);
-
-                return gallery;
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+                return dataLoader.getGalleryByPhotoInfo(id, token, page);
+            } catch (ApiCallException e) {
                 e.printStackTrace();
             }
 

@@ -1,4 +1,4 @@
-package tw.skyarrow.ehreader.util;
+package tw.skyarrow.ehreader.widget;
 
 import android.widget.AbsListView;
 

@@ -27,6 +27,9 @@ import tw.skyarrow.ehreader.service.GalleryDownloadService;
 public class DownloadContextMenu extends DialogFragment {
     public static final String TAG = "DownloadContextMenu";
 
+    public static final String EXTRA_GALLERY = "id";
+    public static final String EXTRA_TITLE = "title";
+
     private SQLiteDatabase db;
     private DaoMaster daoMaster;
     private DaoSession daoSession;
@@ -39,7 +42,7 @@ public class DownloadContextMenu extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
         Bundle args = getArguments();
-        galleryId = args.getLong("id");
+        galleryId = args.getLong(EXTRA_GALLERY);
 
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
         db = helper.getReadableDatabase();
@@ -71,7 +74,7 @@ public class DownloadContextMenu extends DialogFragment {
                 break;
         }
 
-        dialog.setTitle(args.getString("title"))
+        dialog.setTitle(args.getString(EXTRA_TITLE))
                 .setItems(menu, onItemClick);
 
         MapBuilder builder = MapBuilder.createAppView();
@@ -111,7 +114,7 @@ public class DownloadContextMenu extends DialogFragment {
         Intent intent = new Intent(getActivity(), GalleryActivity.class);
         Bundle args = new Bundle();
 
-        args.putLong("id", galleryId);
+        args.putLong(GalleryActivity.EXTRA_GALLERY, galleryId);
         intent.putExtras(args);
 
         startActivity(intent);
@@ -139,7 +142,7 @@ public class DownloadContextMenu extends DialogFragment {
         Bundle args = new Bundle();
         DialogFragment dialog = new RedownloadDialog();
 
-        args.putLong("id", galleryId);
+        args.putLong(RedownloadDialog.EXTRA_GALLERY, galleryId);
 
         dialog.setArguments(args);
         dialog.show(getActivity().getSupportFragmentManager(), RedownloadDialog.TAG);
@@ -165,7 +168,7 @@ public class DownloadContextMenu extends DialogFragment {
         DialogFragment dialog = new DownloadDeleteConfirmDialog();
         Bundle args = new Bundle();
 
-        args.putLong("id", galleryId);
+        args.putLong(DownloadDeleteConfirmDialog.EXTRA_GALLERY, galleryId);
 
         dialog.setArguments(args);
         dialog.show(getActivity().getSupportFragmentManager(), DownloadDeleteConfirmDialog.TAG);

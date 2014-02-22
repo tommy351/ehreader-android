@@ -33,9 +33,10 @@ import tw.skyarrow.ehreader.db.Download;
 import tw.skyarrow.ehreader.db.DownloadDao;
 import tw.skyarrow.ehreader.event.GalleryDeleteEvent;
 import tw.skyarrow.ehreader.event.GalleryDownloadEvent;
+import tw.skyarrow.ehreader.event.ListUpdateEvent;
 import tw.skyarrow.ehreader.service.GalleryDownloadService;
 import tw.skyarrow.ehreader.util.DownloadHelper;
-import tw.skyarrow.ehreader.util.InfiniteScrollListener;
+import tw.skyarrow.ehreader.widget.InfiniteScrollListener;
 
 /**
  * Created by SkyArrow on 2014/1/26.
@@ -52,16 +53,15 @@ public class MainFragmentDownload extends Fragment implements AbsListView.OnScro
 
     public static final String TAG = "MainFragmentDownload";
 
+    public static final String EXTRA_POSITION = "position";
+
     private SQLiteDatabase db;
-    private DaoMaster daoMaster;
-    private DaoSession daoSession;
     private DownloadDao downloadDao;
 
     private List<Download> downloadList;
     private DownloadListAdapter adapter;
     private EventBus bus;
     private DownloadHelper downloadHelper;
-
     private boolean isDownloading = false;
 
     @Override
@@ -75,28 +75,28 @@ public class MainFragmentDownload extends Fragment implements AbsListView.OnScro
 
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
         db = helper.getWritableDatabase();
-        daoMaster = new DaoMaster(db);
-        daoSession = daoMaster.newSession();
+        DaoMaster daoMaster = new DaoMaster(db);
+        DaoSession daoSession = daoMaster.newSession();
         downloadDao = daoSession.getDownloadDao();
-        downloadHelper = new DownloadHelper(getActivity());
+        downloadHelper = DownloadHelper.getInstance();
 
-        QueryBuilder qb = downloadDao.queryBuilder();
+        QueryBuilder<Download> qb = downloadDao.queryBuilder();
         qb.orderDesc(DownloadDao.Properties.Created);
 
         downloadList = qb.list();
         adapter = new DownloadListAdapter(getActivity(), downloadList);
+        isDownloading = downloadHelper.isServiceRunning();
 
         listView.setAdapter(adapter);
         listView.setOnScrollListener(this);
         loadingView.setVisibility(View.GONE);
-        downloadHelper.checkServiceStatus();
 
         if (downloadList.size() == 0) {
             errorView.setText(R.string.error_no_download);
         }
 
         if (savedInstanceState != null) {
-            listView.setSelection(savedInstanceState.getInt("position"));
+            listView.setSelection(savedInstanceState.getInt(EXTRA_POSITION));
         }
 
         return view;
@@ -153,7 +153,7 @@ public class MainFragmentDownload extends Fragment implements AbsListView.OnScro
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putInt("position", listView.getSelectedItemPosition());
+        outState.putInt(EXTRA_POSITION, listView.getSelectedItemPosition());
     }
 
     public void onEventMainThread(GalleryDownloadEvent event) {
@@ -186,12 +186,12 @@ public class MainFragmentDownload extends Fragment implements AbsListView.OnScro
 
             case GalleryDownloadService.EVENT_SERVICE_START:
                 isDownloading = true;
-                getActivity().supportInvalidateOptionsMenu();
+                invalidateOptionsMenu();
                 break;
 
             case GalleryDownloadService.EVENT_SERVICE_STOP:
                 isDownloading = false;
-                getActivity().supportInvalidateOptionsMenu();
+                invalidateOptionsMenu();
                 break;
         }
     }
@@ -207,18 +207,16 @@ public class MainFragmentDownload extends Fragment implements AbsListView.OnScro
         adapter.notifyDataSetChanged();
     }
 
-    private void startAll() {
-        isDownloading = true;
+    public void onEvent(ListUpdateEvent event) {
+        adapter.notifyDataSetChanged();
+    }
 
-        downloadHelper.startAllDownload();
-        getActivity().supportInvalidateOptionsMenu();
+    private void startAll() {
+        downloadHelper.startAll();
     }
 
     private void pauseAll() {
-        isDownloading = false;
-
-        downloadHelper.pauseAllDownload();
-        getActivity().supportInvalidateOptionsMenu();
+        downloadHelper.pauseAll();
     }
 
     @Override
@@ -234,5 +232,9 @@ public class MainFragmentDownload extends Fragment implements AbsListView.OnScro
     @Override
     public void onScroll(AbsListView absListView, int i, int i2, int i3) {
 
+    }
+
+    private void invalidateOptionsMenu() {
+        getActivity().supportInvalidateOptionsMenu();
     }
 }

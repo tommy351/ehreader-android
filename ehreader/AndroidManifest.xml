@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.SET_WALLPAPER"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
         android:allowBackup="true"
@@ -29,7 +30,7 @@
             android:name=".app.gallery.GalleryActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.MainActivity"/>
+                android:value=".app.main.MainActivity"/>
         </activity>
         <activity
             android:name=".app.gallery.GalleryIntentActivity"
@@ -44,7 +45,7 @@
             </intent-filter>
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.MainActivity"/>
+                android:value=".app.main.MainActivity"/>
         </activity>
         <activity
             android:name=".app.photo.PhotoActivity"
@@ -52,7 +53,7 @@
             android:configChanges="orientation|screenSize|keyboardHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.GalleryActivity"/>
+                android:value=".app.gallery.GalleryActivity"/>
         </activity>
         <activity
             android:name=".app.photo.PhotoIntentActivity"
@@ -67,7 +68,7 @@
             </intent-filter>
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.MainActivity"/>
+                android:value=".app.main.MainActivity"/>
         </activity>
         <activity
             android:name=".app.photo.CropActivity"
@@ -80,7 +81,7 @@
             </intent-filter>
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.MainActivity"/>
+                android:value=".app.main.MainActivity"/>
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable"/>
@@ -91,7 +92,7 @@
             android:configChanges="orientation|screenSize|keyboardHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.MainActivity"/>
+                android:value=".app.main.MainActivity"/>
             <intent-filter>
                 <action android:name="android.intent.action.SEND"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -103,7 +104,7 @@
             android:label="@string/label_settings">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.MainActivity"/>
+                android:value=".app.main.MainActivity"/>
         </activity>
         <activity
             android:name=".app.search.FilterActivity"
@@ -111,7 +112,7 @@
             android:configChanges="orientation|screenSize|keyboardHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.MainActivity"/>
+                android:value=".app.main.MainActivity"/>
         </activity>
         <activity
             android:name=".app.pref.AboutActivity"
@@ -119,7 +120,7 @@
             android:theme="@style/Theme.About">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.PrefActivity"/>
+                android:value=".app.pref.PrefActivity"/>
         </activity>
         <provider
             android:name=".provider.PhotoProvider"
@@ -132,11 +133,18 @@
             android:name=".service.GalleryDownloadService"/>
         <service
             android:name=".service.PhotoInfoService"/>
+        <service
+            android:name=".service.UpdateCheckService"/>
         <receiver
             android:name=".receiver.NetworkStateReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGED"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".receiver.UpdateAlarmReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
     </application>

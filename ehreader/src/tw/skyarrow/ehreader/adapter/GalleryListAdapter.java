@@ -50,8 +50,9 @@ public class GalleryListAdapter extends BaseListAdapter<Gallery> {
 
         int categoryRes = gallery.getCategoryResource();
         String meta = getContext().getString(categoryRes) + " / " + gallery.getCount() + "P";
+        String[] titles = gallery.getTitles(getContext());
 
-        holder.title.setText(gallery.getTitle());
+        holder.title.setText(titles[0]);
         holder.meta.setText(meta);
         holder.rating.setRating(gallery.getRating());
 

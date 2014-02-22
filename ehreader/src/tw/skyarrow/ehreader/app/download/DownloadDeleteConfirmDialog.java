@@ -18,13 +18,15 @@ import tw.skyarrow.ehreader.R;
 public class DownloadDeleteConfirmDialog extends DialogFragment {
     public static final String TAG = "DownloadDeleteConfirmDialog";
 
+    public static final String EXTRA_GALLERY = "id";
+
     private long galleryId;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
         Bundle args = getArguments();
-        galleryId = args.getLong("id");
+        galleryId = args.getLong(EXTRA_GALLERY);
 
         dialog.setTitle(R.string.delete_gallery_title)
                 .setMessage(R.string.delete_gallery_msg)
@@ -45,7 +47,7 @@ public class DownloadDeleteConfirmDialog extends DialogFragment {
             DialogFragment dialog = new DownloadDeleteDialog();
             Bundle args = new Bundle();
 
-            args.putLong("id", galleryId);
+            args.putLong(DownloadDeleteDialog.EXTRA_GALLERY, galleryId);
 
             dialog.setArguments(args);
             dialog.show(getActivity().getSupportFragmentManager(), DownloadDeleteDialog.TAG);

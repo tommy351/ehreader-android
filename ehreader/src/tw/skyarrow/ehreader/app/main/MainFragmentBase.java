@@ -14,18 +14,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.ButterKnife;
+import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.adapter.GalleryListAdapter;
 import tw.skyarrow.ehreader.app.gallery.GalleryActivity;
 import tw.skyarrow.ehreader.db.Gallery;
+import tw.skyarrow.ehreader.event.ListUpdateEvent;
 
 /**
  * Created by SkyArrow on 2014/1/30.
  */
 public class MainFragmentBase extends Fragment implements AdapterView.OnItemClickListener, AbsListView.OnScrollListener {
+    public static final String EXTRA_POSITION = "position";
+
     private ListView listView;
     private List<Gallery> list;
     private GalleryListAdapter adapter;
+    private EventBus bus;
 
     public ListView getListView() {
         return listView;
@@ -63,6 +68,8 @@ public class MainFragmentBase extends Fragment implements AdapterView.OnItemClic
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         ButterKnife.inject(this, view);
+        bus = EventBus.getDefault();
+        bus.register(this);
 
         listView = (ListView) view.findViewById(R.id.list);
         list = new ArrayList<Gallery>();
@@ -73,17 +80,23 @@ public class MainFragmentBase extends Fragment implements AdapterView.OnItemClic
         listView.setOnScrollListener(this);
 
         if (savedInstanceState != null) {
-            listView.setSelection(savedInstanceState.getInt("position"));
+            listView.setSelection(savedInstanceState.getInt(EXTRA_POSITION));
         }
 
         return view;
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        bus.unregister(this);
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putInt("position", listView.getSelectedItemPosition());
+        outState.putInt(EXTRA_POSITION, listView.getSelectedItemPosition());
     }
 
     @Override
@@ -93,10 +106,8 @@ public class MainFragmentBase extends Fragment implements AdapterView.OnItemClic
         if (gallery == null) return;
 
         Intent intent = new Intent(getActivity(), GalleryActivity.class);
-        Bundle args = new Bundle();
 
-        args.putLong("id", gallery.getId());
-        intent.putExtras(args);
+        intent.putExtra(GalleryActivity.EXTRA_GALLERY, gallery.getId());
         startActivity(intent);
     }
 
@@ -113,5 +124,9 @@ public class MainFragmentBase extends Fragment implements AdapterView.OnItemClic
     @Override
     public void onScroll(AbsListView absListView, int i, int i2, int i3) {
         //
+    }
+
+    public void onEvent(ListUpdateEvent event) {
+        adapter.notifyDataSetChanged();
     }
 }

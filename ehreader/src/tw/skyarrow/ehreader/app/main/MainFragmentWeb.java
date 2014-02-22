@@ -20,22 +20,22 @@ import android.widget.TextView;
 import com.google.analytics.tracking.android.Fields;
 import com.google.analytics.tracking.android.MapBuilder;
 
-import org.json.JSONException;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.adapter.GalleryListAdapter;
+import tw.skyarrow.ehreader.api.ApiCallException;
+import tw.skyarrow.ehreader.api.DataLoader;
 import tw.skyarrow.ehreader.app.gallery.GalleryActivity;
 import tw.skyarrow.ehreader.db.Gallery;
-import tw.skyarrow.ehreader.util.DownloadHelper;
-import tw.skyarrow.ehreader.util.InfiniteScrollListener;
+import tw.skyarrow.ehreader.event.ListUpdateEvent;
 import tw.skyarrow.ehreader.util.NetworkHelper;
+import tw.skyarrow.ehreader.widget.InfiniteScrollListener;
 
 /**
  * Created by SkyArrow on 2014/1/26.
@@ -57,13 +57,17 @@ public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.
 
     public static final String TAG = "MainFragmentWeb";
 
+    public static final String EXTRA_BASE = "base";
+    public static final String EXTRA_POSITION = "position";
+
     private String baseUrl;
     private InfiniteScrollListener scrollListener;
     private List<Long> galleryIndex;
     private List<Gallery> galleryList;
     private GalleryListAdapter adapter;
-    private DownloadHelper downloadHelper;
+    private DataLoader dataLoader;
     private NetworkHelper network;
+    private EventBus bus;
 
     private View footer;
     private ProgressBar footerProgressBar;
@@ -78,13 +82,15 @@ public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         ButterKnife.inject(this, view);
         setHasOptionsMenu(true);
+        bus = EventBus.getDefault();
+        bus.register(this);
 
         Context context = getActivity();
-        downloadHelper = new DownloadHelper(getActivity());
+        dataLoader = DataLoader.getInstance();
         network = new NetworkHelper(getActivity());
 
         Bundle args = getArguments();
-        baseUrl = args.getString("base");
+        baseUrl = args.getString(EXTRA_BASE);
 
         scrollListener = new InfiniteScrollListener();
         scrollListener.setOnScrollToEndListener(this);
@@ -109,7 +115,7 @@ public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.
         listView.setOnScrollListener(scrollListener);
 
         if (savedInstanceState != null) {
-            listView.setSelection(savedInstanceState.getInt("position"));
+            listView.setSelection(savedInstanceState.getInt(EXTRA_POSITION));
         }
 
         getGalleryList(0);
@@ -130,6 +136,7 @@ public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        bus.unregister(this);
 
         if (task != null && !task.isCancelled()) {
             task.cancel(true);
@@ -161,7 +168,11 @@ public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putInt("position", listView.getSelectedItemPosition());
+        outState.putInt(EXTRA_POSITION, listView.getSelectedItemPosition());
+    }
+
+    public void onEvent(ListUpdateEvent event) {
+        adapter.notifyDataSetChanged();
     }
 
     private void getGalleryList(int page) {
@@ -184,10 +195,8 @@ public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.
         if (gallery == null) return;
 
         Intent intent = new Intent(getActivity(), GalleryActivity.class);
-        Bundle args = new Bundle();
 
-        args.putLong("id", gallery.getId());
-        intent.putExtras(args);
+        intent.putExtra(GalleryActivity.EXTRA_GALLERY, gallery.getId());
         startActivity(intent);
     }
 
@@ -199,10 +208,8 @@ public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.
             int page = integers[0];
 
             try {
-                return downloadHelper.getGalleryIndex(baseUrl, page);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+                return dataLoader.getGalleryIndex(baseUrl, page);
+            } catch (ApiCallException e) {
                 e.printStackTrace();
             }
 

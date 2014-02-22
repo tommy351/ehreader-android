@@ -42,6 +42,9 @@ import tw.skyarrow.ehreader.util.L;
 public class LoginDialog extends DialogFragment {
     public static final String TAG = "LoginDialog";
 
+    public static final String EXTRA_USERNAME = "username";
+    public static final String EXTRA_PASSWORD = "password";
+
     private static final String LOGIN_URL = "https://forums.e-hentai.org/index.php?act=Login&CODE=01";
 
     private String username;
@@ -51,8 +54,8 @@ public class LoginDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         ProgressDialog dialog = new ProgressDialog(getActivity());
         Bundle args = getArguments();
-        username = args.getString("username");
-        password = args.getString("password");
+        username = args.getString(EXTRA_USERNAME);
+        password = args.getString(EXTRA_PASSWORD);
 
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);

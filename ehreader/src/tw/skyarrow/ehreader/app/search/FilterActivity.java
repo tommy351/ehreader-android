@@ -21,7 +21,9 @@ import tw.skyarrow.ehreader.util.ActionBarHelper;
  * Created by SkyArrow on 2014/2/2.
  */
 public class FilterActivity extends ActionBarActivity {
-    private static final String TAG = "FilterActivity";
+    public static final String TAG = "FilterActivity";
+
+    public static final String EXTRA_FILTER = "filter";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +38,7 @@ public class FilterActivity extends ActionBarActivity {
         Fragment fragment = new MainFragmentWeb();
         Bundle args = getIntent().getExtras();
         Uri.Builder builder = Uri.parse(isLoggedIn ? Constant.BASE_URL_EX : Constant.BASE_URL).buildUpon();
-        boolean[] filter = args.getBooleanArray("filter");
+        boolean[] filter = args.getBooleanArray(EXTRA_FILTER);
 
         for (int i = 0; i < filter.length; i++) {
             String param = filter[i] ? "1" : "0";
@@ -86,7 +88,7 @@ public class FilterActivity extends ActionBarActivity {
 
         builder.appendQueryParameter("f_apply", "Apply Filter");
 
-        args.putString("base", builder.build().toString());
+        args.putString(MainFragmentWeb.EXTRA_BASE, builder.build().toString());
         fragment.setArguments(args);
 
         ft.replace(R.id.container, fragment);

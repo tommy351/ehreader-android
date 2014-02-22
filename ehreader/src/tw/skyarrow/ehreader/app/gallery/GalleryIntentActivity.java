@@ -14,9 +14,6 @@ import android.widget.TextView;
 
 import com.google.analytics.tracking.android.MapBuilder;
 
-import org.json.JSONException;
-
-import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,12 +23,13 @@ import butterknife.OnClick;
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.api.ApiCallException;
+import tw.skyarrow.ehreader.api.DataLoader;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
 import tw.skyarrow.ehreader.util.ActionBarHelper;
-import tw.skyarrow.ehreader.util.DownloadHelper;
 import tw.skyarrow.ehreader.util.L;
 
 /**
@@ -47,16 +45,16 @@ public class GalleryIntentActivity extends ActionBarActivity {
     @InjectView(R.id.retry)
     Button retryBtn;
 
-    public static final String TAG = "GalleryActivity";
+    public static final String TAG = "GalleryIntentActivity";
 
-    private static final Pattern pGalleryUrl = DownloadHelper.pGalleryUrl;
+    private static final Pattern pGalleryUrl = DataLoader.pGalleryUrl;
 
     private SQLiteDatabase db;
     private DaoMaster daoMaster;
     private DaoSession daoSession;
     private GalleryDao galleryDao;
 
-    private DownloadHelper downloadHelper;
+    private DataLoader dataLoader;
     private long id = 0;
     private String token = "";
 
@@ -71,7 +69,7 @@ public class GalleryIntentActivity extends ActionBarActivity {
         daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();
-        downloadHelper = new DownloadHelper(this);
+        dataLoader = DataLoader.getInstance();
 
         ActionBar actionBar = getSupportActionBar();
 
@@ -149,12 +147,8 @@ public class GalleryIntentActivity extends ActionBarActivity {
         @Override
         protected Gallery doInBackground(Integer... integers) {
             try {
-                Gallery gallery = downloadHelper.getGalleryInfo(id, token);
-
-                return gallery;
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+                return dataLoader.getGallery(id, token);
+            } catch (ApiCallException e) {
                 e.printStackTrace();
             }
 
@@ -184,10 +178,8 @@ public class GalleryIntentActivity extends ActionBarActivity {
 
     private void showGallery(Gallery gallery) {
         Intent intent = new Intent(this, GalleryActivity.class);
-        Bundle args = new Bundle();
 
-        args.putLong("id", gallery.getId());
-        intent.putExtras(args);
+        intent.putExtra(GalleryActivity.EXTRA_GALLERY, gallery.getId());
         startActivity(intent);
     }
 

@@ -1,4 +1,5 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Account -->
     <PreferenceCategory
         android:key="@string/pref_account"
         android:title="@string/pref_account_title">
@@ -10,6 +11,7 @@
             android:key="@string/pref_logout"
             android:title="@string/pref_logout_title"/>
     </PreferenceCategory>
+    <!-- View -->
     <PreferenceCategory
         android:title="@string/pref_view_title">
         <tw.skyarrow.ehreader.widget.ListPreferenceWithSummary
@@ -19,6 +21,13 @@
             android:defaultValue="@string/pref_launch_page_default"
             android:dialogTitle="@string/pref_launch_page_title"
             android:entryValues="@array/pref_launch_page_values"/>
+        <tw.skyarrow.ehreader.widget.ListPreferenceWithSummary
+            android:key="@string/pref_screen_orientation"
+            android:title="@string/pref_screen_orientation_title"
+            android:entries="@array/pref_screen_orientation_entries"
+            android:defaultValue="@string/pref_screen_orientation_default"
+            android:dialogTitle="@string/pref_screen_orientation_title"
+            android:entryValues="@array/pref_screen_orientation_values"/>
         <CheckBoxPreference
             android:key="@string/pref_volume_key_navigation"
             android:title="@string/pref_volume_key_navigation_title"
@@ -29,7 +38,13 @@
             android:title="@string/pref_keep_screen_on_title"
             android:summary="@string/pref_keep_screen_on_summary"
             android:defaultValue="@bool/pref_keep_screen_on_default"/>
+        <CheckBoxPreference
+            android:key="@string/pref_japanese_title"
+            android:title="@string/pref_japanese_title_title"
+            android:summary="@string/pref_japanese_title_summary"
+            android:defaultValue="@bool/pref_japanese_title_default"/>
     </PreferenceCategory>
+    <!-- Download -->
     <PreferenceCategory
         android:title="@string/pref_download_title">
         <CheckBoxPreference
@@ -43,6 +58,21 @@
             android:summary="@string/pref_download_over_wifi_summary"
             android:defaultValue="@bool/pref_download_over_wifi_default"/>
     </PreferenceCategory>
+    <!-- Update -->
+    <PreferenceCategory
+        android:title="@string/pref_update_title">
+        <PreferenceScreen
+            android:title="@string/pref_check_update_title"
+            android:key="@string/pref_check_update"/>
+        <tw.skyarrow.ehreader.widget.ListPreferenceWithSummary
+            android:title="@string/pref_auto_check_update_title"
+            android:key="@string/pref_auto_check_update"
+            android:defaultValue="@string/pref_auto_check_update_default"
+            android:entries="@array/pref_auto_check_update_entries"
+            android:entryValues="@array/pref_auto_check_update_values"
+            android:dialogTitle="@string/pref_auto_check_update_title"/>
+    </PreferenceCategory>
+    <!-- Advanced -->
     <PreferenceCategory
         android:title="@string/pref_advanced_title">
         <PreferenceScreen
@@ -55,12 +85,7 @@
             android:title="@string/pref_clear_search_title"
             android:key="@string/pref_clear_search"/>
     </PreferenceCategory>
-    <PreferenceCategory
-        android:title="@string/pref_update_title">
-        <PreferenceScreen
-            android:title="@string/pref_check_update_title"
-            android:key="@string/pref_check_update"/>
-    </PreferenceCategory>
+    <!-- About -->
     <PreferenceCategory
         android:title="@string/pref_about_title">
         <PreferenceScreen

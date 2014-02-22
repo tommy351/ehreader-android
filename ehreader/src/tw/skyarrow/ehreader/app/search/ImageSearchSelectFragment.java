@@ -39,7 +39,7 @@ import butterknife.OnClick;
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
-import tw.skyarrow.ehreader.util.DownloadHelper;
+import tw.skyarrow.ehreader.api.DataLoader;
 import tw.skyarrow.ehreader.util.NetworkHelper;
 import tw.skyarrow.ehreader.util.ObservableHttpEntity;
 
@@ -47,8 +47,6 @@ import tw.skyarrow.ehreader.util.ObservableHttpEntity;
  * Created by SkyArrow on 2014/1/29.
  */
 public class ImageSearchSelectFragment extends Fragment {
-    private static final int PHOTO_SELECT = 200;
-
     @InjectView(R.id.select)
     Button selectBtn;
 
@@ -76,6 +74,12 @@ public class ImageSearchSelectFragment extends Fragment {
     @InjectView(R.id.error)
     TextView errorView;
 
+    public static final String TAG = "ImageSearchSelectFragment";
+
+    public static final String EXTRA_DATA = "data";
+
+    private static final int PHOTO_SELECT = 200;
+
     private MultiPartPostTask uploadTask;
     private boolean loggedIn;
     private boolean backStack = true;
@@ -91,8 +95,8 @@ public class ImageSearchSelectFragment extends Fragment {
         loggedIn = BaseApplication.isLoggedIn();
         network = new NetworkHelper(getActivity());
 
-        if (args != null && args.getParcelable("data") != null) {
-            uri = args.getParcelable("data");
+        if (args != null && args.getParcelable(EXTRA_DATA) != null) {
+            uri = args.getParcelable(EXTRA_DATA);
             backStack = false;
 
             fileUpload();
@@ -156,7 +160,7 @@ public class ImageSearchSelectFragment extends Fragment {
             try {
                 HttpClient httpClient = new DefaultHttpClient();
                 HttpPost httpPost = new HttpPost(loggedIn ? Constant.IMAGE_SEARCH_URL_EX : Constant.IMAGE_SEARCH_URL);
-                HttpContext httpContext = DownloadHelper.setupHttpContext(getActivity());
+                HttpContext httpContext = DataLoader.getInstance().getHttpContext();
                 HttpParams params = httpPost.getParams();
                 MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
 

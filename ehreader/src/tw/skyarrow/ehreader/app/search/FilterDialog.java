@@ -79,7 +79,7 @@ public class FilterDialog extends DialogFragment {
             Intent intent = new Intent(getActivity(), FilterActivity.class);
             Bundle args = new Bundle();
 
-            args.putBooleanArray("filter", filter);
+            args.putBooleanArray(FilterActivity.EXTRA_FILTER, filter);
             intent.putExtras(args);
 
             startActivity(intent);

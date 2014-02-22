@@ -12,19 +12,29 @@ import android.preference.PreferenceFragment;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 
+import java.text.DateFormat;
+import java.util.Date;
+
 import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.event.LoginEvent;
-import tw.skyarrow.ehreader.util.UpdateChecker;
+import tw.skyarrow.ehreader.event.UpdateCheckEvent;
+import tw.skyarrow.ehreader.service.UpdateCheckService;
+import tw.skyarrow.ehreader.util.UpdateHelper;
+import tw.skyarrow.ehreader.widget.ListPreferenceWithSummary;
 
 /**
  * Created by SkyArrow on 2014/2/3.
  */
 public class PrefFragment extends PreferenceFragment {
+    public static final String TAG = "PrefFragment";
+
+    private SharedPreferences preferences;
     private PreferenceCategory accountCategory;
     private Preference loginPref;
     private Preference logoutPref;
+    private Preference checkUpdatePref;
 
     private static final int CLICK_THRESHOLD = 5;
     private static final long RESET_DELAY = 500;
@@ -37,6 +47,8 @@ public class PrefFragment extends PreferenceFragment {
         addPreferencesFromResource(R.xml.pref);
         EventBus.getDefault().register(this);
 
+        preferences = getPreferenceManager().getSharedPreferences();
+
         accountCategory = (PreferenceCategory) findPreferenceByResource(R.string.pref_account);
 
         loginPref = findPreferenceByResource(R.string.pref_login);
@@ -46,6 +58,14 @@ public class PrefFragment extends PreferenceFragment {
         logoutPref = findPreferenceByResource(R.string.pref_logout);
         logoutPref.setOnPreferenceClickListener(
                 new OpenDialogPreference(new LogoutDialog(), LogoutDialog.TAG));
+
+        boolean loggedIn = preferences.getBoolean(getString(R.string.pref_logged_in), false);
+
+        if (loggedIn) {
+            hideLoginPref();
+        } else {
+            hideLogoutPref();
+        }
 
         Preference clearCachePref = findPreferenceByResource(R.string.pref_clear_cache);
         clearCachePref.setOnPreferenceClickListener(
@@ -59,29 +79,38 @@ public class PrefFragment extends PreferenceFragment {
         clearSearchPref.setOnPreferenceClickListener(
                 new OpenDialogPreference(new ClearSearchDialog(), ClearSearchDialog.TAG));
 
-        Preference checkUpdatePref = findPreferenceByResource(R.string.pref_check_update);
+        checkUpdatePref = findPreferenceByResource(R.string.pref_check_update);
         checkUpdatePref.setOnPreferenceClickListener(
                 new OpenDialogPreference(new CheckUpdateDialog(), CheckUpdateDialog.TAG));
+        updateLastCheckedAt();
+
+        final ListPreferenceWithSummary autoUpdatePref =
+                (ListPreferenceWithSummary) findPreferenceByResource(R.string.pref_auto_check_update);
+        final UpdateHelper updateHelper = new UpdateHelper(getActivity());
+
+        autoUpdatePref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object value) {
+                autoUpdatePref.updateSummary();
+                updateHelper.cancelAlarm();
+
+                if (Integer.parseInt((String) value) > 0) {
+                    updateHelper.setupAlarm();
+                }
+
+                return true;
+            }
+        });
 
         Preference versionPref = findPreferenceByResource(R.string.pref_version);
-        UpdateChecker updateChecker = new UpdateChecker(getActivity());
         versionPref.setOnPreferenceClickListener(onVersionClick);
-        versionPref.setSummary(updateChecker.getVersionCode());
+        versionPref.setSummary(updateHelper.getVersionCode());
 
         Preference authorPref = findPreferenceByResource(R.string.pref_author);
         authorPref.setOnPreferenceClickListener(onAuthorClick);
 
         Preference sourceCodePref = findPreferenceByResource(R.string.pref_source_code);
         sourceCodePref.setOnPreferenceClickListener(onSourceCodeClick);
-
-        SharedPreferences preferences = getPreferenceManager().getSharedPreferences();
-        boolean loggedIn = preferences.getBoolean(getString(R.string.pref_logged_in), false);
-
-        if (loggedIn) {
-            hideLoginPref();
-        } else {
-            hideLogoutPref();
-        }
     }
 
     @Override
@@ -99,6 +128,25 @@ public class PrefFragment extends PreferenceFragment {
             case LoginEvent.LOGOUT:
                 hideLogoutPref();
                 break;
+        }
+    }
+
+    public void onEventMainThread(UpdateCheckEvent event) {
+        switch (event.getCode()) {
+            case UpdateCheckService.EVENT_AVAILABLE:
+            case UpdateCheckService.EVENT_LATEST:
+                updateLastCheckedAt();
+                break;
+        }
+    }
+
+    private void updateLastCheckedAt() {
+        long lastCheckedAt = preferences.getLong(getString(R.string.pref_update_checked_at), 0);
+
+        if (lastCheckedAt > 0) {
+            DateFormat dateFormat = DateFormat.getDateInstance();
+            String dateString = dateFormat.format(new Date(lastCheckedAt));
+            checkUpdatePref.setSummary(String.format(getString(R.string.pref_check_update_summary), dateString));
         }
     }
 

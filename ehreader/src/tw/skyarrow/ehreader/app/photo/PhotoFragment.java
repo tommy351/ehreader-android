@@ -68,6 +68,12 @@ public class PhotoFragment extends Fragment {
     @InjectView(R.id.retry)
     Button retryBtn;
 
+    public static final String TAG = "PhotoFragment";
+
+    public static final String EXTRA_GALLERY = "id";
+    public static final String EXTRA_PAGE = "page";
+    public static final String EXTRA_TITLE = "title";
+
     private SQLiteDatabase db;
     private PhotoDao photoDao;
 
@@ -110,9 +116,9 @@ public class PhotoFragment extends Fragment {
                 .build();
 
         Bundle args = getArguments();
-        galleryId = args.getLong("id");
-        page = args.getInt("page");
-        galleryTitle = args.getString("title");
+        galleryId = args.getLong(EXTRA_GALLERY);
+        page = args.getInt(EXTRA_PAGE);
+        galleryTitle = args.getString(EXTRA_TITLE);
 
         pageText.setText(Integer.toString(page));
         displayPhoto();
@@ -376,7 +382,7 @@ public class PhotoFragment extends Fragment {
                 "UI", "button", "find similar", null
         ).build());
 
-        args.putLong("photo", photo.getId());
+        args.putLong(ImageSearchActivity.EXTRA_PHOTO, photo.getId());
         intent.putExtras(args);
         startActivity(intent);
     }

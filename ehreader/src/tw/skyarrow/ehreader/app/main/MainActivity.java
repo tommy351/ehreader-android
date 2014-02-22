@@ -14,17 +14,20 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.SpinnerAdapter;
 
+import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
-import tw.skyarrow.ehreader.app.search.FilterDialog;
 import tw.skyarrow.ehreader.app.pref.PrefActivity;
+import tw.skyarrow.ehreader.app.search.FilterDialog;
 import tw.skyarrow.ehreader.app.search.ImageSearchActivity;
+import tw.skyarrow.ehreader.event.ListUpdateEvent;
 import tw.skyarrow.ehreader.util.ActionBarHelper;
 
 public class MainActivity extends ActionBarActivity implements ActionBar.OnNavigationListener {
-    private static final String TAG = "MainActivity";
+    public static final String TAG = "MainActivity";
 
+    public static final String EXTRA_TAB = "tab";
     public static final int TAB_GALLERY = 0;
     public static final int TAB_STARRED = 1;
     public static final int TAB_HISTORY = 2;
@@ -32,10 +35,15 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 
     private static final int CONTAINER = R.id.container;
 
+    public static final int REQUEST_PREFERENCE = 1;
+
+    private EventBus bus;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        bus = EventBus.getDefault();
 
         SpinnerAdapter spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.main_tabs,
                 android.R.layout.simple_spinner_dropdown_item);
@@ -46,18 +54,11 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         actionBar.setDisplayShowTitleEnabled(false);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String launchPagePref = preferences.getString(getString(R.string.pref_launch_page), "0");
-        int tab = Integer.parseInt(launchPagePref);
-        Bundle args;
+        String launchPagePref = preferences.getString(getString(R.string.pref_launch_page), getString(R.string.pref_launch_page_default));
+        int tab = getIntent().getIntExtra(EXTRA_TAB, Integer.parseInt(launchPagePref));
 
         if (savedInstanceState != null) {
-            args = savedInstanceState;
-        } else {
-            args = getIntent().getExtras();
-        }
-
-        if (args != null) {
-            tab = args.getInt("tab");
+            tab = savedInstanceState.getInt(EXTRA_TAB);
         }
 
         actionBar.setSelectedNavigationItem(tab);
@@ -67,7 +68,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putInt("tab", getActionBar().getSelectedNavigationIndex());
+        outState.putInt(EXTRA_TAB, getActionBar().getSelectedNavigationIndex());
     }
 
     @Override
@@ -124,7 +125,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
             default:
                 fragment = new MainFragmentWeb();
                 tag = MainFragmentWeb.TAG;
-                args.putString("base", loggedIn ? Constant.BASE_URL_EX : Constant.BASE_URL);
+                args.putString(MainFragmentWeb.EXTRA_BASE, loggedIn ? Constant.BASE_URL_EX : Constant.BASE_URL);
         }
 
         fragment.setArguments(args);
@@ -132,6 +133,15 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
         ft.commit();
 
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_PREFERENCE:
+                bus.post(new ListUpdateEvent());
+                break;
+        }
     }
 
     private void fileSearch() {
@@ -149,6 +159,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
     private void openSettings() {
         Intent intent = new Intent(this, PrefActivity.class);
 
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_PREFERENCE);
     }
 }

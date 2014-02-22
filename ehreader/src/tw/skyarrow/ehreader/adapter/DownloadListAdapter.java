@@ -60,10 +60,11 @@ public class DownloadListAdapter extends BaseListAdapter<Download> {
 
         int progress = download.getProgress();
         int total = gallery.getCount();
+        String[] titles = gallery.getTitles(getContext());
 
         view.setOnClickListener(new OnClickListener(download));
         view.setOnLongClickListener(new OnLongClickListener(download));
-        holder.title.setText(gallery.getTitle());
+        holder.title.setText(titles[0]);
         holder.progressBar.setMax(total);
         holder.progressBar.setProgress(progress);
         holder.featureBtn.setOnClickListener(new OnFeatureClickListener(download));
@@ -130,10 +131,8 @@ public class DownloadListAdapter extends BaseListAdapter<Download> {
         @Override
         public void onClick(View view) {
             Intent intent = new Intent(getContext(), GalleryActivity.class);
-            Bundle args = new Bundle();
 
-            args.putLong("id", download.getId());
-            intent.putExtras(args);
+            intent.putExtra(GalleryActivity.EXTRA_GALLERY, download.getId());
             getContext().startActivity(intent);
         }
     }
@@ -169,8 +168,8 @@ public class DownloadListAdapter extends BaseListAdapter<Download> {
         DialogFragment dialog = new DownloadContextMenu();
         Bundle args = new Bundle();
 
-        args.putLong("id", download.getId());
-        args.putString("title", download.getGallery().getTitle());
+        args.putLong(DownloadContextMenu.EXTRA_GALLERY, download.getId());
+        args.putString(DownloadContextMenu.EXTRA_TITLE, download.getGallery().getTitle());
 
         dialog.setArguments(args);
         dialog.show(((FragmentActivity) getContext()).getSupportFragmentManager(), DownloadContextMenu.TAG);

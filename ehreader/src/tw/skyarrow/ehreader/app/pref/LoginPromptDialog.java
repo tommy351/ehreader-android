@@ -71,8 +71,8 @@ public class LoginPromptDialog extends DialogFragment {
             DialogFragment dialog = new LoginDialog();
             Bundle args = new Bundle();
 
-            args.putString("username", username);
-            args.putString("password", password);
+            args.putString(LoginDialog.EXTRA_USERNAME, username);
+            args.putString(LoginDialog.EXTRA_PASSWORD, password);
 
             dialog.setArguments(args);
             dialog.show(getActivity().getSupportFragmentManager(), LoginDialog.TAG);

@@ -13,7 +13,7 @@ import com.google.analytics.tracking.android.MapBuilder;
 
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
-import tw.skyarrow.ehreader.util.UpdateChecker;
+import tw.skyarrow.ehreader.util.UpdateHelper;
 
 /**
  * Created by SkyArrow on 2014/2/17.
@@ -21,13 +21,15 @@ import tw.skyarrow.ehreader.util.UpdateChecker;
 public class CheckUpdateAvailableDialog extends DialogFragment {
     public static final String TAG = "CheckUpdateAvailableDialog";
 
+    public static final String EXTRA_VERSION = "version";
+
     private String version;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
         Bundle args = getArguments();
-        version = args.getString("version");
+        version = args.getString(EXTRA_VERSION);
 
         dialog.setTitle(R.string.check_update_available_title)
                 .setMessage(getString(R.string.check_update_available_msg, version))
@@ -47,7 +49,7 @@ public class CheckUpdateAvailableDialog extends DialogFragment {
         public void onClick(DialogInterface dialogInterface, int i) {
             Intent intent = new Intent(Intent.ACTION_VIEW);
 
-            intent.setData(Uri.parse(UpdateChecker.getDownloadUrl(version)));
+            intent.setData(Uri.parse(UpdateHelper.getDownloadUrl(version)));
             startActivity(intent);
         }
     };

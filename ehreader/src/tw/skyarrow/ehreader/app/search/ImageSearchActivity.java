@@ -22,7 +22,9 @@ import tw.skyarrow.ehreader.util.ActionBarHelper;
  * Created by SkyArrow on 2014/1/29.
  */
 public class ImageSearchActivity extends ActionBarActivity {
-    private static final String TAG = "ImageSearchActivity";
+    public static final String TAG = "ImageSearchActivity";
+
+    public static final String EXTRA_PHOTO = "photo";
 
     private boolean isSelected = false;
     private static final int CONTAINER = R.id.container;
@@ -44,15 +46,9 @@ public class ImageSearchActivity extends ActionBarActivity {
             fragment = new ImageSearchSelectFragment();
             Uri uri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
 
-            if (uri != null) args.putParcelable("data", uri);
+            if (uri != null) args.putParcelable(ImageSearchSelectFragment.EXTRA_DATA, uri);
         } else if (args != null) {
-            if (args.getLong("photo") > 0) {
-                fragment = new ImageSearchPhotoFragment();
-            } else if (args.getString("base") != null) {
-                fragment = new MainFragmentWeb();
-            } else {
-                fragment = new ImageSearchSelectFragment();
-            }
+            fragment = new ImageSearchPhotoFragment();
         } else {
             fragment = new ImageSearchSelectFragment();
         }
@@ -99,7 +95,7 @@ public class ImageSearchActivity extends ActionBarActivity {
         Bundle args = new Bundle();
         isSelected = true;
 
-        args.putString("base", base);
+        args.putString(MainFragmentWeb.EXTRA_BASE, base);
         fragment.setArguments(args);
 
         ft.replace(CONTAINER, fragment);
@@ -113,7 +109,7 @@ public class ImageSearchActivity extends ActionBarActivity {
         Fragment fragment = new MainFragmentWeb();
         Bundle args = new Bundle();
 
-        args.putString("base", base);
+        args.putString(MainFragmentWeb.EXTRA_BASE, base);
         fragment.setArguments(args);
 
         ft.replace(CONTAINER, fragment);

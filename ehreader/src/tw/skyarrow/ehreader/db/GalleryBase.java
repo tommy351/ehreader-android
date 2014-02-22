@@ -1,7 +1,10 @@
 package tw.skyarrow.ehreader.db;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 
 import java.io.File;
 
@@ -16,6 +19,8 @@ public abstract class GalleryBase {
     abstract String getToken();
     abstract Integer getCategory();
     abstract void setCategory(Integer category);
+    abstract String getTitle();
+    abstract String getSubtitle();
 
     public int getCategoryResource() {
         switch (getCategory()) {
@@ -108,5 +113,22 @@ public abstract class GalleryBase {
         File ehFolder = new File(Environment.getExternalStorageDirectory(), Constant.FOLDER_NAME);
 
         return new File(ehFolder, Long.toString(getId()));
+    }
+
+    public String[] getTitles(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean displayJapaneseTitle = preferences.getBoolean(context.getString(R.string.pref_japanese_title),
+                context.getResources().getBoolean(R.bool.pref_japanese_title_default));
+        String title = getTitle();
+        String subtitle = getSubtitle();
+
+        if (displayJapaneseTitle && !subtitle.isEmpty()) {
+            title = getSubtitle();
+            subtitle = getTitle();
+        }
+
+        String[] arr = {title, subtitle};
+
+        return arr;
     }
 }

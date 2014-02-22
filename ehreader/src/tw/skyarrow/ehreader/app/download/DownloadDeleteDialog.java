@@ -35,6 +35,8 @@ import tw.skyarrow.ehreader.service.GalleryDownloadService;
 public class DownloadDeleteDialog extends DialogFragment {
     public static final String TAG = "DownloadDeleteDialog";
 
+    public static final String EXTRA_GALLERY = "id";
+
     private SQLiteDatabase db;
     private DaoMaster daoMaster;
     private DaoSession daoSession;
@@ -50,7 +52,7 @@ public class DownloadDeleteDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         dialog = new ProgressDialog(getActivity());
         Bundle args = getArguments();
-        galleryId = args.getLong("id");
+        galleryId = args.getLong(EXTRA_GALLERY);
 
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
         db = helper.getWritableDatabase();

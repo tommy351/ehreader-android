@@ -20,13 +20,15 @@ import tw.skyarrow.ehreader.service.GalleryDownloadService;
 public class RedownloadDialog extends DialogFragment {
     public static final String TAG = "RedownloadDialog";
 
+    public static final String EXTRA_GALLERY = "id";
+
     private long galleryId;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
         Bundle args = getArguments();
-        galleryId = args.getLong("id");
+        galleryId = args.getLong(EXTRA_GALLERY);
 
         dialog.setMessage(R.string.redownload_confirm)
                 .setPositiveButton(R.string.download_redownload, onSubmitClick)
