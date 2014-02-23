@@ -107,7 +107,7 @@ public class UpdateCheckService extends Service {
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        builder.setContentText(getString(R.string.notification_update_title))
+        builder.setContentTitle(getString(R.string.notification_update_title))
                 .setSmallIcon(R.drawable.ic_notification_info)
                 .setContentText(String.format(getString(R.string.notification_update_msg), version.toString()))
                 .setContentIntent(pendingIntent)
