@@ -1,12 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/menu_share"
-        android:title="@string/menu_share"
-        android:icon="@drawable/ic_share_dark"
-        app:showAsAction="ifRoom"
-        app:actionProviderClass="android.support.v7.widget.ShareActionProvider"/>
-    <item
         android:id="@+id/menu_add_bookmark"
         android:title="@string/menu_add_bookmark"
         android:icon="@drawable/ic_add_bookmark_dark"
@@ -16,10 +10,6 @@
         android:title="@string/menu_remove_bookmark"
         android:icon="@drawable/ic_remove_bookmark_dark"
         app:showAsAction="always"/>
-    <item
-        android:id="@+id/menu_set_as_wallpaper"
-        android:title="@string/menu_set_as_wallpaper"
-        app:showAsAction="never"/>
     <item
         android:id="@+id/menu_find_similar"
         android:title="@string/menu_find_similar"

@@ -156,16 +156,20 @@ public class PhotoFragment extends Fragment {
 
         inflater.inflate(R.menu.photo_fragment, menu);
 
-        MenuItem shareItem = menu.findItem(R.id.menu_share);
-        ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
-        shareActionProvider.setShareIntent(getShareIntent());
-
         if (photo.getBookmarked()) {
             menu.findItem(R.id.menu_add_bookmark).setVisible(false);
             menu.findItem(R.id.menu_remove_bookmark).setVisible(true);
         } else {
             menu.findItem(R.id.menu_add_bookmark).setVisible(true);
             menu.findItem(R.id.menu_remove_bookmark).setVisible(false);
+        }
+
+        if (mBitmap != null) {
+            inflater.inflate(R.menu.photo_fragment_loaded, menu);
+
+            MenuItem shareItem = menu.findItem(R.id.menu_share);
+            ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
+            shareActionProvider.setShareIntent(getShareIntent());
         }
 
         super.onCreateOptionsMenu(menu, inflater);
@@ -286,9 +290,11 @@ public class PhotoFragment extends Fragment {
         @Override
         public void onLoadingStarted(String imageUri, View view) {
             startLoadAt = System.currentTimeMillis();
+            isLoaded = true;
 
             progressBar.setIndeterminate(false);
             progressBar.setProgress(0);
+            getActivity().supportInvalidateOptionsMenu();
         }
 
         @Override
@@ -301,7 +307,6 @@ public class PhotoFragment extends Fragment {
             mBitmap = bitmap;
             attacher.setOnViewTapListener(onPhotoTap);
 
-            isLoaded = true;
             getActivity().supportInvalidateOptionsMenu();
 
             BaseApplication.getTracker().send(MapBuilder.createTiming(
