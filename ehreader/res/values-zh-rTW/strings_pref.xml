@@ -126,4 +126,8 @@
     <string name="check_update_latest_title">已是最新版本！</string>
     <string name="check_update_latest_msg">版本 %s 已是目前最新的版本。</string>
     <string name="update">更新</string>
+
+    // Notification: Update
+    <string name="notification_update_title">可用更新</string>
+    <string name="notification_update_msg">E-Hentai 新版本 %s 已經推出。</string>
 </resources>

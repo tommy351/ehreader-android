@@ -7,6 +7,7 @@
     <string name="menu_set_as_wallpaper">設為桌布</string>
     <string name="menu_rotate_left">向左旋轉</string>
     <string name="menu_rotate_right">向右旋轉</string>
+    <string name="menu_slideshow">投影片</string>
 
     // Notification
     <string name="notification_bookmark_added">書籤已新增</string>
