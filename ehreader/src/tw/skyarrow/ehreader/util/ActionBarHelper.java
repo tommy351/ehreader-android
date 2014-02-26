@@ -46,6 +46,7 @@ public class ActionBarHelper {
         searchView.setOnQueryTextListener(new QueryTextListener(item));
         searchView.setOnSuggestionListener(new SuggestionListener(item));
         searchView.setSearchableInfo(searchableInfo);
+        searchView.setIconifiedByDefault(true);
     }
 
     public static class QueryTextListener implements SearchView.OnQueryTextListener {
