@@ -16,7 +16,6 @@ import java.util.List;
 import butterknife.ButterKnife;
 import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.R;
-import tw.skyarrow.ehreader.adapter.GalleryListAdapter;
 import tw.skyarrow.ehreader.app.gallery.GalleryActivity;
 import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.event.ListUpdateEvent;

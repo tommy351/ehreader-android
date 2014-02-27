@@ -49,8 +49,10 @@ import butterknife.OnClick;
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.app.DrawerActivity;
 import tw.skyarrow.ehreader.app.download.DownloadConfirmDialog;
 import tw.skyarrow.ehreader.app.download.RedownloadDialog;
+import tw.skyarrow.ehreader.app.main.MainDrawerActivity;
 import tw.skyarrow.ehreader.app.photo.PhotoActivity;
 import tw.skyarrow.ehreader.app.search.SearchActivity;
 import tw.skyarrow.ehreader.db.DaoMaster;
@@ -64,7 +66,7 @@ import tw.skyarrow.ehreader.util.ActionBarHelper;
 /**
  * Created by SkyArrow on 2014/1/27.
  */
-public class GalleryActivity extends ActionBarActivity {
+public class GalleryActivity extends MainDrawerActivity {
     @InjectView(R.id.meta)
     TextView metaView;
 
@@ -116,8 +118,10 @@ public class GalleryActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_gallery);
+        setContentView(R.layout.activity_gallery_wrap);
+        setupDrawer();
         ButterKnife.inject(this);
+        setDrawerIndicatorEnabled(false);
 
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, Constant.DB_NAME, null);
         db = helper.getWritableDatabase();

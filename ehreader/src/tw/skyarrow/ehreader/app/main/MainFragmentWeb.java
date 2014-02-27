@@ -28,7 +28,6 @@ import butterknife.InjectView;
 import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
-import tw.skyarrow.ehreader.adapter.GalleryListAdapter;
 import tw.skyarrow.ehreader.api.ApiCallException;
 import tw.skyarrow.ehreader.api.DataLoader;
 import tw.skyarrow.ehreader.app.gallery.GalleryActivity;

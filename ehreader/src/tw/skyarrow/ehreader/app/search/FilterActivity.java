@@ -14,13 +14,15 @@ import com.google.analytics.tracking.android.MapBuilder;
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.app.DrawerActivity;
+import tw.skyarrow.ehreader.app.main.MainDrawerActivity;
 import tw.skyarrow.ehreader.app.main.MainFragmentWeb;
 import tw.skyarrow.ehreader.util.ActionBarHelper;
 
 /**
  * Created by SkyArrow on 2014/2/2.
  */
-public class FilterActivity extends ActionBarActivity {
+public class FilterActivity extends MainDrawerActivity {
     public static final String TAG = "FilterActivity";
 
     public static final String EXTRA_FILTER = "filter";
@@ -29,6 +31,8 @@ public class FilterActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setupDrawer();
+        setDrawerIndicatorEnabled(false);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);

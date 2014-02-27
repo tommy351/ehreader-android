@@ -1,4 +1,4 @@
-package tw.skyarrow.ehreader.adapter;
+package tw.skyarrow.ehreader.app;
 
 import android.content.Context;
 import android.view.LayoutInflater;

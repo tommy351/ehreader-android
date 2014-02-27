@@ -15,13 +15,15 @@ import com.google.analytics.tracking.android.MapBuilder;
 
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.app.DrawerActivity;
+import tw.skyarrow.ehreader.app.main.MainDrawerActivity;
 import tw.skyarrow.ehreader.app.main.MainFragmentWeb;
 import tw.skyarrow.ehreader.util.ActionBarHelper;
 
 /**
  * Created by SkyArrow on 2014/1/29.
  */
-public class ImageSearchActivity extends ActionBarActivity {
+public class ImageSearchActivity extends MainDrawerActivity {
     public static final String TAG = "ImageSearchActivity";
 
     public static final String EXTRA_PHOTO = "photo";
@@ -33,6 +35,8 @@ public class ImageSearchActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setupDrawer();
+        setDrawerIndicatorEnabled(false);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);

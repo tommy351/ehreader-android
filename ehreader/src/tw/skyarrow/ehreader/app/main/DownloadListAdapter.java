@@ -1,4 +1,4 @@
-package tw.skyarrow.ehreader.adapter;
+package tw.skyarrow.ehreader.app.main;
 
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +20,7 @@ import java.util.List;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.app.BaseListAdapter;
 import tw.skyarrow.ehreader.app.download.DownloadContextMenu;
 import tw.skyarrow.ehreader.app.gallery.GalleryActivity;
 import tw.skyarrow.ehreader.db.Download;
