@@ -1,11 +1,26 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="@dimen/margin_medium"
-    android:background="@drawable/listitem_bg">
+    android:paddingLeft="@dimen/margin_medium"
+    android:paddingRight="@dimen/margin_medium"
+    android:paddingTop="@dimen/margin_small"
+    android:paddingBottom="@dimen/margin_small"
+    android:background="?android:attr/selectableItemBackground"
+    android:minHeight="?android:attr/listPreferredItemHeight">
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="@dimen/navigation_drawer_icon_size"
+        android:layout_height="@dimen/navigation_drawer_icon_size"
+        android:layout_marginRight="@dimen/margin_small"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_drawer_star"/>
     <TextView
-        android:id="@+id/drawer_item"
+        android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_toRightOf="@+id/icon"
+        android:textColor="?android:attr/textColorPrimary"
+        android:layout_centerVertical="true"
+        android:text="Menu"/>
 </RelativeLayout>

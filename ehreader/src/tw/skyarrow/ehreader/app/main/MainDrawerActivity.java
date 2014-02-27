@@ -30,9 +30,10 @@ public class MainDrawerActivity extends SearchBarActivity {
 
         String[] menuItems = getResources().getStringArray(R.array.main_tabs);
 
-        for (int i = 0, len = menuItems.length; i < len; i++) {
-            list.add(new DrawerItem(menuItems[i]));
-        }
+        list.add(new DrawerItem(menuItems[0], R.drawable.ic_drawer_gallery));
+        list.add(new DrawerItem(menuItems[1], R.drawable.ic_drawer_star));
+        list.add(new DrawerItem(menuItems[2], R.drawable.ic_drawer_history));
+        list.add(new DrawerItem(menuItems[3], R.drawable.ic_drawer_download));
 
         drawerView.setAdapter(adapter);
     }

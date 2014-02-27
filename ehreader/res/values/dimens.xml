@@ -16,4 +16,5 @@
     <dimen name="cover_margin">32dp</dimen>
 
     <dimen name="navigation_drawer_width">240dp</dimen>
+    <dimen name="navigation_drawer_icon_size">24dp</dimen>
 </resources>

@@ -2,8 +2,10 @@ package tw.skyarrow.ehreader.app.main;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -36,6 +38,7 @@ public class DrawerAdapter extends BaseListAdapter<DrawerItem> {
         }
 
         holder.name.setText(drawerItem.getName());
+        holder.icon.setImageDrawable(getIcon(drawerItem.getIcon()));
 
         if (drawerItem.isSelected()) {
             holder.name.setTypeface(null, Typeface.BOLD);
@@ -53,9 +56,16 @@ public class DrawerAdapter extends BaseListAdapter<DrawerItem> {
         return view;
     }
 
+    private Drawable getIcon(int res) {
+        return getContext().getResources().getDrawable(res);
+    }
+
     static final class ViewHolder {
-        @InjectView(R.id.drawer_item)
+        @InjectView(R.id.name)
         TextView name;
+
+        @InjectView(R.id.icon)
+        ImageView icon;
 
         public ViewHolder(View view) {
             ButterKnife.inject(this, view);
