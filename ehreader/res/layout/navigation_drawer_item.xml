@@ -12,8 +12,7 @@
         android:layout_width="@dimen/navigation_drawer_icon_size"
         android:layout_height="@dimen/navigation_drawer_icon_size"
         android:layout_marginRight="@dimen/margin_small"
-        android:layout_centerVertical="true"
-        android:src="@drawable/ic_drawer_star"/>
+        android:layout_centerVertical="true"/>
     <TextView
         android:id="@+id/name"
         android:layout_width="wrap_content"
@@ -22,5 +21,5 @@
         android:layout_toRightOf="@+id/icon"
         android:textColor="?android:attr/textColorPrimary"
         android:layout_centerVertical="true"
-        android:text="Menu"/>
+        android:fontFamily="sans-serif-light"/>
 </RelativeLayout>

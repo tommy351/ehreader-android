@@ -7,6 +7,14 @@
         app:showAsAction="ifRoom"
         app:actionProviderClass="android.support.v7.widget.ShareActionProvider"/>
     <item
+        android:id="@+id/menu_save_photo"
+        android:title="@string/menu_save_photo"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/menu_delete_photo"
+        android:title="@string/menu_delete_photo"
+        app:showAsAction="never"/>
+    <item
         android:id="@+id/menu_set_as_wallpaper"
         android:title="@string/menu_set_as_wallpaper"
         app:showAsAction="never"/>

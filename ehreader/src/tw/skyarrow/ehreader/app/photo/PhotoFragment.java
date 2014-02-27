@@ -4,11 +4,16 @@ import android.content.ContentUris;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -47,6 +52,7 @@ import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.db.PhotoDao;
+import tw.skyarrow.ehreader.event.PhotoDownloadEvent;
 import tw.skyarrow.ehreader.event.PhotoInfoEvent;
 import tw.skyarrow.ehreader.provider.PhotoProvider;
 import tw.skyarrow.ehreader.service.PhotoInfoService;
@@ -156,13 +162,10 @@ public class PhotoFragment extends Fragment {
 
         inflater.inflate(R.menu.photo_fragment, menu);
 
-        if (photo.getBookmarked()) {
-            menu.findItem(R.id.menu_add_bookmark).setVisible(false);
-            menu.findItem(R.id.menu_remove_bookmark).setVisible(true);
-        } else {
-            menu.findItem(R.id.menu_add_bookmark).setVisible(true);
-            menu.findItem(R.id.menu_remove_bookmark).setVisible(false);
-        }
+        boolean isBookmarked = photo.getBookmarked();
+
+        menu.findItem(R.id.menu_add_bookmark).setVisible(!isBookmarked);
+        menu.findItem(R.id.menu_remove_bookmark).setVisible(isBookmarked);
 
         if (mBitmap != null) {
             inflater.inflate(R.menu.photo_fragment_loaded, menu);
@@ -170,6 +173,11 @@ public class PhotoFragment extends Fragment {
             MenuItem shareItem = menu.findItem(R.id.menu_share);
             ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
             shareActionProvider.setShareIntent(getShareIntent());
+
+            boolean isDownloaded = photo.getDownloaded();
+
+            menu.findItem(R.id.menu_save_photo).setVisible(!isDownloaded);
+            menu.findItem(R.id.menu_delete_photo).setVisible(isDownloaded);
         }
 
         super.onCreateOptionsMenu(menu, inflater);
@@ -197,6 +205,14 @@ public class PhotoFragment extends Fragment {
             case R.id.menu_open_in_browser:
                 openInBrowser();
                 return true;
+
+            case R.id.menu_save_photo:
+                savePhoto();
+                return true;
+
+            case R.id.menu_delete_photo:
+                deletePhoto();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -215,6 +231,13 @@ public class PhotoFragment extends Fragment {
         this.photo = photo;
         getActivity().supportInvalidateOptionsMenu();
         loadImage();
+    }
+
+    public void onEvent(PhotoDownloadEvent event) {
+        if (event.getId() != photo.getId()) return;
+
+        photo.setDownloaded(event.isDownloaded());
+        getActivity().supportInvalidateOptionsMenu();
     }
 
     private Intent getShareIntent() {
@@ -409,5 +432,31 @@ public class PhotoFragment extends Fragment {
 
         intent.setData(photo.getUri());
         startActivity(intent);
+    }
+
+    private void savePhoto() {
+        DialogFragment dialog = new PhotoSaveDialog();
+        Bundle args = new Bundle();
+
+        BaseApplication.getTracker().send(MapBuilder.createEvent(
+                "UI", "button", "save photo", null
+        ).build());
+
+        args.putLong(PhotoSaveDialog.EXTRA_PHOTO, photo.getId());
+        dialog.setArguments(args);
+        dialog.show(getActivity().getSupportFragmentManager(), PhotoSaveDialog.TAG);
+    }
+
+    private void deletePhoto() {
+        DialogFragment dialog = new PhotoDeleteConfirmDialog();
+        Bundle args = new Bundle();
+
+        BaseApplication.getTracker().send(MapBuilder.createEvent(
+                "UI", "button", "delete photo", null
+        ).build());
+
+        args.putLong(PhotoDeleteConfirmDialog.EXTRA_PHOTO, photo.getId());
+        dialog.setArguments(args);
+        dialog.show(getActivity().getSupportFragmentManager(), PhotoDeleteConfirmDialog.TAG);
     }
 }

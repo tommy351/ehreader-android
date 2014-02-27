@@ -7,10 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
-import com.google.analytics.tracking.android.Fields;
-import com.google.analytics.tracking.android.MapBuilder;
-
-import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.service.GalleryDownloadService;
 
@@ -30,14 +26,10 @@ public class RedownloadDialog extends DialogFragment {
         Bundle args = getArguments();
         galleryId = args.getLong(EXTRA_GALLERY);
 
-        dialog.setMessage(R.string.redownload_confirm)
+        dialog.setTitle(getString(R.string.download_confirm_title))
+                .setMessage(R.string.redownload_msg)
                 .setPositiveButton(R.string.download_redownload, onSubmitClick)
                 .setNegativeButton(R.string.cancel, null);
-
-        MapBuilder builder = MapBuilder.createAppView();
-        builder.set(Fields.SCREEN_NAME, TAG);
-
-        BaseApplication.getTracker().send(builder.build());
 
         return dialog.create();
     }

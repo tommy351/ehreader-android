@@ -3,9 +3,6 @@
     <string name="menu_start_all">Start all</string>
     <string name="menu_pause_all">Pause all</string>
 
-    <string name="download_confirm">This gallery needs total %s. Do you want to download?</string>
-    <string name="redownload_confirm">This gallery has been already downloaded. Do you want to redownload?</string>
-
     <string name="download_open">Open</string>
     <string name="download_start">Start</string>
     <string name="download_pause">Pause</string>
@@ -19,7 +16,14 @@
     <string name="download_success">Download success</string>
     <string name="download_pending">Download pending</string>
 
-    // Delete gallery
+    // Dialog: Download confirm
+    <string name="download_confirm_title">Download</string>
+    <string name="download_confirm_msg">This gallery needs total %s. Do you want to download?</string>
+
+    // Dialog: Redownload
+    <string name="redownload_msg">This gallery has been already downloaded. Do you want to redownload?</string>
+
+    // Dialog: Delete gallery
     <string name="delete_gallery_title">Delete gallery</string>
     <string name="delete_gallery_msg">Do you want to delete the downloaded gallery? This operation can\'t be undone.</string>
     <string name="gallery_deleting">Deleting&#8230;</string>

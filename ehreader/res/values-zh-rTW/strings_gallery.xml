@@ -13,8 +13,8 @@
     <string name="read_btn">閱讀</string>
 
     // Notification
-    <string name="notification_starred">已收藏</string>
-    <string name="notification_unstarred">已取消收藏</string>
+    <string name="notification_starred">相簿已收藏</string>
+    <string name="notification_unstarred">相簿已取消收藏</string>
 
     // Error
     <string name="error_token_invalid">Token 無效。</string>

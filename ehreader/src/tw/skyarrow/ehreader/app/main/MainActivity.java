@@ -19,6 +19,7 @@ import tw.skyarrow.ehreader.app.pref.PrefActivity;
 import tw.skyarrow.ehreader.app.search.FilterDialog;
 import tw.skyarrow.ehreader.app.search.ImageSearchActivity;
 import tw.skyarrow.ehreader.event.ListUpdateEvent;
+import tw.skyarrow.ehreader.util.ActionBarHelper;
 
 public class MainActivity extends MainDrawerActivity {
     public static final String TAG = "MainActivity";
@@ -63,7 +64,7 @@ public class MainActivity extends MainDrawerActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-        setupSearchBar(menu.findItem(R.id.menu_search));
+        ActionBarHelper.createSearchMenu(this, menu.findItem(R.id.menu_search));
 
         return true;
     }

@@ -7,12 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import tw.skyarrow.ehreader.R;
-import tw.skyarrow.ehreader.app.SearchBarActivity;
+import tw.skyarrow.ehreader.app.DrawerActivity;
 
 /**
  * Created by SkyArrow on 2014/2/27.
  */
-public class MainDrawerActivity extends SearchBarActivity {
+public class MainDrawerActivity extends DrawerActivity {
     private DrawerAdapter adapter;
 
     @Override

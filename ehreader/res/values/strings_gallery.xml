@@ -13,8 +13,8 @@
     <string name="read_btn">Read</string>
 
     // Notification
-    <string name="notification_starred">Starred</string>
-    <string name="notification_unstarred">Unstarred</string>
+    <string name="notification_starred">Gallery starred</string>
+    <string name="notification_unstarred">Gallery unstarred</string>
 
     // Error
     <string name="error_token_invalid">Token is invalid.</string>

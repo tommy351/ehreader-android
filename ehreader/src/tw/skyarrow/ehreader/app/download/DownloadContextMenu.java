@@ -77,11 +77,6 @@ public class DownloadContextMenu extends DialogFragment {
         dialog.setTitle(args.getString(EXTRA_TITLE))
                 .setItems(menu, onItemClick);
 
-        MapBuilder builder = MapBuilder.createAppView();
-        builder.set(Fields.SCREEN_NAME, TAG);
-
-        BaseApplication.getTracker().send(builder.build());
-
         return dialog.create();
     }
 

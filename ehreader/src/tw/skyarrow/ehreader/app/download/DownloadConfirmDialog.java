@@ -7,10 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
-import com.google.analytics.tracking.android.Fields;
-import com.google.analytics.tracking.android.MapBuilder;
-
-import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.service.GalleryDownloadService;
 import tw.skyarrow.ehreader.util.FileInfoHelper;
@@ -32,16 +28,12 @@ public class DownloadConfirmDialog extends DialogFragment {
         Bundle args = getArguments();
         galleryId = args.getLong(EXTRA_GALLERY);
         long gallerySize = args.getLong(EXTRA_SIZE);
-        String message = String.format(getString(R.string.download_confirm), FileInfoHelper.toBytes(gallerySize));
+        String message = String.format(getString(R.string.download_confirm_msg), FileInfoHelper.toBytes(gallerySize));
 
-        dialog.setMessage(message)
+        dialog.setTitle(getString(R.string.download_confirm_title))
+                .setMessage(message)
                 .setPositiveButton(R.string.ok, onSubmitClick)
                 .setNegativeButton(R.string.cancel, null);
-
-        MapBuilder builder = MapBuilder.createAppView();
-        builder.set(Fields.SCREEN_NAME, TAG);
-
-        BaseApplication.getTracker().send(builder.build());
 
         return dialog.create();
     }

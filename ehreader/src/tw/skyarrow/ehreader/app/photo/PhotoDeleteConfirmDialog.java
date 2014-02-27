@@ -1,4 +1,4 @@
-package tw.skyarrow.ehreader.app.download;
+package tw.skyarrow.ehreader.app.photo;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -13,23 +13,23 @@ import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
 
 /**
- * Created by SkyArrow on 2014/2/2.
+ * Created by SkyArrow on 2014/2/28.
  */
-public class DownloadDeleteConfirmDialog extends DialogFragment {
-    public static final String TAG = "DownloadDeleteConfirmDialog";
+public class PhotoDeleteConfirmDialog extends DialogFragment {
+    public static final String TAG = "PhotoSaveDialog";
 
-    public static final String EXTRA_GALLERY = "id";
+    public static final String EXTRA_PHOTO = "photo";
 
-    private long galleryId;
+    private long id;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
         Bundle args = getArguments();
-        galleryId = args.getLong(EXTRA_GALLERY);
+        id = args.getLong(EXTRA_PHOTO);
 
-        dialog.setTitle(R.string.delete_gallery_title)
-                .setMessage(R.string.delete_gallery_msg)
+        dialog.setTitle(getString(R.string.photo_delete_title))
+                .setMessage(getString(R.string.photo_delete_msg))
                 .setPositiveButton(R.string.delete, onSubmitClick)
                 .setNegativeButton(R.string.cancel, null);
 
@@ -39,13 +39,12 @@ public class DownloadDeleteConfirmDialog extends DialogFragment {
     private DialogInterface.OnClickListener onSubmitClick = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialogInterface, int i) {
-            DialogFragment dialog = new DownloadDeleteDialog();
+            DialogFragment dialog = new PhotoDeleteDialog();
             Bundle args = new Bundle();
 
-            args.putLong(DownloadDeleteDialog.EXTRA_GALLERY, galleryId);
-
+            args.putLong(PhotoDeleteDialog.EXTRA_PHOTO, id);
             dialog.setArguments(args);
-            dialog.show(getActivity().getSupportFragmentManager(), DownloadDeleteDialog.TAG);
+            dialog.show(getActivity().getSupportFragmentManager(), PhotoDeleteDialog.TAG);
         }
     };
 }

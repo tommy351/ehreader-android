@@ -78,11 +78,6 @@ public class DownloadDeleteDialog extends DialogFragment {
 
         getActivity().startService(intent);
 
-        MapBuilder builder = MapBuilder.createAppView();
-        builder.set(Fields.SCREEN_NAME, TAG);
-
-        BaseApplication.getTracker().send(builder.build());
-
         new GalleryDeleteTask().execute();
 
         return dialog;
