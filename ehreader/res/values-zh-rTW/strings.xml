@@ -5,6 +5,8 @@
     // Menu
     <string name="menu_settings">設定</string>
     <string name="menu_share">分享</string>
+    <string name="menu_open_drawer">開啟側欄</string>
+    <string name="menu_close_drawer">關閉側欄</string>
 
     // Categories
     <string name="category_doujinshi">同人誌</string>

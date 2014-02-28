@@ -118,6 +118,7 @@ public class PhotoFragment extends Fragment {
                 .cacheOnDisc(true)
                 .imageScaleType(ImageScaleType.EXACTLY)
                 .bitmapConfig(Bitmap.Config.RGB_565)
+                .imageScaleType(ImageScaleType.IN_SAMPLE_INT)
                 .build();
 
         Bundle args = getArguments();
