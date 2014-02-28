@@ -14,6 +14,7 @@ import com.google.analytics.tracking.android.MapBuilder;
 
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.app.main.AdActivity;
 import tw.skyarrow.ehreader.app.main.MainDrawerActivity;
 import tw.skyarrow.ehreader.app.main.MainFragmentWeb;
 import tw.skyarrow.ehreader.util.ActionBarHelper;
@@ -21,7 +22,7 @@ import tw.skyarrow.ehreader.util.ActionBarHelper;
 /**
  * Created by SkyArrow on 2014/1/29.
  */
-public class ImageSearchActivity extends MainDrawerActivity {
+public class ImageSearchActivity extends AdActivity {
     public static final String TAG = "ImageSearchActivity";
 
     public static final String EXTRA_PHOTO = "photo";
@@ -58,6 +59,7 @@ public class ImageSearchActivity extends MainDrawerActivity {
         fragment.setArguments(args);
         ft.replace(CONTAINER, fragment);
         ft.commit();
+        setupAd();
     }
 
     @Override

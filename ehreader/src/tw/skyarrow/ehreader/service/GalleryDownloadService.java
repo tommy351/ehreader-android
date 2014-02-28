@@ -218,6 +218,11 @@ public class GalleryDownloadService extends Service {
             download.setCreated(new Date(System.currentTimeMillis()));
             download.setProgress(0);
             downloadDao.insertInTx(download);
+
+            if (!gallery.getStarred()) {
+                gallery.setStarred(true);
+                galleryDao.updateInTx(gallery);
+            }
         }
 
         addDownload(download, startId);

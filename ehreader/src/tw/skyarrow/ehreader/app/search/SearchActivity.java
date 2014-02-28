@@ -16,6 +16,7 @@ import com.google.analytics.tracking.android.MapBuilder;
 
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.app.main.AdActivity;
 import tw.skyarrow.ehreader.app.main.MainDrawerActivity;
 import tw.skyarrow.ehreader.app.main.MainFragmentWeb;
 import tw.skyarrow.ehreader.provider.SearchSuggestionProvider;
@@ -24,7 +25,7 @@ import tw.skyarrow.ehreader.util.ActionBarHelper;
 /**
  * Created by SkyArrow on 2014/1/28.
  */
-public class SearchActivity extends MainDrawerActivity {
+public class SearchActivity extends AdActivity {
     private static final String TAG = "SearchActivity";
 
     private String query;
@@ -57,7 +58,9 @@ public class SearchActivity extends MainDrawerActivity {
             suggestions.saveRecentQuery(query, null);
             actionBar.setTitle(query);
 
-            ft.add(R.id.container, fragment).commit();
+            ft.replace(R.id.container, fragment);
+            ft.commit();
+            setupAd();
         }
     }
 

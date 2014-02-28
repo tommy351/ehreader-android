@@ -8,8 +8,8 @@
     <string name="menu_rotate_left">向左旋轉</string>
     <string name="menu_rotate_right">向右旋轉</string>
     <string name="menu_slideshow">投影片</string>
-    <string name="menu_save_photo">儲存相片</string>
-    <string name="menu_delete_photo">刪除相片</string>
+    <string name="menu_save_photo">儲存圖片</string>
+    <string name="menu_delete_photo">刪除圖片</string>
 
     // Notification
     <string name="notification_bookmark_added">書籤已新增</string>
@@ -22,13 +22,13 @@
 
     // Dialog: Save photo
     <string name="photo_saving">儲存中&#8230;</string>
-    <string name="photo_save_success">相片已儲存於 %s</string>
-    <string name="photo_save_failed">相片儲存失敗</string>
+    <string name="photo_save_success">圖片已儲存於 %s</string>
+    <string name="photo_save_failed">圖片儲存失敗</string>
 
     // Dialog: Delete photo
-    <string name="photo_delete_title">刪除相片</string>
-    <string name="photo_delete_msg">您確定要刪除此相片嗎？此操作無法復原。</string>
+    <string name="photo_delete_title">刪除圖片</string>
+    <string name="photo_delete_msg">您確定要刪除此圖片嗎？此操作無法復原。</string>
     <string name="photo_deleting">刪除中&#8230;</string>
-    <string name="photo_delete_success">相片已刪除</string>
-    <string name="photo_delete_failed">相片刪除失敗</string>
+    <string name="photo_delete_success">圖片已刪除</string>
+    <string name="photo_delete_failed">圖片刪除失敗</string>
 </resources>

@@ -13,6 +13,7 @@ import com.google.analytics.tracking.android.MapBuilder;
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.app.main.AdActivity;
 import tw.skyarrow.ehreader.app.main.MainDrawerActivity;
 import tw.skyarrow.ehreader.app.main.MainFragmentWeb;
 import tw.skyarrow.ehreader.util.ActionBarHelper;
@@ -20,7 +21,7 @@ import tw.skyarrow.ehreader.util.ActionBarHelper;
 /**
  * Created by SkyArrow on 2014/2/2.
  */
-public class FilterActivity extends MainDrawerActivity {
+public class FilterActivity extends AdActivity {
     public static final String TAG = "FilterActivity";
 
     public static final String EXTRA_FILTER = "filter";
@@ -95,6 +96,7 @@ public class FilterActivity extends MainDrawerActivity {
 
         ft.replace(R.id.container, fragment);
         ft.commit();
+        setupAd();
     }
 
     @Override
