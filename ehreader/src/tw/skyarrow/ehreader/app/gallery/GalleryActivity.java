@@ -95,9 +95,6 @@ public class GalleryActivity extends MainDrawerActivity {
     @InjectView(R.id.cover_bg)
     ImageView coverBackground;
 
-    @InjectView(R.id.read)
-    Button readBtn;
-
     @InjectView(R.id.cover_loading)
     ProgressBar coverLoading;
 
@@ -204,10 +201,6 @@ public class GalleryActivity extends MainDrawerActivity {
 
             case R.id.menu_unstar:
                 starGallery(false);
-                return true;
-
-            case R.id.menu_download:
-                downloadGallery();
                 return true;
 
             case R.id.menu_open_in_browser:
@@ -435,7 +428,8 @@ public class GalleryActivity extends MainDrawerActivity {
         Toast.makeText(this, res, Toast.LENGTH_SHORT).show();
     }
 
-    private void downloadGallery() {
+    @OnClick(R.id.download)
+    void downloadGallery() {
         Download download = downloadDao.load(gallery.getId());
         Bundle args = new Bundle();
         DialogFragment dialog;

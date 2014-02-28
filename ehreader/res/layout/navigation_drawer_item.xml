@@ -3,10 +3,9 @@
     android:layout_height="wrap_content"
     android:paddingLeft="@dimen/margin_medium"
     android:paddingRight="@dimen/margin_medium"
-    android:paddingTop="@dimen/margin_small"
-    android:paddingBottom="@dimen/margin_small"
-    android:background="?android:attr/selectableItemBackground"
-    android:minHeight="?android:attr/listPreferredItemHeight">
+    android:paddingTop="12dp"
+    android:paddingBottom="12dp"
+    android:background="?android:attr/selectableItemBackground">
     <ImageView
         android:id="@+id/icon"
         android:layout_width="@dimen/navigation_drawer_icon_size"
@@ -17,9 +16,8 @@
         android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_toRightOf="@+id/icon"
-        android:textColor="?android:attr/textColorPrimary"
         android:layout_centerVertical="true"
-        android:fontFamily="sans-serif-light"/>
+        android:fontFamily="sans-serif-light"
+        android:textSize="@dimen/navigation_drawer_text_size"/>
 </RelativeLayout>

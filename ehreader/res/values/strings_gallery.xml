@@ -2,7 +2,6 @@
     // Menu
     <string name="menu_star">Star</string>
     <string name="menu_unstar">Unstar</string>
-    <string name="menu_download">Download</string>
     <string name="menu_open_in_browser">Open in browser</string>
 
     // Meta
@@ -11,6 +10,7 @@
     <string name="meta_created">Created at:</string>
 
     <string name="read_btn">Read</string>
+    <string name="download_btn">Download</string>
 
     // Notification
     <string name="notification_starred">Gallery starred</string>

@@ -2,7 +2,6 @@
     // Menu
     <string name="menu_star">收藏</string>
     <string name="menu_unstar">取消收藏</string>
-    <string name="menu_download">下載</string>
     <string name="menu_open_in_browser">以瀏覽器開啟</string>
 
     // Meta
@@ -11,6 +10,7 @@
     <string name="meta_created">建立時間：</string>
 
     <string name="read_btn">閱讀</string>
+    <string name="download_btn">下載</string>
 
     // Notification
     <string name="notification_starred">相簿已收藏</string>

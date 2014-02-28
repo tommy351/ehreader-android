@@ -12,9 +12,11 @@
     <dimen name="list_item_margin_top">@dimen/margin_small</dimen>
     <integer name="title_max_line">2</integer>
 
-    <dimen name="cover_size">256dp</dimen>
+    <dimen name="cover_size">304dp</dimen>
     <dimen name="cover_margin">32dp</dimen>
+    <dimen name="cover_actionbar_height">48dp</dimen>
 
     <dimen name="navigation_drawer_width">240dp</dimen>
-    <dimen name="navigation_drawer_icon_size">24dp</dimen>
+    <dimen name="navigation_drawer_icon_size">36dp</dimen>
+    <dimen name="navigation_drawer_text_size">20dp</dimen>
 </resources>

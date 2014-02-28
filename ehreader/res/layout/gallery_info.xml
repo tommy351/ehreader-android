@@ -15,24 +15,16 @@
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Title"
         android:layout_marginTop="@dimen/margin_small"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textIsSelectable="true"/>
     <TextView
         android:id="@+id/subtitle"
-        android:text="Subtitle"
         android:layout_marginTop="@dimen/margin_small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textIsSelectable="true"/>
-    <Button
-        android:id="@+id/read"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_medium"
-        android:text="@string/read_btn"/>
     <LinearLayout
         android:id="@+id/meta_box"
         android:layout_width="match_parent"
@@ -47,19 +39,16 @@
             android:id="@+id/tags"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tags"
             android:layout_marginTop="@dimen/margin_medium"/>
         <TextView
             android:id="@+id/uploader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Uploader"
             android:layout_marginTop="@dimen/margin_medium"/>
         <TextView
             android:id="@+id/created"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Created"
             android:layout_marginTop="@dimen/margin_medium"/>
     </LinearLayout>
 </LinearLayout>

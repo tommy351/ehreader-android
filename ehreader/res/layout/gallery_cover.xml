@@ -14,5 +14,50 @@
         android:id="@+id/cover_fg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="@dimen/cover_margin"/>
+        android:layout_margin="@dimen/cover_margin"
+        android:layout_above="@+id/cover_actionbar"/>
+    <LinearLayout
+        android:id="@+id/cover_actionbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/cover_actionbar_height"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:background="@drawable/cover_actionbar_bg">
+        <tw.skyarrow.ehreader.widget.CoverActionBarButton
+            android:id="@+id/read"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_play_dark"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/read_btn"
+                android:fontFamily="sans-serif-light"/>
+        </tw.skyarrow.ehreader.widget.CoverActionBarButton>
+        <View
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/margin_small"
+            android:layout_marginBottom="@dimen/margin_small"
+            android:background="#8fff"/>
+        <tw.skyarrow.ehreader.widget.CoverActionBarButton
+            android:id="@+id/download"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_download_dark"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/download_btn"
+                android:fontFamily="sans-serif-light"/>
+        </tw.skyarrow.ehreader.widget.CoverActionBarButton>
+    </LinearLayout>
 </merge>
