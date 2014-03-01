@@ -35,7 +35,6 @@ import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
-import tw.skyarrow.ehreader.db.DownloadDao;
 import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
 import tw.skyarrow.ehreader.db.Photo;
@@ -52,7 +51,6 @@ public class DataLoader {
     private SQLiteDatabase db;
     private GalleryDao galleryDao;
     private PhotoDao photoDao;
-    private DownloadDao downloadDao;
     private HttpContext httpContext;
     private boolean isLoggedIn;
 
@@ -88,7 +86,6 @@ public class DataLoader {
         DaoSession daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();
         photoDao = daoSession.getPhotoDao();
-        downloadDao = daoSession.getDownloadDao();
     }
 
     private void setupHttpContext() {
@@ -137,6 +134,8 @@ public class DataLoader {
     }
 
     public JSONObject callApi(JSONObject json) throws ApiCallException {
+        String responseStr = "";
+
         try {
             String url = isLoggedIn ? Constant.API_URL_EX : Constant.API_URL;
             HttpPost httpPost = new HttpPost(url);
@@ -146,7 +145,11 @@ public class DataLoader {
             httpPost.setEntity(new StringEntity(json.toString()));
 
             HttpResponse response = getHttpResponse(httpPost);
-            JSONObject result = new JSONObject(HttpRequestHelper.readResponse(response));
+            responseStr = HttpRequestHelper.readResponse(response);
+
+            L.d("Api callback: %s", responseStr);
+
+            JSONObject result = new JSONObject(responseStr);
 
             if (result.has("error")) {
                 String error = result.getString("error");
@@ -164,6 +167,10 @@ public class DataLoader {
         } catch (IOException e) {
             throw new ApiCallException(ApiErrorCode.IO_ERROR, e);
         } catch (JSONException e) {
+            if (responseStr != null && !responseStr.isEmpty()) {
+                L.e("Api call error: %s", responseStr);
+            }
+
             throw new ApiCallException(ApiErrorCode.JSON_ERROR, e);
         }
     }
@@ -203,36 +210,29 @@ public class DataLoader {
             Matcher matcher = pPhotoUrl.matcher(content);
 
             while (matcher.find()) {
-                Photo photo = new Photo();
+                Photo photo = getPhotoInDb(galleryId, page);
                 String token = matcher.group(2);
                 int photoPage = Integer.parseInt(matcher.group(4));
 
                 L.d("Photo found: {galleryId: %d, token: %s, page: %d}", galleryId, token, photoPage);
 
-                photo.setGalleryId(galleryId);
-                photo.setToken(token);
-                photo.setPage(photoPage);
-                list.add(photo);
-
-                QueryBuilder qb = photoDao.queryBuilder();
-                qb.where(qb.and(
-                        PhotoDao.Properties.GalleryId.eq(galleryId),
-                        PhotoDao.Properties.Page.eq(page)
-                ));
-                qb.limit(1);
-
-                if (qb.count() > 0) {
-                    Photo qPhoto = (Photo) qb.list().get(0);
-
-                    qPhoto.setToken(token);
+                if (photo != null) {
+                    photo.setToken(token);
                     photoDao.updateInTx(photo);
                 } else {
+                    photo = new Photo();
+
+                    photo.setGalleryId(galleryId);
+                    photo.setToken(token);
+                    photo.setPage(photoPage);
                     photo.setDownloaded(false);
                     photo.setBookmarked(false);
                     photo.setInvalid(false);
 
                     photoDao.insertInTx(photo);
                 }
+
+                list.add(photo);
             }
 
             return list;
@@ -242,29 +242,41 @@ public class DataLoader {
     }
 
     public Photo getPhotoInfo(Gallery gallery, int page) throws ApiCallException {
-        QueryBuilder qb = photoDao.queryBuilder();
-        qb.where(qb.and(
-                PhotoDao.Properties.GalleryId.eq(gallery.getId()),
-                PhotoDao.Properties.Page.eq(page)
-        ));
-        qb.limit(1);
-        List<Photo> list = qb.list();
+        Photo photo = getPhotoInDb(gallery, page);
 
-        if (list.size() > 0) {
-            return getPhotoInfo(gallery, list.get(0));
+        if (photo != null) {
+            return getPhotoInfo(gallery, photo);
         }
 
         int galleryPage = page / Constant.PHOTO_PER_PAGE;
 
         getPhotoList(gallery, galleryPage);
 
-        list = qb.list();
+        photo = getPhotoInDb(gallery, page);
 
-        if (list.size() > 0) {
-            return getPhotoInfo(gallery, list.get(0));
+        if (photo != null) {
+            return getPhotoInfo(gallery, photo);
         } else {
             throw new ApiCallException(ApiErrorCode.PHOTO_NOT_EXIST);
         }
+    }
+
+    private Photo getPhotoInDb(long galleryId, int page) {
+        QueryBuilder<Photo> qb = photoDao.queryBuilder();
+        qb.where(qb.and(
+                PhotoDao.Properties.GalleryId.eq(galleryId),
+                PhotoDao.Properties.Page.eq(page)
+        ));
+
+        if (qb.count() > 0) {
+            return qb.list().get(0);
+        } else {
+            return null;
+        }
+    }
+
+    private Photo getPhotoInDb(Gallery gallery, int page) {
+        return getPhotoInDb(gallery.getId(), page);
     }
 
     public Photo getPhotoInfo(Gallery gallery, Photo photo) throws ApiCallException {
@@ -329,8 +341,9 @@ public class DataLoader {
     }
 
     public String getShowkey(Gallery gallery) throws ApiCallException {
-        QueryBuilder qb = photoDao.queryBuilder();
-        qb.where(PhotoDao.Properties.GalleryId.eq(gallery.getId())).limit(1);
+        long galleryId = gallery.getId();
+        QueryBuilder<Photo> qb = photoDao.queryBuilder();
+        qb.where(PhotoDao.Properties.GalleryId.eq(galleryId)).limit(1);
         List<Photo> list = qb.list();
         Photo photo = list.get(0);
 
@@ -346,6 +359,15 @@ public class DataLoader {
             HttpGet httpGet = new HttpGet(url);
             HttpResponse response = getHttpResponse(httpGet);
             String content = HttpRequestHelper.readResponse(response);
+
+            L.d("Get show key callback: %s", content);
+
+            if (content.equals("Invalid page.")) {
+                // TODO retry getShowKey again
+                getPhotoList(galleryId, photo.getPage() / Constant.PHOTO_PER_PAGE);
+                throw new ApiCallException(ApiErrorCode.SHOWKEY_EXPIRED, url, response);
+            }
+
             Matcher matcher = pShowkey.matcher(content);
             String showkey = "";
 

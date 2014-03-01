@@ -88,9 +88,10 @@ public class DownloadDeleteDialog extends DialogFragment {
     private class GalleryDeleteTask extends AsyncTask<Integer, Integer, String> {
         @Override
         protected String doInBackground(Integer... integers) {
-            QueryBuilder qb = photoDao.queryBuilder();
+            QueryBuilder<Photo> qb = photoDao.queryBuilder();
             qb.where(PhotoDao.Properties.GalleryId.eq(galleryId));
             List<Photo> photos = qb.list();
+            File galleryFolder = gallery.getFolder();
 
             for (Photo photo : photos) {
                 File file = photo.getFile();
@@ -104,6 +105,10 @@ public class DownloadDeleteDialog extends DialogFragment {
                 publishProgress(1);
             }
 
+            if (galleryFolder.exists()) {
+                galleryFolder.delete();
+            }
+
             return null;
         }
 
@@ -114,12 +119,6 @@ public class DownloadDeleteDialog extends DialogFragment {
 
         @Override
         protected void onPostExecute(String s) {
-            File galleryFolder = gallery.getFolder();
-
-            if (galleryFolder.exists()) {
-                galleryFolder.delete();
-            }
-
             downloadDao.delete(download);
 
             EventBus.getDefault().post(new GalleryDeleteEvent(galleryId));

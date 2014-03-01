@@ -16,4 +16,5 @@ public class ApiErrorCode {
     public static final int TOKEN_NOT_FOUND = 10;
     public static final int TOKEN_OR_PAGE_INVALID = 11;
     public static final int TOKEN_INVALID = 12;
+    public static final int SHOWKEY_EXPIRED = 13;
 }

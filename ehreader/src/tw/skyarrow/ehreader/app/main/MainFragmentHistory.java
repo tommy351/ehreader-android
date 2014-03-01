@@ -18,6 +18,7 @@ import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
+import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
 
 /**
@@ -42,7 +43,7 @@ public class MainFragmentHistory extends MainFragmentBase {
         DaoSession daoSession = daoMaster.newSession();
         GalleryDao galleryDao = daoSession.getGalleryDao();
 
-        QueryBuilder qb = galleryDao.queryBuilder();
+        QueryBuilder<Gallery> qb = galleryDao.queryBuilder();
         qb.where(GalleryDao.Properties.Lastread.isNotNull());
         qb.orderDesc(GalleryDao.Properties.Lastread);
         getList().addAll(qb.list());

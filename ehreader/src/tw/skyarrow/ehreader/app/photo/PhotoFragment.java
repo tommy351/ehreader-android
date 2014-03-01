@@ -253,7 +253,7 @@ public class PhotoFragment extends Fragment {
     }
 
     private void displayPhoto() {
-        QueryBuilder qb = photoDao.queryBuilder();
+        QueryBuilder<Photo> qb = photoDao.queryBuilder();
         qb.where(qb.and(
                 PhotoDao.Properties.GalleryId.eq(galleryId),
                 PhotoDao.Properties.Page.eq(page)
@@ -366,8 +366,11 @@ public class PhotoFragment extends Fragment {
         progressBar.setVisibility(View.VISIBLE);
         progressBar.setIndeterminate(true);
 
-        photo.setInvalid(true);
-        photoDao.update(photo);
+        if (photo != null) {
+            photo.setInvalid(true);
+            photoDao.update(photo);
+        }
+
         callService();
 
         BaseApplication.getTracker().send(MapBuilder.createEvent(
