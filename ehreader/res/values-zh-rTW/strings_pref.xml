@@ -60,6 +60,9 @@
     <string name="pref_auto_download_title">自動下載</string>
     <string name="pref_auto_download_summary">自動繼續未完成的下載</string>
 
+    <string name="pref_hide_files_title">隱藏檔案</string>
+    <string name="pref_hide_files_summary">不要在系統相簿中顯示下載檔案</string>
+
     // Update
     <string name="pref_update_title">更新</string>
 

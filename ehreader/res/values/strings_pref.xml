@@ -113,6 +113,11 @@
     <string name="pref_auto_download_summary">Continue unfinished downloads automatically</string>
     <bool name="pref_auto_download_default">true</bool>
 
+    <string name="pref_hide_files" translatable="false">hide_files</string>
+    <string name="pref_hide_files_title">Hide files</string>
+    <string name="pref_hide_files_summary">Hide downloaded files in the system gallery</string>
+    <bool name="pref_hide_files_default">true</bool>
+
     // Update
     <string name="pref_update_title">Update</string>
 

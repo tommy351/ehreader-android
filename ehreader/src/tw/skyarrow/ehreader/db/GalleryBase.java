@@ -10,6 +10,7 @@ import java.io.File;
 
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.util.DownloadHelper;
 
 /**
  * Created by SkyArrow on 2014/2/4.
@@ -110,9 +111,7 @@ public abstract class GalleryBase {
     }
 
     public File getFolder() {
-        File ehFolder = new File(Environment.getExternalStorageDirectory(), Constant.FOLDER_NAME);
-
-        return new File(ehFolder, Long.toString(getId()));
+        return new File(DownloadHelper.getFolder(), Long.toString(getId()));
     }
 
     public String[] getTitles(Context context) {

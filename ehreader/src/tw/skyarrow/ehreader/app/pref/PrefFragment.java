@@ -12,6 +12,7 @@ import android.preference.PreferenceFragment;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
 
@@ -21,6 +22,7 @@ import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.event.LoginEvent;
 import tw.skyarrow.ehreader.event.UpdateCheckEvent;
 import tw.skyarrow.ehreader.service.UpdateCheckService;
+import tw.skyarrow.ehreader.util.DownloadHelper;
 import tw.skyarrow.ehreader.util.UpdateHelper;
 import tw.skyarrow.ehreader.widget.ListPreferenceWithSummary;
 
@@ -66,6 +68,9 @@ public class PrefFragment extends PreferenceFragment {
         } else {
             hideLogoutPref();
         }
+
+        Preference hideFilesPref = findPreferenceByResource(R.string.pref_hide_files);
+        hideFilesPref.setOnPreferenceChangeListener(onHideFileChange);
 
         Preference clearCachePref = findPreferenceByResource(R.string.pref_clear_cache);
         clearCachePref.setOnPreferenceClickListener(
@@ -159,6 +164,19 @@ public class PrefFragment extends PreferenceFragment {
         accountCategory.removePreference(logoutPref);
         accountCategory.addPreference(loginPref);
     }
+
+    private Preference.OnPreferenceChangeListener onHideFileChange = new Preference.OnPreferenceChangeListener() {
+        @Override
+        public boolean onPreferenceChange(Preference preference, Object value) {
+            try {
+                DownloadHelper.setFolderVisibility(!(Boolean) value);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return true;
+        }
+    };
 
     private Preference.OnPreferenceClickListener onVersionClick = new Preference.OnPreferenceClickListener() {
         @Override

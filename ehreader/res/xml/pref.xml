@@ -76,6 +76,11 @@
             android:title="@string/pref_download_over_wifi_title"
             android:summary="@string/pref_download_over_wifi_summary"
             android:defaultValue="@bool/pref_download_over_wifi_default"/>
+        <CheckBoxPreference
+            android:key="@string/pref_hide_files"
+            android:title="@string/pref_hide_files_title"
+            android:summary="@string/pref_hide_files_summary"
+            android:defaultValue="@bool/pref_hide_files_default"/>
     </PreferenceCategory>
     <!-- Update -->
     <PreferenceCategory

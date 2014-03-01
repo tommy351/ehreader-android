@@ -1,4 +1,4 @@
 <resources>
     <string name="admob_unit_id" translatable="false">a153049b46ebb97</string>
-    <bool name="admob_hide_in_debug_mode" translatable="false">true</bool>
+    <bool name="admob_hide_in_debug_mode">true</bool>
 </resources>

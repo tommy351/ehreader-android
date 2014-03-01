@@ -9,6 +9,8 @@ import com.google.analytics.tracking.android.Tracker;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
+import java.io.IOException;
+
 import tw.skyarrow.ehreader.api.DataLoader;
 import tw.skyarrow.ehreader.util.DownloadHelper;
 import tw.skyarrow.ehreader.util.UpdateHelper;
@@ -33,6 +35,7 @@ public class BaseApplication extends Application {
         initDataLoader();
         initDownloadHelper();
         initAutoUpdate();
+        setFolderVisibility();
     }
 
     @Override
@@ -85,6 +88,17 @@ public class BaseApplication extends Application {
             updateHelper.setupAlarm();
             editor.putBoolean(getString(R.string.pref_first_installed), false);
             editor.commit();
+        }
+    }
+
+    private void setFolderVisibility() {
+        try {
+            boolean isVisible = preferences.getBoolean(getString(R.string.pref_hide_files),
+                    getResources().getBoolean(R.bool.pref_hide_files_default));
+
+            DownloadHelper.setFolderVisibility(!isVisible);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

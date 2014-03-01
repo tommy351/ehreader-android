@@ -6,6 +6,7 @@ import android.os.Environment;
 import java.io.File;
 
 import tw.skyarrow.ehreader.Constant;
+import tw.skyarrow.ehreader.util.DownloadHelper;
 
 /**
  * Created by SkyArrow on 2014/2/4.
@@ -35,8 +36,7 @@ public abstract class PhotoBase {
     }
 
     public File getFile() {
-        File ehFolder = new File(Environment.getExternalStorageDirectory(), Constant.FOLDER_NAME);
-        File galleryFolder = new File(ehFolder, Long.toString(getGalleryId()));
+        File galleryFolder = new File(DownloadHelper.getFolder(), Long.toString(getGalleryId()));
 
         return new File(galleryFolder, getFilename());
     }

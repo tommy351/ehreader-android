@@ -4,7 +4,10 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Environment;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import de.greenrobot.dao.query.QueryBuilder;
@@ -77,5 +80,22 @@ public class DownloadHelper {
         }
 
         return false;
+    }
+
+    public static File getFolder() {
+        return new File(Environment.getExternalStorageDirectory(), Constant.FOLDER_NAME);
+    }
+
+    public static void setFolderVisibility(boolean visible) throws IOException {
+        File ehFolder = getFolder();
+        if (!ehFolder.exists()) return;
+
+        File nomedia = new File(ehFolder, ".nomedia");
+
+        if (nomedia.exists()) {
+            if (visible) nomedia.delete();
+        } else {
+            if (!visible) nomedia.createNewFile();
+        }
     }
 }
