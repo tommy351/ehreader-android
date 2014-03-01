@@ -7,6 +7,7 @@ import com.google.ads.AdRequest;
 import com.google.ads.AdSize;
 import com.google.ads.AdView;
 
+import tw.skyarrow.ehreader.BuildConfig;
 import tw.skyarrow.ehreader.R;
 
 /**
@@ -19,6 +20,9 @@ public class AdActivity extends MainDrawerActivity {
     protected void setupAd() {
         adContainer = (ViewGroup) findViewById(R.id.ad_container);
         String unitId = getString(R.string.admob_unit_id);
+        boolean hideInDebugMode = getResources().getBoolean(R.bool.admob_hide_in_debug_mode);
+
+        if (BuildConfig.DEBUG && hideInDebugMode) return;
 
         ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
