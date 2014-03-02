@@ -2,10 +2,13 @@ package tw.skyarrow.ehreader.app.photo;
 
 import android.content.ContentUris;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
@@ -32,17 +35,30 @@ import com.nostra13.universalimageloader.core.assist.ImageLoadingProgressListene
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.CookieStore;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.cookie.BasicClientCookie;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
+
 import java.io.File;
-import java.util.List;
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
-import de.greenrobot.dao.query.QueryBuilder;
 import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.api.DataLoader;
 import tw.skyarrow.ehreader.app.search.ImageSearchActivity;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
@@ -53,6 +69,8 @@ import tw.skyarrow.ehreader.event.PhotoInfoEvent;
 import tw.skyarrow.ehreader.provider.PhotoProvider;
 import tw.skyarrow.ehreader.service.PhotoInfoService;
 import tw.skyarrow.ehreader.util.FileInfoHelper;
+import tw.skyarrow.ehreader.util.HttpRequestHelper;
+import tw.skyarrow.ehreader.util.L;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 /**
@@ -77,17 +95,26 @@ public class PhotoFragment extends Fragment {
     public static final String EXTRA_PAGE = "page";
     public static final String EXTRA_TITLE = "title";
 
+    private static final int QUALITY_ORIGINAL = 0;
+    private static final int QUALITY_LOW = 1;
+    private static final int QUALITY_MEDIUM = 2;
+    private static final int QUALITY_HIGH = 3;
+
+    private static final Pattern pLofiSrc = Pattern.compile("<img id=\"sm\" src=\"(.+?)\".+?>");
+
     private SQLiteDatabase db;
     private PhotoDao photoDao;
 
     private ImageLoader imageLoader;
     private DisplayImageOptions displayOptions;
+    private DataLoader dataLoader;
 
     private long galleryId;
     private int page;
     private String galleryTitle;
     private Photo photo;
     private Bitmap mBitmap;
+    private int pictureQuality;
 
     private boolean isLoaded = false;
     private boolean isServiceCalled = false;
@@ -112,6 +139,7 @@ public class PhotoFragment extends Fragment {
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         photoDao = daoSession.getPhotoDao();
+        dataLoader = DataLoader.getInstance();
 
         imageLoader = ImageLoader.getInstance();
         displayOptions = new DisplayImageOptions.Builder()
@@ -125,6 +153,10 @@ public class PhotoFragment extends Fragment {
         galleryId = args.getLong(EXTRA_GALLERY);
         page = args.getInt(EXTRA_PAGE);
         galleryTitle = args.getString(EXTRA_TITLE);
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String qualityPref = preferences.getString(getString(R.string.pref_picture_quality), getString(R.string.pref_picture_quality_default));
+        pictureQuality = Integer.parseInt(qualityPref);
 
         pageText.setText(Integer.toString(page));
         displayPhoto();
@@ -218,14 +250,13 @@ public class PhotoFragment extends Fragment {
     public void onEventMainThread(PhotoInfoEvent event) {
         if (event.getGalleryId() != galleryId || event.getPage() != page) return;
 
-        Photo photo = event.getPhoto();
+        photo = event.getPhoto();
 
         if (photo == null) {
             showRetryBtn();
             return;
         }
 
-        this.photo = photo;
         getActivity().supportInvalidateOptionsMenu();
         loadImage();
     }
@@ -253,15 +284,9 @@ public class PhotoFragment extends Fragment {
     }
 
     private void displayPhoto() {
-        QueryBuilder<Photo> qb = photoDao.queryBuilder();
-        qb.where(qb.and(
-                PhotoDao.Properties.GalleryId.eq(galleryId),
-                PhotoDao.Properties.Page.eq(page)
-        ));
-        List<Photo> photoList = qb.list();
+        photo = dataLoader.getPhotoInDb(galleryId, page);
 
-        if (photoList.size() > 0) {
-            photo = photoList.get(0);
+        if (photo != null) {
             String src = photo.getSrc();
 
             if (src != null && !src.isEmpty() && !photo.getInvalid()) {
@@ -296,7 +321,20 @@ public class PhotoFragment extends Fragment {
             }
         }
 
-        imageLoader.displayImage(photo.getSrc(), imageView, displayOptions, imageLoadingListener, imageProgressListener);
+        switch (pictureQuality) {
+            case QUALITY_LOW:
+            case QUALITY_MEDIUM:
+            case QUALITY_HIGH:
+                new PhotoLofiTask().execute(pictureQuality);
+                break;
+
+            default:
+                displayImage(photo.getSrc());
+        }
+    }
+
+    private void displayImage(String src) {
+        imageLoader.displayImage(src, imageView, displayOptions, imageLoadingListener, imageProgressListener);
     }
 
     private void showRetryBtn() {
@@ -458,5 +496,57 @@ public class PhotoFragment extends Fragment {
         args.putLong(PhotoDeleteConfirmDialog.EXTRA_PHOTO, photo.getId());
         dialog.setArguments(args);
         dialog.show(getActivity().getSupportFragmentManager(), PhotoDeleteConfirmDialog.TAG);
+    }
+
+    private class PhotoLofiTask extends AsyncTask<Integer, Integer, String> {
+        @Override
+        protected String doInBackground(Integer... integers) {
+            try {
+                int quality = integers[0];
+                HttpContext httpContext = new BasicHttpContext();
+                CookieStore cookieStore = new BasicCookieStore();
+
+                cookieStore.addCookie(new Cookie("xres", Integer.toString(quality)));
+                httpContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
+
+                HttpClient client = new DefaultHttpClient();
+                HttpGet httpGet = new HttpGet(String.format(Constant.PHOTO_URL_LOFI,
+                        photo.getToken(), photo.getGalleryId(), photo.getPage()));
+                HttpResponse response = client.execute(httpGet, httpContext);
+                String content = HttpRequestHelper.readResponse(response);
+                Matcher matcher = pLofiSrc.matcher(content);
+                String src = "";
+
+                L.d("Photo lofi callback: %s", content);
+
+                while (matcher.find()) {
+                    src = matcher.group(1);
+                }
+
+                return src;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String src) {
+            if (src != null && !src.isEmpty()) {
+                displayImage(src);
+            } else {
+                showRetryBtn();
+            }
+        }
+    }
+
+    private class Cookie extends BasicClientCookie {
+        private Cookie(String name, String value) {
+            super(name, value);
+
+            setPath("/");
+            setDomain("lofi.e-hentai.org");
+        }
     }
 }
