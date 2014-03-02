@@ -10,7 +10,7 @@ The best E-Hentai Reader for Android ever!
 
 ## Download
 
-[![](http://i.minus.com/io9s7kzkS9HkL.png)][Download]
+[![](http://i.minus.com/iVyCGCEMqhl5R.png)][Download]
 
 ## Screenshots
 
@@ -38,6 +38,10 @@ $ cd android-stackblur/StackBlur
 $ ndk-build
 ```
 
+### Generating DAO
+
+This app uses [GreenDAO](http://greendao-orm.com/) as ORM. Before you get started or after the DAO is updated, you have to run the gradle task `DaoGenerator:run`.
+
 ## License
 
 Apache License 2.0
@@ -58,4 +62,4 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
-[Download]: https://github.com/tommy351/ehreader-android/releases/download/0.3.1/ehreader-release.apk
+[Download]: https://github.com/tommy351/ehreader-android/releases/download/0.3.2/ehreader-release.apk
