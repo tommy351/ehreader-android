@@ -13,7 +13,7 @@ import tw.skyarrow.ehreader.app.DrawerActivity;
  * Created by SkyArrow on 2014/2/27.
  */
 public class MainDrawerActivity extends DrawerActivity {
-    private DrawerAdapter adapter;
+    private DrawerHeaderAdapter headerAdapter;
 
     @Override
     protected void setupDrawer() {
@@ -21,21 +21,31 @@ public class MainDrawerActivity extends DrawerActivity {
 
         List<DrawerItem> list = new ArrayList<DrawerItem>();
         ListView drawerView = (ListView) getDrawerView();
-        adapter = new DrawerAdapter(this, list) {
+        DrawerAdapter adapter = new DrawerAdapter(this, list);
+
+        list.add(new DrawerItem(getString(R.string.drawer_settings), R.drawable.ic_drawer_settings));
+
+        drawerView.setAdapter(adapter);
+
+        ListView headerView = (ListView) getLayoutInflater().inflate(R.layout.drawer_header, null);
+        List<DrawerItem> headerList = new ArrayList<DrawerItem>();
+
+        String[] menuItems = getResources().getStringArray(R.array.main_tabs);
+
+        headerList.add(new DrawerItem(menuItems[0], R.drawable.ic_drawer_gallery));
+        headerList.add(new DrawerItem(menuItems[1], R.drawable.ic_drawer_star));
+        headerList.add(new DrawerItem(menuItems[2], R.drawable.ic_drawer_history));
+        headerList.add(new DrawerItem(menuItems[3], R.drawable.ic_drawer_download));
+
+        headerAdapter = new DrawerHeaderAdapter(this, headerList) {
             @Override
             public void onItemClick(int i) {
                 MainDrawerActivity.this.onItemClick(i);
             }
         };
 
-        String[] menuItems = getResources().getStringArray(R.array.main_tabs);
-
-        list.add(new DrawerItem(menuItems[0], R.drawable.ic_drawer_gallery));
-        list.add(new DrawerItem(menuItems[1], R.drawable.ic_drawer_star));
-        list.add(new DrawerItem(menuItems[2], R.drawable.ic_drawer_history));
-        list.add(new DrawerItem(menuItems[3], R.drawable.ic_drawer_download));
-
-        drawerView.setAdapter(adapter);
+        headerView.setAdapter(headerAdapter);
+        drawerView.addHeaderView(headerView);
     }
 
     public void onItemClick(int i) {
@@ -49,7 +59,7 @@ public class MainDrawerActivity extends DrawerActivity {
         startActivity(intent);
   }
 
-    public DrawerAdapter getDrawerAdapter() {
-        return adapter;
+    public DrawerHeaderAdapter getDrawerAdapter() {
+        return headerAdapter;
     }
 }

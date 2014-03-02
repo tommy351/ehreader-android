@@ -14,7 +14,6 @@ import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.app.main.AdActivity;
-import tw.skyarrow.ehreader.app.main.MainDrawerActivity;
 import tw.skyarrow.ehreader.app.main.MainFragmentWeb;
 import tw.skyarrow.ehreader.util.ActionBarHelper;
 

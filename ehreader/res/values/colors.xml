@@ -1,4 +1,5 @@
 <resources>
-    <color name="navigation_drawer_background">#f3f3f3</color>
+    <color name="navigation_drawer_background_highlight">#fff</color>
+    <color name="navigation_drawer_background">#f7f7f7</color>
     <color name="cover_actionbar_text_color">#fff</color>
 </resources>

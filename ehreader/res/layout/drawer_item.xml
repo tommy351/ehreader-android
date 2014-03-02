@@ -1,23 +1,24 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingLeft="@dimen/margin_medium"
+    android:layout_height="match_parent"
+    android:paddingLeft="24dp"
     android:paddingRight="@dimen/margin_medium"
     android:paddingTop="12dp"
     android:paddingBottom="12dp"
-    android:background="?android:attr/selectableItemBackground">
+    android:background="?android:selectableItemBackground">
     <ImageView
         android:id="@+id/icon"
-        android:layout_width="@dimen/navigation_drawer_icon_size"
-        android:layout_height="@dimen/navigation_drawer_icon_size"
-        android:layout_marginRight="@dimen/margin_small"
-        android:layout_centerVertical="true"/>
+        android:layout_width="@dimen/drawer_icon_size_minor"
+        android:layout_height="@dimen/drawer_icon_size_minor"
+        android:layout_marginRight="@dimen/margin_medium"
+        android:layout_centerVertical="true"
+        android:scaleType="fitXY"/>
     <TextView
         android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/icon"
         android:layout_centerVertical="true"
-        android:fontFamily="sans-serif-light"
-        android:textSize="@dimen/navigation_drawer_text_size"/>
+        android:textSize="@dimen/drawer_text_size_minor"
+        android:textColor="?android:textColorHint"/>
 </RelativeLayout>

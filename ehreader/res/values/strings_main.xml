@@ -10,6 +10,9 @@
         <item>History</item>
         <item>Download</item>
     </string-array>
+    <string name="drawer_settings">Settings</string>
+    <string name="drawer_login">Log in</string>
+    <string name="drawer_logout">Log out</string>
 
     // Error
     <string name="error_no_results">No galleries found. Please try other keywords.</string>

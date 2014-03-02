@@ -1,7 +1,7 @@
 package tw.skyarrow.ehreader.app.main;
 
 import android.content.Context;
-import android.content.Intent;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,16 +14,14 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.app.BaseListAdapter;
-import tw.skyarrow.ehreader.app.pref.PrefActivity;
 
 /**
- * Created by SkyArrow on 2014/2/27.
+ * Created by SkyArrow on 2014/3/2.
  */
-public class DrawerAdapter extends BaseListAdapter<DrawerItem> {
-    private static final int MENU_SETTINGS = 0;
+public class DrawerHeaderAdapter extends BaseListAdapter<DrawerItem> {
+    private Typeface typeface;
 
-
-    public DrawerAdapter(Context context, List<DrawerItem> list) {
+    public DrawerHeaderAdapter(Context context, List<DrawerItem> list) {
         super(context, list);
     }
 
@@ -31,9 +29,10 @@ public class DrawerAdapter extends BaseListAdapter<DrawerItem> {
     public View getView(final int i, View view, ViewGroup viewGroup) {
         ViewHolder holder;
         DrawerItem drawerItem = getItem(i);
+        //String name = drawerItem.getName();
 
         if (view == null) {
-            view = getInflater().inflate(R.layout.drawer_item, null);
+            view = getInflater().inflate(R.layout.drawer_header_item, null);
             holder = new ViewHolder(view);
             view.setTag(holder);
             view.setClickable(true);
@@ -41,8 +40,28 @@ public class DrawerAdapter extends BaseListAdapter<DrawerItem> {
             holder = (ViewHolder) view.getTag();
         }
 
+        if (typeface == null) {
+            typeface = holder.name.getTypeface();
+        }
+        //Typeface typeface = holder.name.getTypeface();
+
         holder.name.setText(drawerItem.getName());
         holder.icon.setImageDrawable(getIcon(drawerItem.getIcon()));
+
+        if (drawerItem.isSelected()) {
+            holder.name.setTypeface(null, Typeface.BOLD);
+        } else {
+            holder.name.setTypeface(typeface, Typeface.NORMAL);
+        }
+/*
+        if (drawerItem.isSelected()) {
+            SpannableString sp = new SpannableString(name);
+
+            sp.setSpan(new StyleSpan(Typeface.BOLD), 0, name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            holder.name.setText(sp);
+        } else {
+            holder.name.setText(name);
+        }*/
 
         view.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,12 +90,6 @@ public class DrawerAdapter extends BaseListAdapter<DrawerItem> {
     }
 
     public void onItemClick(int i) {
-        switch (i) {
-            case MENU_SETTINGS:
-                Intent intent = new Intent(getContext(), PrefActivity.class);
-                getContext().startActivity(intent);
-
-                break;
-        }
+        //
     }
 }

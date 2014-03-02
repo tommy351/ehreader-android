@@ -16,7 +16,9 @@
     <dimen name="cover_margin">32dp</dimen>
     <dimen name="cover_actionbar_height">48dp</dimen>
 
-    <dimen name="navigation_drawer_width">240dp</dimen>
-    <dimen name="navigation_drawer_icon_size">36dp</dimen>
-    <dimen name="navigation_drawer_text_size">20dp</dimen>
+    <dimen name="drawer_width">240dp</dimen>
+    <dimen name="drawer_icon_size">36dp</dimen>
+    <dimen name="drawer_text_size">20dp</dimen>
+    <dimen name="drawer_icon_size_minor">20dp</dimen>
+    <dimen name="drawer_text_size_minor">16dp</dimen>
 </resources>

@@ -17,7 +17,6 @@ import com.google.analytics.tracking.android.MapBuilder;
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.app.main.AdActivity;
-import tw.skyarrow.ehreader.app.main.MainDrawerActivity;
 import tw.skyarrow.ehreader.app.main.MainFragmentWeb;
 import tw.skyarrow.ehreader.provider.SearchSuggestionProvider;
 import tw.skyarrow.ehreader.util.ActionBarHelper;

@@ -2,7 +2,6 @@ package tw.skyarrow.ehreader.app.main;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
@@ -11,14 +10,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 
-import com.google.ads.AdRequest;
-import com.google.ads.AdSize;
-import com.google.ads.AdView;
-
-import butterknife.ButterKnife;
-import butterknife.InjectView;
 import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
@@ -112,7 +104,7 @@ public class MainActivity extends AdActivity {
         String[] tabs = getResources().getStringArray(R.array.main_tabs);
         actionBarTitle = tabs[i];
 
-        DrawerAdapter adapter = getDrawerAdapter();
+        DrawerHeaderAdapter adapter = getDrawerAdapter();
 
         adapter.getItem(currentTab).setSelected(false);
         adapter.getItem(i).setSelected(true);
