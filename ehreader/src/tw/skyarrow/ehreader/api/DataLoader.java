@@ -210,9 +210,9 @@ public class DataLoader {
             Matcher matcher = pPhotoUrl.matcher(content);
 
             while (matcher.find()) {
-                Photo photo = getPhotoInDb(galleryId, page);
                 String token = matcher.group(2);
                 int photoPage = Integer.parseInt(matcher.group(4));
+                Photo photo = getPhotoInDb(galleryId, photoPage);
 
                 L.d("Photo found: {galleryId: %d, token: %s, page: %d}", galleryId, token, photoPage);
 
@@ -249,10 +249,8 @@ public class DataLoader {
         }
 
         int galleryPage = page / Constant.PHOTO_PER_PAGE;
-
-        getPhotoList(gallery, galleryPage);
-
-        photo = getPhotoInDb(gallery, page);
+        List<Photo> list = getPhotoList(gallery, galleryPage);
+        photo = list.get((page - 1) % Constant.PHOTO_PER_PAGE);
 
         if (photo != null) {
             return getPhotoInfo(gallery, photo);
@@ -267,6 +265,7 @@ public class DataLoader {
                 PhotoDao.Properties.GalleryId.eq(galleryId),
                 PhotoDao.Properties.Page.eq(page)
         ));
+        qb.orderDesc(PhotoDao.Properties.Id);
 
         if (qb.count() > 0) {
             return qb.list().get(0);
@@ -363,9 +362,17 @@ public class DataLoader {
             L.d("Get show key callback: %s", content);
 
             if (content.equals("Invalid page.")) {
-                // TODO retry getShowKey again
-                getPhotoList(galleryId, photo.getPage() / Constant.PHOTO_PER_PAGE);
-                throw new ApiCallException(ApiErrorCode.SHOWKEY_EXPIRED, url, response);
+                list = getPhotoList(galleryId, photo.getPage() / Constant.PHOTO_PER_PAGE);
+                photo = list.get(0);
+                httpGet = new HttpGet(photo.getUrl(isLoggedIn));
+                response = getHttpResponse(httpGet);
+                content = HttpRequestHelper.readResponse(response);
+
+                L.d("Get show key callback (retry): %s", content);
+
+                if (content.equals("Invalid page.")) {
+                    throw new ApiCallException(ApiErrorCode.SHOWKEY_EXPIRED, url, response);
+                }
             }
 
             Matcher matcher = pShowkey.matcher(content);
