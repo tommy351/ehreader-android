@@ -261,7 +261,7 @@ public class DataLoader {
         }
     }
 
-    private Photo getPhotoInDb(long galleryId, int page) {
+    public Photo getPhotoInDb(long galleryId, int page) {
         QueryBuilder<Photo> qb = photoDao.queryBuilder();
         qb.where(qb.and(
                 PhotoDao.Properties.GalleryId.eq(galleryId),
@@ -275,7 +275,7 @@ public class DataLoader {
         }
     }
 
-    private Photo getPhotoInDb(Gallery gallery, int page) {
+    public Photo getPhotoInDb(Gallery gallery, int page) {
         return getPhotoInDb(gallery.getId(), page);
     }
 
