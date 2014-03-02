@@ -51,6 +51,7 @@ public class LogoutDialog extends DialogFragment {
             editor.commit();
 
             EventBus.getDefault().post(new LoginEvent(LoginEvent.LOGOUT));
+            BaseApplication.setLoggedIn(false);
         }
     };
 }
