@@ -45,6 +45,7 @@ import java.util.Date;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import butterknife.OnLongClick;
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
@@ -477,6 +478,20 @@ public class GalleryActivity extends MainDrawerActivity {
 
         intent.putExtras(args);
         startActivity(intent);
+    }
 
+    @OnLongClick(R.id.read)
+    boolean onReadBtnLongClick() {
+        DialogFragment dialog = new GalleryPageDialog();
+        Bundle args = new Bundle();
+
+        args.putLong(GalleryPageDialog.EXTRA_GALLERY, gallery.getId());
+        args.putInt(GalleryPageDialog.EXTRA_DEFAULT_PAGE, gallery.getProgress());
+        args.putInt(GalleryPageDialog.EXTRA_TOTAL_PAGE, gallery.getCount());
+
+        dialog.setArguments(args);
+        dialog.show(getSupportFragmentManager(), GalleryPageDialog.TAG);
+
+        return true;
     }
 }
