@@ -42,6 +42,7 @@ import tw.skyarrow.ehreader.db.PhotoDao;
 import tw.skyarrow.ehreader.util.DatabaseHelper;
 import tw.skyarrow.ehreader.util.HttpRequestHelper;
 import tw.skyarrow.ehreader.util.L;
+import tw.skyarrow.ehreader.util.LoginHelper;
 
 /**
  * Created by SkyArrow on 2014/2/19.
@@ -53,7 +54,7 @@ public class DataLoader {
     private GalleryDao galleryDao;
     private PhotoDao photoDao;
     private HttpContext httpContext;
-    private boolean isLoggedIn;
+    private LoginHelper loginHelper;
 
     private static final String IPB_MEMBER_ID = "ipb_member_id";
     private static final String IPB_PASS_HASH = "ipb_pass_hash";
@@ -67,6 +68,7 @@ public class DataLoader {
 
     private DataLoader(Context context) {
         this.context = context;
+        loginHelper = LoginHelper.getInstance(context);
 
         setupDatabase();
         setupHttpContext();
@@ -91,10 +93,10 @@ public class DataLoader {
 
     private void setupHttpContext() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        isLoggedIn = preferences.getBoolean(context.getString(R.string.pref_logged_in), false);
         String memberId = preferences.getString(context.getString(R.string.pref_login_memberid), "");
         String passhash = preferences.getString(context.getString(R.string.pref_login_passhash), "");
         String sessionid = preferences.getString(context.getString(R.string.pref_login_sessionid), "");
+        boolean isLoggedIn = isLoggedIn();
 
         httpContext = new BasicHttpContext();
         CookieStore cookieStore = new BasicCookieStore();
@@ -115,13 +117,7 @@ public class DataLoader {
     }
 
     public boolean isLoggedIn() {
-        return isLoggedIn;
-    }
-
-    public void setLoggedIn(boolean isLoggedIn) {
-        this.isLoggedIn = isLoggedIn;
-
-        setupHttpContext();
+        return loginHelper.isLoggedIn();
     }
 
     public HttpContext getHttpContext() {
@@ -138,7 +134,7 @@ public class DataLoader {
         String responseStr = "";
 
         try {
-            String url = isLoggedIn ? Constant.API_URL_EX : Constant.API_URL;
+            String url = isLoggedIn() ? Constant.API_URL_EX : Constant.API_URL;
             HttpPost httpPost = new HttpPost(url);
 
             httpPost.setHeader("Accept", "application/json");
@@ -198,7 +194,7 @@ public class DataLoader {
 
     public List<Photo> getPhotoList(Gallery gallery, int page) throws ApiCallException {
         try {
-            String url = gallery.getUrl(page, isLoggedIn);
+            String url = gallery.getUrl(page, isLoggedIn());
 
             L.d("Get photo list: %s", url);
 
@@ -352,7 +348,7 @@ public class DataLoader {
         }
 
         try {
-            String url = photo.getUrl(isLoggedIn);
+            String url = photo.getUrl(isLoggedIn());
 
             L.d("Get show key: %s", url);
 
@@ -365,7 +361,7 @@ public class DataLoader {
             if (content.equals("Invalid page.")) {
                 list = getPhotoList(galleryId, photo.getPage() / Constant.PHOTO_PER_PAGE);
                 photo = list.get(0);
-                httpGet = new HttpGet(photo.getUrl(isLoggedIn));
+                httpGet = new HttpGet(photo.getUrl(isLoggedIn()));
                 response = getHttpResponse(httpGet);
                 content = HttpRequestHelper.readResponse(response);
 
