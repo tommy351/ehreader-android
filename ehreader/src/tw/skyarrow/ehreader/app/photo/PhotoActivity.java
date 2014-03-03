@@ -162,6 +162,8 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
             }
         });
 
+        pager.setOffscreenPageLimit(3);
+
         String orientation = preferences.getString(getString(R.string.pref_screen_orientation),
                 getString(R.string.pref_screen_orientation_default));
 
