@@ -30,15 +30,13 @@ public class MainFragmentStar extends MainFragmentBase {
 
     public static final String TAG = "MainFragmentStar";
 
-    private SQLiteDatabase db;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
         ButterKnife.inject(this, view);
 
         DatabaseHelper helper = DatabaseHelper.getInstance(getActivity());
-        db = helper.getWritableDatabase();
+        SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         GalleryDao galleryDao = daoSession.getGalleryDao();

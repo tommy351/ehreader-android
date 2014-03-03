@@ -35,7 +35,6 @@ public class PhotoSaveDialog extends DialogFragment {
 
     public static final String EXTRA_PHOTO = "photo";
 
-    private SQLiteDatabase db;
     private PhotoDao photoDao;
     private PhotoSaveTask task;
 
@@ -45,7 +44,7 @@ public class PhotoSaveDialog extends DialogFragment {
         Bundle args = getArguments();
 
         DatabaseHelper helper = DatabaseHelper.getInstance(getActivity());
-        db = helper.getWritableDatabase();
+        SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         photoDao = daoSession.getPhotoDao();

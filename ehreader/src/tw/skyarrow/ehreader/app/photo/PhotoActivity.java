@@ -77,7 +77,6 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
     private static final int UI_HIDE_DELAY = 3000;
     private static final int HINT_HIDE_DELAY = 500;
 
-    private SQLiteDatabase db;
     private GalleryDao galleryDao;
     private SharedPreferences preferences;
 
@@ -100,7 +99,7 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
         decorView.setOnSystemUiVisibilityChangeListener(this);
 
         DatabaseHelper helper = DatabaseHelper.getInstance(this);
-        db = helper.getWritableDatabase();
+        SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();

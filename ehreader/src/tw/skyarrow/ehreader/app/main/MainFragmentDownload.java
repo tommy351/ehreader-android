@@ -54,8 +54,6 @@ public class MainFragmentDownload extends Fragment implements AbsListView.OnScro
 
     public static final String EXTRA_POSITION = "position";
 
-    private SQLiteDatabase db;
-
     private List<Download> downloadList;
     private DownloadListAdapter adapter;
     private EventBus bus;
@@ -72,7 +70,7 @@ public class MainFragmentDownload extends Fragment implements AbsListView.OnScro
         bus.register(this);
 
         DatabaseHelper helper = DatabaseHelper.getInstance(getActivity());
-        db = helper.getWritableDatabase();
+        SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         DownloadDao downloadDao = daoSession.getDownloadDao();

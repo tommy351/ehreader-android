@@ -51,7 +51,6 @@ public class ImageSearchPhotoFragment extends Fragment {
 
     private static final Pattern pSearchUrl = Pattern.compile("<a href=\"http://(g.e-|ex)hentai.org/\\?f_shash=(.+?)\">");
 
-    private SQLiteDatabase db;
     private GalleryDao galleryDao;
     private PhotoDao photoDao;
     private DataLoader dataLoader;
@@ -68,7 +67,7 @@ public class ImageSearchPhotoFragment extends Fragment {
         photoId = args.getLong("photo");
 
         DatabaseHelper helper = DatabaseHelper.getInstance(getActivity());
-        db = helper.getWritableDatabase();
+        SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();

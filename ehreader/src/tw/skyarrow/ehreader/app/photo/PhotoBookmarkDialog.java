@@ -29,7 +29,6 @@ public class PhotoBookmarkDialog extends DialogFragment {
 
     public static final String EXTRA_GALLERY = "id";
 
-    private SQLiteDatabase db;
     private List<Photo> photoList;
 
     @Override
@@ -39,7 +38,7 @@ public class PhotoBookmarkDialog extends DialogFragment {
         long galleryId = args.getLong(EXTRA_GALLERY);
 
         DatabaseHelper helper = DatabaseHelper.getInstance(getActivity());
-        db = helper.getReadableDatabase();
+        SQLiteDatabase db = helper.getReadableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         PhotoDao photoDao = daoSession.getPhotoDao();

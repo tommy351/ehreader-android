@@ -103,7 +103,6 @@ public class GalleryActivity extends MainDrawerActivity {
 
     public static final String EXTRA_GALLERY = "id";
 
-    private SQLiteDatabase db;
     private GalleryDao galleryDao;
     private DownloadDao downloadDao;
 
@@ -120,7 +119,7 @@ public class GalleryActivity extends MainDrawerActivity {
         setDrawerIndicatorEnabled(false);
 
         DatabaseHelper helper = DatabaseHelper.getInstance(this);
-        db = helper.getWritableDatabase();
+        SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();

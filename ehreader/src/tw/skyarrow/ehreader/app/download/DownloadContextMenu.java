@@ -26,8 +26,6 @@ public class DownloadContextMenu extends DialogFragment {
     public static final String EXTRA_GALLERY = "id";
     public static final String EXTRA_TITLE = "title";
 
-    private SQLiteDatabase db;
-
     private long galleryId;
     private Download download;
 
@@ -38,7 +36,7 @@ public class DownloadContextMenu extends DialogFragment {
         galleryId = args.getLong(EXTRA_GALLERY);
 
         DatabaseHelper helper = DatabaseHelper.getInstance(getActivity());
-        db = helper.getReadableDatabase();
+        SQLiteDatabase db = helper.getReadableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         DownloadDao downloadDao = daoSession.getDownloadDao();

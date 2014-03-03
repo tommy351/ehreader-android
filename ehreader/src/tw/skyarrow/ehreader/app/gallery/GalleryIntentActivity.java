@@ -49,7 +49,6 @@ public class GalleryIntentActivity extends ActionBarActivity {
 
     private static final Pattern pGalleryUrl = DataLoader.pGalleryUrl;
 
-    private SQLiteDatabase db;
     private GalleryDao galleryDao;
 
     private DataLoader dataLoader;
@@ -63,7 +62,7 @@ public class GalleryIntentActivity extends ActionBarActivity {
         ButterKnife.inject(this);
 
         DatabaseHelper helper = DatabaseHelper.getInstance(this);
-        db = helper.getWritableDatabase();
+        SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();

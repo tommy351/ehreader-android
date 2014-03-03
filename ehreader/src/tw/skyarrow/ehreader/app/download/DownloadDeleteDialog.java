@@ -33,7 +33,6 @@ public class DownloadDeleteDialog extends DialogFragment {
 
     public static final String EXTRA_GALLERY = "id";
 
-    private SQLiteDatabase db;
     private PhotoDao photoDao;
     private DownloadDao downloadDao;
 
@@ -49,7 +48,7 @@ public class DownloadDeleteDialog extends DialogFragment {
         galleryId = args.getLong(EXTRA_GALLERY);
 
         DatabaseHelper helper = DatabaseHelper.getInstance(getActivity());
-        db = helper.getWritableDatabase();
+        SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         photoDao = daoSession.getPhotoDao();
@@ -75,12 +74,6 @@ public class DownloadDeleteDialog extends DialogFragment {
         new GalleryDeleteTask().execute();
 
         return dialog;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        db.close();
     }
 
     private class GalleryDeleteTask extends AsyncTask<Integer, Integer, String> {

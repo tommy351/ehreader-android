@@ -105,7 +105,6 @@ public class PhotoFragment extends Fragment {
 
     private static final Pattern pLofiSrc = Pattern.compile("<img id=\"sm\" src=\"(.+?)\".+?>");
 
-    private SQLiteDatabase db;
     private PhotoDao photoDao;
 
     private ImageLoader imageLoader;
@@ -137,7 +136,7 @@ public class PhotoFragment extends Fragment {
         });
 
         DatabaseHelper helper = DatabaseHelper.getInstance(getActivity());
-        db = helper.getWritableDatabase();
+        SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         photoDao = daoSession.getPhotoDao();
