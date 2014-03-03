@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 
 import de.greenrobot.event.EventBus;
+import tw.skyarrow.ehreader.api.ApiCallException;
 import tw.skyarrow.ehreader.api.DataLoader;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
@@ -74,10 +75,10 @@ public class PhotoInfoService extends IntentService {
             Photo photo = dataLoader.getPhotoInfo(gallery, page);
 
             bus.post(new PhotoInfoEvent(galleryId, page, photo));
-        } catch (Exception e) {
+        } catch (ApiCallException e) {
             e.printStackTrace();
 
-            bus.post(new PhotoInfoEvent(galleryId, page, null));
+            bus.post(new PhotoInfoEvent(galleryId, page, e));
         }
     }
 }

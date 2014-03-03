@@ -358,7 +358,9 @@ public class DataLoader {
 
             L.d("Get show key callback: %s", content);
 
-            if (content.equals("Invalid page.")) {
+            if (content.contains("This gallery is pining for the fjords")) {
+                throw new ApiCallException(ApiErrorCode.GALLERY_PINNED, url, response);
+            } else if (content.equals("Invalid page.")) {
                 list = getPhotoList(galleryId, photo.getPage() / Constant.PHOTO_PER_PAGE);
                 photo = list.get(0);
                 httpGet = new HttpGet(photo.getUrl(isLoggedIn()));

@@ -58,6 +58,8 @@ import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.api.ApiCallException;
+import tw.skyarrow.ehreader.api.ApiErrorCode;
 import tw.skyarrow.ehreader.api.DataLoader;
 import tw.skyarrow.ehreader.app.search.ImageSearchActivity;
 import tw.skyarrow.ehreader.db.DaoMaster;
@@ -117,7 +119,6 @@ public class PhotoFragment extends Fragment {
     private Bitmap mBitmap;
     private int pictureQuality;
 
-    private boolean isLoaded = false;
     private boolean isServiceCalled = false;
 
     @Override
@@ -187,7 +188,7 @@ public class PhotoFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (!isLoaded) return;
+        if (photo == null) return;
 
         inflater.inflate(R.menu.photo_fragment, menu);
 
@@ -253,6 +254,26 @@ public class PhotoFragment extends Fragment {
         photo = event.getPhoto();
 
         if (photo == null) {
+            ApiCallException exception = event.getException();
+
+            if (exception != null) {
+                // TODO avoid opening multiple dialogs
+                switch (exception.getCode()) {
+                    case ApiErrorCode.GALLERY_PINNED:
+                    case ApiErrorCode.IO_ERROR:
+                    case ApiErrorCode.TOKEN_OR_PAGE_INVALID:
+                        DialogFragment dialog = new PhotoErrorDialog();
+                        Bundle args = new Bundle();
+
+                        args.putInt(PhotoErrorDialog.EXTRA_ERROR_CODE, exception.getCode());
+
+                        dialog.setArguments(args);
+                        dialog.show(getActivity().getSupportFragmentManager(), PhotoErrorDialog.TAG);
+
+                        break;
+                }
+            }
+
             showRetryBtn();
             return;
         }
@@ -348,7 +369,6 @@ public class PhotoFragment extends Fragment {
         @Override
         public void onLoadingStarted(String imageUri, View view) {
             startLoadAt = System.currentTimeMillis();
-            isLoaded = true;
 
             progressBar.setIndeterminate(false);
             progressBar.setProgress(0);
