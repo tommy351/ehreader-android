@@ -16,14 +16,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_small"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="@dimen/text_size_medium"
         android:textIsSelectable="true"/>
     <TextView
         android:id="@+id/subtitle"
         android:layout_marginTop="@dimen/margin_small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="@dimen/text_size_small"
         android:textIsSelectable="true"/>
     <LinearLayout
         android:id="@+id/meta_box"

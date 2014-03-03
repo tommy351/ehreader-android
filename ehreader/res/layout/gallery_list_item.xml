@@ -22,16 +22,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:maxLines="@integer/title_max_line"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="@dimen/text_size_medium"
         android:layout_below="@+id/header"
         android:layout_toRightOf="@+id/cover"
         android:layout_marginTop="@dimen/margin_small"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginBottom="@dimen/margin_medium"
         android:ellipsize="end"/>
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_alignParentBottom="true"
-        android:background="?android:attr/listDivider"/>
+        android:background="?android:listDivider"/>
 </RelativeLayout>
