@@ -18,6 +18,5 @@
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/icon"
         android:layout_centerVertical="true"
-        android:fontFamily="sans-serif-light"
         android:textSize="@dimen/drawer_text_size"/>
 </RelativeLayout>
