@@ -14,7 +14,6 @@ import java.util.List;
 
 import de.greenrobot.dao.query.QueryBuilder;
 import tw.skyarrow.ehreader.BaseApplication;
-import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
@@ -23,6 +22,7 @@ import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
 import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.db.PhotoDao;
+import tw.skyarrow.ehreader.util.DatabaseHelper;
 
 /**
  * Created by SkyArrow on 2014/2/3.
@@ -39,7 +39,7 @@ public class ClearHistoryDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
+        DatabaseHelper helper = DatabaseHelper.getInstance(getActivity());
         db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();

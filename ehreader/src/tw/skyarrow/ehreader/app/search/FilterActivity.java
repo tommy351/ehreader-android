@@ -16,6 +16,7 @@ import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.app.main.AdActivity;
 import tw.skyarrow.ehreader.app.main.MainFragmentWeb;
 import tw.skyarrow.ehreader.util.ActionBarHelper;
+import tw.skyarrow.ehreader.util.LoginHelper;
 
 /**
  * Created by SkyArrow on 2014/2/2.
@@ -34,7 +35,7 @@ public class FilterActivity extends AdActivity {
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        boolean isLoggedIn = BaseApplication.isLoggedIn();
+        boolean isLoggedIn = LoginHelper.getInstance(this).isLoggedIn();
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         Fragment fragment = new MainFragmentWeb();

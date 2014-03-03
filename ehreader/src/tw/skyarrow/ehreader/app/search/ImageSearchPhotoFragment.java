@@ -24,7 +24,6 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import tw.skyarrow.ehreader.BaseApplication;
-import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.api.DataLoader;
 import tw.skyarrow.ehreader.db.DaoMaster;
@@ -33,6 +32,7 @@ import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
 import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.db.PhotoDao;
+import tw.skyarrow.ehreader.util.DatabaseHelper;
 import tw.skyarrow.ehreader.util.L;
 import tw.skyarrow.ehreader.util.NetworkHelper;
 
@@ -67,14 +67,14 @@ public class ImageSearchPhotoFragment extends Fragment {
         Bundle args = getArguments();
         photoId = args.getLong("photo");
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
+        DatabaseHelper helper = DatabaseHelper.getInstance(getActivity());
         db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();
         photoDao = daoSession.getPhotoDao();
-        dataLoader = DataLoader.getInstance();
-        network = new NetworkHelper(getActivity());
+        dataLoader = DataLoader.getInstance(getActivity());
+        network = NetworkHelper.getInstance(getActivity());
 
         searchPhoto();
 

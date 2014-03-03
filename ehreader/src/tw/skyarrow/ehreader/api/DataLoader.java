@@ -39,6 +39,7 @@ import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
 import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.db.PhotoDao;
+import tw.skyarrow.ehreader.util.DatabaseHelper;
 import tw.skyarrow.ehreader.util.HttpRequestHelper;
 import tw.skyarrow.ehreader.util.L;
 
@@ -46,7 +47,7 @@ import tw.skyarrow.ehreader.util.L;
  * Created by SkyArrow on 2014/2/19.
  */
 public class DataLoader {
-    private static DataLoader instance = null;
+    private static DataLoader instance;
     private Context context;
     private SQLiteDatabase db;
     private GalleryDao galleryDao;
@@ -64,23 +65,23 @@ public class DataLoader {
     public static final Pattern pImageSrc = Pattern.compile("<img id=\"img\" src=\"(.+)/(.+?)\"");
     public static final Pattern pGalleryURL = Pattern.compile("<a href=\"http://(g\\.e-|ex)hentai\\.org/g/(\\d+)/(\\w+)/\" onmouseover");
 
-    public static DataLoader getInstance() {
-        if (instance == null) {
-            instance = new DataLoader();
-        }
-
-        return instance;
-    }
-
-    public void init(Context context) {
+    private DataLoader(Context context) {
         this.context = context;
 
         setupDatabase();
         setupHttpContext();
     }
 
+    public static DataLoader getInstance(Context context) {
+        if (instance == null) {
+            instance = new DataLoader(context.getApplicationContext());
+        }
+
+        return instance;
+    }
+
     private void setupDatabase() {
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, Constant.DB_NAME, null);
+        DatabaseHelper helper = DatabaseHelper.getInstance(context);
         db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();

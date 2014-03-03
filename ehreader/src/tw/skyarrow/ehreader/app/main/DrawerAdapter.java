@@ -22,7 +22,6 @@ import tw.skyarrow.ehreader.app.pref.PrefActivity;
 public class DrawerAdapter extends BaseListAdapter<DrawerItem> {
     private static final int MENU_SETTINGS = 0;
 
-
     public DrawerAdapter(Context context, List<DrawerItem> list) {
         super(context, list);
     }

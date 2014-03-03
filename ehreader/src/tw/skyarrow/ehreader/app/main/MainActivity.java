@@ -12,7 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import de.greenrobot.event.EventBus;
-import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.app.pref.PrefActivity;
@@ -20,6 +19,7 @@ import tw.skyarrow.ehreader.app.search.FilterDialog;
 import tw.skyarrow.ehreader.app.search.ImageSearchActivity;
 import tw.skyarrow.ehreader.event.ListUpdateEvent;
 import tw.skyarrow.ehreader.util.ActionBarHelper;
+import tw.skyarrow.ehreader.util.LoginHelper;
 
 public class MainActivity extends AdActivity {
     public static final String TAG = "MainActivity";
@@ -100,7 +100,7 @@ public class MainActivity extends AdActivity {
         Fragment fragment;
         Bundle args = new Bundle();
         String tag;
-        boolean loggedIn = BaseApplication.isLoggedIn();
+        boolean loggedIn = LoginHelper.getInstance(this).isLoggedIn();
         String[] tabs = getResources().getStringArray(R.array.main_tabs);
         actionBarTitle = tabs[i];
 

@@ -43,7 +43,6 @@ import java.util.Map;
 
 import de.greenrobot.dao.query.QueryBuilder;
 import de.greenrobot.event.EventBus;
-import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.api.DataLoader;
 import tw.skyarrow.ehreader.app.gallery.GalleryActivity;
@@ -57,6 +56,7 @@ import tw.skyarrow.ehreader.db.GalleryDao;
 import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.db.PhotoDao;
 import tw.skyarrow.ehreader.event.GalleryDownloadEvent;
+import tw.skyarrow.ehreader.util.DatabaseHelper;
 import tw.skyarrow.ehreader.util.L;
 
 /**
@@ -125,7 +125,7 @@ public class GalleryDownloadService extends Service {
         serviceHandler = new ServiceHandler(serviceLooper);
         pendingDownloads = new HashMap<Long, Download>();
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, Constant.DB_NAME, null);
+        DatabaseHelper helper = DatabaseHelper.getInstance(this);
         db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
@@ -133,7 +133,7 @@ public class GalleryDownloadService extends Service {
         photoDao = daoSession.getPhotoDao();
         downloadDao = daoSession.getDownloadDao();
         bus = EventBus.getDefault();
-        dataLoader = DataLoader.getInstance();
+        dataLoader = DataLoader.getInstance(this);
         discCache = ImageLoader.getInstance().getDiscCache();
 
         nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);

@@ -42,13 +42,13 @@ import java.util.Date;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import tw.skyarrow.ehreader.BaseApplication;
-import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
 import tw.skyarrow.ehreader.util.ActionBarHelper;
+import tw.skyarrow.ehreader.util.DatabaseHelper;
 
 /**
  * Created by SkyArrow on 2014/1/31.
@@ -99,7 +99,7 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
         decorView = getWindow().getDecorView();
         decorView.setOnSystemUiVisibilityChangeListener(this);
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, Constant.DB_NAME, null);
+        DatabaseHelper helper = DatabaseHelper.getInstance(this);
         db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 
 import de.greenrobot.event.EventBus;
-import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.api.DataLoader;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
@@ -13,6 +12,7 @@ import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
 import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.event.PhotoInfoEvent;
+import tw.skyarrow.ehreader.util.DatabaseHelper;
 import tw.skyarrow.ehreader.util.L;
 
 /**
@@ -25,8 +25,6 @@ public class PhotoInfoService extends IntentService {
     public static final String EXTRA_PAGE = "photoPage";
 
     private SQLiteDatabase db;
-    private DaoMaster daoMaster;
-    private DaoSession daoSession;
     private GalleryDao galleryDao;
 
     private DataLoader dataLoader;
@@ -40,14 +38,20 @@ public class PhotoInfoService extends IntentService {
     public void onCreate() {
         super.onCreate();
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, Constant.DB_NAME, null);
+        DatabaseHelper helper = DatabaseHelper.getInstance(this);
         db = helper.getWritableDatabase();
-        daoMaster = new DaoMaster(db);
-        daoSession = daoMaster.newSession();
+        DaoMaster daoMaster = new DaoMaster(db);
+        DaoSession daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();
 
-        dataLoader = DataLoader.getInstance();
+        dataLoader = DataLoader.getInstance(this);
         bus = EventBus.getDefault();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        db.close();
     }
 
     @Override

@@ -21,7 +21,6 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import tw.skyarrow.ehreader.BaseApplication;
-import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.api.ApiCallException;
 import tw.skyarrow.ehreader.api.DataLoader;
@@ -30,6 +29,7 @@ import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
 import tw.skyarrow.ehreader.util.ActionBarHelper;
+import tw.skyarrow.ehreader.util.DatabaseHelper;
 import tw.skyarrow.ehreader.util.L;
 
 /**
@@ -50,8 +50,6 @@ public class GalleryIntentActivity extends ActionBarActivity {
     private static final Pattern pGalleryUrl = DataLoader.pGalleryUrl;
 
     private SQLiteDatabase db;
-    private DaoMaster daoMaster;
-    private DaoSession daoSession;
     private GalleryDao galleryDao;
 
     private DataLoader dataLoader;
@@ -64,12 +62,12 @@ public class GalleryIntentActivity extends ActionBarActivity {
         setContentView(R.layout.activity_intent);
         ButterKnife.inject(this);
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, Constant.DB_NAME, null);
+        DatabaseHelper helper = DatabaseHelper.getInstance(this);
         db = helper.getWritableDatabase();
-        daoMaster = new DaoMaster(db);
-        daoSession = daoMaster.newSession();
+        DaoMaster daoMaster = new DaoMaster(db);
+        DaoSession daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();
-        dataLoader = DataLoader.getInstance();
+        dataLoader = DataLoader.getInstance(this);
 
         ActionBar actionBar = getSupportActionBar();
 

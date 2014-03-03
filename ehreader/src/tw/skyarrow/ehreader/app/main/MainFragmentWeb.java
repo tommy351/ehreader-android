@@ -85,8 +85,8 @@ public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.
         bus.register(this);
 
         Context context = getActivity();
-        dataLoader = DataLoader.getInstance();
-        network = new NetworkHelper(getActivity());
+        dataLoader = DataLoader.getInstance(getActivity());
+        network = NetworkHelper.getInstance(getActivity());
 
         Bundle args = getArguments();
         baseUrl = args.getString(EXTRA_BASE);

@@ -68,6 +68,7 @@ import tw.skyarrow.ehreader.event.PhotoDownloadEvent;
 import tw.skyarrow.ehreader.event.PhotoInfoEvent;
 import tw.skyarrow.ehreader.provider.PhotoProvider;
 import tw.skyarrow.ehreader.service.PhotoInfoService;
+import tw.skyarrow.ehreader.util.DatabaseHelper;
 import tw.skyarrow.ehreader.util.FileInfoHelper;
 import tw.skyarrow.ehreader.util.HttpRequestHelper;
 import tw.skyarrow.ehreader.util.L;
@@ -134,12 +135,12 @@ public class PhotoFragment extends Fragment {
             }
         });
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
+        DatabaseHelper helper = DatabaseHelper.getInstance(getActivity());
         db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         photoDao = daoSession.getPhotoDao();
-        dataLoader = DataLoader.getInstance();
+        dataLoader = DataLoader.getInstance(getActivity());
 
         imageLoader = ImageLoader.getInstance();
         displayOptions = new DisplayImageOptions.Builder()

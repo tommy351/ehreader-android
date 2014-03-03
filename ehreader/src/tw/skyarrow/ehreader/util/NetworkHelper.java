@@ -11,9 +11,19 @@ public class NetworkHelper {
     private Context context;
     private ConnectivityManager cm;
 
-    public NetworkHelper(Context context) {
+    private static NetworkHelper instance = null;
+
+    private NetworkHelper(Context context) {
         this.context = context;
         this.cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    }
+
+    public static NetworkHelper getInstance(Context context) {
+        if (instance == null) {
+            instance = new NetworkHelper(context.getApplicationContext());
+        }
+
+        return instance;
     }
 
     public NetworkInfo getNetworkInfo() {

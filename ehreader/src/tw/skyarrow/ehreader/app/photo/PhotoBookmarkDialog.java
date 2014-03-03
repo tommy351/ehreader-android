@@ -14,12 +14,12 @@ import java.util.List;
 
 import de.greenrobot.dao.query.QueryBuilder;
 import tw.skyarrow.ehreader.BaseApplication;
-import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.db.PhotoDao;
+import tw.skyarrow.ehreader.util.DatabaseHelper;
 
 /**
  * Created by SkyArrow on 2014/2/2.
@@ -38,7 +38,7 @@ public class PhotoBookmarkDialog extends DialogFragment {
         Bundle args = getArguments();
         long galleryId = args.getLong(EXTRA_GALLERY);
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
+        DatabaseHelper helper = DatabaseHelper.getInstance(getActivity());
         db = helper.getReadableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();

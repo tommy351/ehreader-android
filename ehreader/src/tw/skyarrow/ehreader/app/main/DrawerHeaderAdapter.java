@@ -19,7 +19,7 @@ import tw.skyarrow.ehreader.app.BaseListAdapter;
  * Created by SkyArrow on 2014/3/2.
  */
 public class DrawerHeaderAdapter extends BaseListAdapter<DrawerItem> {
-    private Typeface typeface;
+    private static Typeface typeface;
 
     public DrawerHeaderAdapter(Context context, List<DrawerItem> list) {
         super(context, list);
@@ -29,7 +29,6 @@ public class DrawerHeaderAdapter extends BaseListAdapter<DrawerItem> {
     public View getView(final int i, View view, ViewGroup viewGroup) {
         ViewHolder holder;
         DrawerItem drawerItem = getItem(i);
-        //String name = drawerItem.getName();
 
         if (view == null) {
             view = getInflater().inflate(R.layout.drawer_header_item, null);
@@ -40,28 +39,18 @@ public class DrawerHeaderAdapter extends BaseListAdapter<DrawerItem> {
             holder = (ViewHolder) view.getTag();
         }
 
-        if (typeface == null) {
-            typeface = holder.name.getTypeface();
-        }
-        //Typeface typeface = holder.name.getTypeface();
-
         holder.name.setText(drawerItem.getName());
         holder.icon.setImageDrawable(getIcon(drawerItem.getIcon()));
 
         if (drawerItem.isSelected()) {
             holder.name.setTypeface(null, Typeface.BOLD);
         } else {
-            holder.name.setTypeface(typeface, Typeface.NORMAL);
-        }
-/*
-        if (drawerItem.isSelected()) {
-            SpannableString sp = new SpannableString(name);
+            if (typeface == null) {
+                typeface = Typeface.create("sans-serif-light", Typeface.NORMAL);
+            }
 
-            sp.setSpan(new StyleSpan(Typeface.BOLD), 0, name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            holder.name.setText(sp);
-        } else {
-            holder.name.setText(name);
-        }*/
+            holder.name.setTypeface(typeface);
+        }
 
         view.setOnClickListener(new View.OnClickListener() {
             @Override
