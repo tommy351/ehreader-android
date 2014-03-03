@@ -114,7 +114,6 @@ public class MainFragmentDownload extends Fragment implements AbsListView.OnScro
     public void onDestroyView() {
         super.onDestroyView();
         bus.unregister(this);
-        db.close();
     }
 
     @Override

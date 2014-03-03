@@ -75,12 +75,6 @@ public class PhotoBookmarkDialog extends DialogFragment {
         return dialog.create();
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        db.close();
-    }
-
     private DialogInterface.OnClickListener onItemClick = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialogInterface, int i) {

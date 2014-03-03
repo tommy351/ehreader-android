@@ -185,7 +185,6 @@ public class GalleryDownloadService extends Service {
 
         bus.post(new GalleryDownloadEvent(EVENT_SERVICE_STOP, null));
         serviceLooper.quit();
-        db.close();
 
         L.d("%s is destroyed", TAG);
     }

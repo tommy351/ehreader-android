@@ -53,12 +53,6 @@ public class PhotoDeleteDialog extends DialogFragment {
         return dialog;
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        db.close();
-    }
-
     private class PhotoDeleteTask extends AsyncTask<Long, Integer, Boolean> {
         private long id;
         private Photo photo;

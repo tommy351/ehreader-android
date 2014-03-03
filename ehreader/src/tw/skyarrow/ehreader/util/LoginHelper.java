@@ -59,7 +59,7 @@ public class LoginHelper {
 
     public static LoginHelper getInstance(Context context) {
         if (instance == null) {
-            instance = new LoginHelper(context);
+            instance = new LoginHelper(context.getApplicationContext());
         }
 
         return instance;

@@ -65,10 +65,4 @@ public class MainFragmentStar extends MainFragmentBase {
 
         BaseApplication.getTracker().send(builder.build());
     }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        db.close();
-    }
 }

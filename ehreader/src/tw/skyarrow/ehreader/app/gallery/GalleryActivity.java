@@ -157,12 +157,6 @@ public class GalleryActivity extends MainDrawerActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        db.close();
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.gallery, menu);
 

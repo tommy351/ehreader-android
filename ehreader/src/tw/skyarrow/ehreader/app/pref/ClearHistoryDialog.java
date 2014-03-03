@@ -60,12 +60,6 @@ public class ClearHistoryDialog extends DialogFragment {
         return dialog.create();
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        db.close();
-    }
-
     private DialogInterface.OnClickListener onSubmitClick = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialogInterface, int n) {

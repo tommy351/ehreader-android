@@ -49,12 +49,6 @@ public class PhotoInfoService extends IntentService {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        db.close();
-    }
-
-    @Override
     protected void onHandleIntent(Intent intent) {
         long galleryId = intent.getLongExtra(EXTRA_GALLERY, 0);
         int page = intent.getIntExtra(EXTRA_PAGE, 0);

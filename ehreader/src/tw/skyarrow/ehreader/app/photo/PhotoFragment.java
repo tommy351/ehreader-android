@@ -179,7 +179,6 @@ public class PhotoFragment extends Fragment {
         super.onDestroyView();
         imageLoader.cancelDisplayTask(imageView);
         EventBus.getDefault().unregister(this);
-        db.close();
 
         if (mBitmap != null && !mBitmap.isRecycled()) {
             mBitmap.recycle();

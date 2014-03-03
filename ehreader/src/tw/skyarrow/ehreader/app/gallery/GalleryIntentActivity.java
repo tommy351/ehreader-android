@@ -108,12 +108,6 @@ public class GalleryIntentActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        db.close();
-    }
-
     private void getGalleryInfo() {
         if (token == null) {
             errorText.setText(R.string.error_token_invalid);

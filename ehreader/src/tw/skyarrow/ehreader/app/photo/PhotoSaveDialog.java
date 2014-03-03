@@ -63,12 +63,6 @@ public class PhotoSaveDialog extends DialogFragment {
         return dialog;
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        db.close();
-    }
-
     private DialogInterface.OnClickListener onCancelClick = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialogInterface, int i) {
