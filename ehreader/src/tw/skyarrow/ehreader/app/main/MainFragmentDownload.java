@@ -230,6 +230,6 @@ public class MainFragmentDownload extends Fragment implements AbsListView.OnScro
     }
 
     private void invalidateOptionsMenu() {
-        getActivity().supportInvalidateOptionsMenu();
+        getActivity().invalidateOptionsMenu();
     }
 }

@@ -1,10 +1,10 @@
 package tw.skyarrow.ehreader.app.search;
 
+import android.app.ActionBar;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 
 import com.google.analytics.tracking.android.Fields;
@@ -33,7 +33,7 @@ public class FilterActivity extends AdActivity {
         setupDrawer();
         setDrawerIndicatorEnabled(false);
 
-        ActionBar actionBar = getSupportActionBar();
+        ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         boolean isLoggedIn = LoginHelper.getInstance(this).isLoggedIn();
 

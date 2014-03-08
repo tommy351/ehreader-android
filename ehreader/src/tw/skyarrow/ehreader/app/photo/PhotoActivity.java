@@ -1,5 +1,6 @@
 package tw.skyarrow.ehreader.app.photo;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,12 +18,11 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.StyleSpan;
@@ -61,7 +61,7 @@ import tw.skyarrow.ehreader.util.DatabaseHelper;
 /**
  * Created by SkyArrow on 2014/1/31.
  */
-public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiVisibilityChangeListener {
+public class PhotoActivity extends FragmentActivity implements View.OnSystemUiVisibilityChangeListener {
     @InjectView(R.id.pager)
     ViewPager pager;
 
@@ -125,7 +125,7 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
             return;
         }
 
-        final ActionBar actionBar = getSupportActionBar();
+        final ActionBar actionBar = getActionBar();
         int page;
         final int total = gallery.getCount();
 
@@ -499,11 +499,7 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
     public void hideSystemUI() {
         systemUIHandler.removeMessages(0);
 
-        int uiOptions = 0;
-
-        if (Build.VERSION.SDK_INT >= 14) {
-            uiOptions |= View.SYSTEM_UI_FLAG_LOW_PROFILE;
-        }
+        int uiOptions = View.SYSTEM_UI_FLAG_LOW_PROFILE;
 
         if (Build.VERSION.SDK_INT >= 16) {
             uiOptions |= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN

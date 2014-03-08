@@ -1,5 +1,6 @@
 package tw.skyarrow.ehreader.app.gallery;
 
+import android.app.ActionBar;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -7,9 +8,6 @@ import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.ShareActionProvider;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -24,6 +22,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
+import android.widget.ShareActionProvider;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -131,7 +130,7 @@ public class GalleryActivity extends MainDrawerActivity {
                 .cacheOnDisc(true)
                 .build();
 
-        ActionBar actionBar = getSupportActionBar();
+        ActionBar actionBar = getActionBar();
 
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
@@ -141,7 +140,7 @@ public class GalleryActivity extends MainDrawerActivity {
 
         if (gallery != null) {
             showGallery();
-            supportInvalidateOptionsMenu();
+            invalidateOptionsMenu();
         }
     }
 
@@ -166,7 +165,7 @@ public class GalleryActivity extends MainDrawerActivity {
         }
 
         MenuItem shareItem = menu.findItem(R.id.menu_share);
-        ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
+        ShareActionProvider shareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
         shareActionProvider.setShareIntent(getShareIntent());
 
         return true;
@@ -411,7 +410,7 @@ public class GalleryActivity extends MainDrawerActivity {
             showToast(R.string.notification_unstarred);
         }
 
-        supportInvalidateOptionsMenu();
+        invalidateOptionsMenu();
 
         BaseApplication.getTracker().send(MapBuilder.createEvent(
                 "UI", "button", "star", null

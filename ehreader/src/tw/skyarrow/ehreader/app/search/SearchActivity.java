@@ -1,5 +1,6 @@
 package tw.skyarrow.ehreader.app.search;
 
+import android.app.ActionBar;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,7 +9,6 @@ import android.preference.PreferenceManager;
 import android.provider.SearchRecentSuggestions;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 
 import com.google.analytics.tracking.android.Fields;
@@ -37,7 +37,7 @@ public class SearchActivity extends AdActivity {
         setDrawerIndicatorEnabled(false);
 
         Intent intent = getIntent();
-        ActionBar actionBar = getSupportActionBar();
+        ActionBar actionBar = getActionBar();
 
         actionBar.setDisplayHomeAsUpEnabled(true);
 

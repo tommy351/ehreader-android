@@ -1,23 +1,22 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/menu_share"
         android:title="@string/menu_share"
         android:icon="@drawable/ic_share"
-        app:showAsAction="ifRoom"
-        app:actionProviderClass="android.support.v7.widget.ShareActionProvider"/>
+        android:showAsAction="ifRoom"
+        android:actionProviderClass="android.widget.ShareActionProvider"/>
     <item
         android:id="@+id/menu_star"
         android:title="@string/menu_star"
         android:icon="@drawable/ic_star"
-        app:showAsAction="always"/>
+        android:showAsAction="always"/>
     <item
         android:id="@+id/menu_unstar"
         android:title="@string/menu_unstar"
         android:icon="@drawable/ic_unstar"
-        app:showAsAction="always"/>
+        android:showAsAction="always"/>
     <item
         android:id="@+id/menu_open_in_browser"
         android:title="@string/menu_open_in_browser"
-        app:showAsAction="never"/>
+        android:showAsAction="never"/>
 </menu>

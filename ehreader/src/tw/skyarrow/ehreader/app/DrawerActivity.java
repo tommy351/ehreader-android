@@ -1,12 +1,12 @@
 package tw.skyarrow.ehreader.app;
 
+import android.app.ActionBar;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.view.GravityCompat;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -15,7 +15,7 @@ import tw.skyarrow.ehreader.R;
 /**
  * Created by SkyArrow on 2014/2/26.
  */
-public abstract class DrawerActivity extends ActionBarActivity {
+public abstract class DrawerActivity extends FragmentActivity {
     private DrawerLayout drawerLayout;
     private View drawerView;
     private ActionBarDrawerToggle drawerToggle;
@@ -29,7 +29,7 @@ public abstract class DrawerActivity extends ActionBarActivity {
     protected void setupDrawer() {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerView = findViewById(R.id.drawer);
-        ActionBar actionBar = getSupportActionBar();
+        ActionBar actionBar = getActionBar();
 
         drawerToggle = new ActionBarDrawerToggle(
                 this,
@@ -64,7 +64,7 @@ public abstract class DrawerActivity extends ActionBarActivity {
         };
 
         drawerLayout.setDrawerListener(drawerToggle);
-        drawerLayout.setDrawerShadow(R.drawable.navigation_drawer_shadow, GravityCompat.START);
+        drawerLayout.setDrawerShadow(R.drawable.navigation_drawer_shadow, Gravity.START);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
     }

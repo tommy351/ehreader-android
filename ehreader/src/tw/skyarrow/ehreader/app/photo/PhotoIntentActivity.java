@@ -1,11 +1,11 @@
 package tw.skyarrow.ehreader.app.photo;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.FragmentActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -34,7 +34,7 @@ import tw.skyarrow.ehreader.util.DatabaseHelper;
 /**
  * Created by SkyArrow on 2014/2/9.
  */
-public class PhotoIntentActivity extends ActionBarActivity {
+public class PhotoIntentActivity extends FragmentActivity {
     @InjectView(R.id.loading)
     ProgressBar loadingView;
 
@@ -68,7 +68,7 @@ public class PhotoIntentActivity extends ActionBarActivity {
         galleryDao = daoSession.getGalleryDao();
         dataLoader = DataLoader.getInstance(this);
 
-        ActionBar actionBar = getSupportActionBar();
+        ActionBar actionBar = getActionBar();
 
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);

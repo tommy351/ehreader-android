@@ -25,7 +25,6 @@ public class PhotoInfoService extends IntentService {
     public static final String EXTRA_GALLERY = "galleryId";
     public static final String EXTRA_PAGE = "photoPage";
 
-    private SQLiteDatabase db;
     private GalleryDao galleryDao;
 
     private DataLoader dataLoader;
@@ -40,7 +39,7 @@ public class PhotoInfoService extends IntentService {
         super.onCreate();
 
         DatabaseHelper helper = DatabaseHelper.getInstance(this);
-        db = helper.getWritableDatabase();
+        SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();

@@ -1,7 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:attr/selectableItemBackground">
+    android:background="?android:selectableItemBackground">
     <ImageView
         android:id="@+id/cover"
         android:layout_height="@dimen/thumbnail_size"
@@ -27,10 +27,10 @@
         android:layout_below="@+id/title"
         android:layout_marginTop="@dimen/margin_medium"
         android:textSize="@dimen/text_size_small"
-        android:textColor="?android:attr/textColorHint"/>
+        android:textColor="?android:textColorHint"/>
     <ProgressBar
         android:id="@+id/progress_bar"
-        style="?android:attr/progressBarStyleHorizontal"
+        style="?android:progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/progress_text"
@@ -41,7 +41,7 @@
         android:id="@+id/feature"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="?android:attr/selectableItemBackground"
+        android:background="?android:selectableItemBackground"
         android:src="@drawable/ic_overflow"
         android:layout_alignParentRight="true"
         android:padding="6dp"/>

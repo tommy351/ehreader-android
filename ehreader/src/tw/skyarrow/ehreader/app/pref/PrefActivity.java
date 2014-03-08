@@ -1,10 +1,10 @@
 package tw.skyarrow.ehreader.app.pref;
 
+import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.FragmentActivity;
 import android.view.MenuItem;
 
 import com.google.analytics.tracking.android.Fields;
@@ -16,7 +16,7 @@ import tw.skyarrow.ehreader.R;
 /**
  * Created by SkyArrow on 2014/1/29.
  */
-public class PrefActivity extends ActionBarActivity {
+public class PrefActivity extends FragmentActivity {
     private static final String TAG = "PrefActivity";
 
     @Override
@@ -24,7 +24,7 @@ public class PrefActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pref);
 
-        ActionBar actionBar = getSupportActionBar();
+        ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();

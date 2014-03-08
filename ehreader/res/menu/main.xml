@@ -1,22 +1,21 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/menu_search"
         android:title="@string/menu_search"
         android:icon="@drawable/ic_search"
-        app:showAsAction="always|collapseActionView"
-        app:actionViewClass="android.support.v7.widget.SearchView"/>
+        android:showAsAction="always|collapseActionView"
+        android:actionViewClass="android.widget.SearchView"/>
     <item
         android:id="@+id/menu_filter"
         android:title="@string/menu_filter"
         android:icon="@drawable/ic_filter"
-        app:showAsAction="ifRoom"/>
+        android:showAsAction="ifRoom"/>
     <item
         android:id="@+id/menu_file_search"
         android:title="@string/menu_image_search"
-        app:showAsAction="never"/>
+        android:showAsAction="never"/>
     <item
         android:id="@+id/menu_settings"
         android:title="@string/menu_settings"
-        app:showAsAction="never"/>
+        android:showAsAction="never"/>
 </menu>

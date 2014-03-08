@@ -87,7 +87,6 @@ public class GalleryDownloadService extends Service {
     private Map<Long, Download> pendingDownloads;
     private DownloadTask downloadTask;
 
-    private SQLiteDatabase db;
     private GalleryDao galleryDao;
     private PhotoDao photoDao;
     private DownloadDao downloadDao;
@@ -126,7 +125,7 @@ public class GalleryDownloadService extends Service {
         pendingDownloads = new HashMap<Long, Download>();
 
         DatabaseHelper helper = DatabaseHelper.getInstance(this);
-        db = helper.getWritableDatabase();
+        SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();

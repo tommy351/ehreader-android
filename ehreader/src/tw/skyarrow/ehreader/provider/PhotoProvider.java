@@ -35,7 +35,6 @@ public class PhotoProvider extends ContentProvider {
 
     public static final Uri PHOTO_URI = Uri.parse("content://" + AUTHORITY + "/photos");
 
-    private SQLiteDatabase db;
     private PhotoDao photoDao;
     private ImageLoader imageLoader;
 
@@ -46,7 +45,7 @@ public class PhotoProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         DatabaseHelper helper = DatabaseHelper.getInstance(getContext());
-        db = helper.getWritableDatabase();
+        SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         photoDao = daoSession.getPhotoDao();

@@ -1,11 +1,11 @@
 package tw.skyarrow.ehreader.app.gallery;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.FragmentActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -35,7 +35,7 @@ import tw.skyarrow.ehreader.util.L;
 /**
  * Created by SkyArrow on 2014/2/9.
  */
-public class GalleryIntentActivity extends ActionBarActivity {
+public class GalleryIntentActivity extends FragmentActivity {
     @InjectView(R.id.loading)
     ProgressBar loadingView;
 
@@ -68,7 +68,7 @@ public class GalleryIntentActivity extends ActionBarActivity {
         galleryDao = daoSession.getGalleryDao();
         dataLoader = DataLoader.getInstance(this);
 
-        ActionBar actionBar = getSupportActionBar();
+        ActionBar actionBar = getActionBar();
 
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);

@@ -2,17 +2,13 @@ package tw.skyarrow.ehreader.app.photo;
 
 import android.content.ContentUris;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.widget.ShareActionProvider;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.ShareActionProvider;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,31 +32,14 @@ import com.nostra13.universalimageloader.core.assist.ImageLoadingProgressListene
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.protocol.ClientContext;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.cookie.BasicClientCookie;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.HttpContext;
-
 import java.io.File;
-import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.BaseApplication;
-import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
-import tw.skyarrow.ehreader.api.ApiCallException;
-import tw.skyarrow.ehreader.api.ApiErrorCode;
 import tw.skyarrow.ehreader.api.DataLoader;
 import tw.skyarrow.ehreader.app.search.ImageSearchActivity;
 import tw.skyarrow.ehreader.db.DaoMaster;
@@ -72,8 +52,6 @@ import tw.skyarrow.ehreader.provider.PhotoProvider;
 import tw.skyarrow.ehreader.service.PhotoInfoService;
 import tw.skyarrow.ehreader.util.DatabaseHelper;
 import tw.skyarrow.ehreader.util.FileInfoHelper;
-import tw.skyarrow.ehreader.util.HttpRequestHelper;
-import tw.skyarrow.ehreader.util.L;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 /**
@@ -109,7 +87,6 @@ public class PhotoFragment extends Fragment {
     private String galleryTitle;
     private Photo photo;
     private Bitmap mBitmap;
-    private int pictureQuality;
 
     private boolean isServiceCalled = false;
 
@@ -147,10 +124,6 @@ public class PhotoFragment extends Fragment {
         galleryId = args.getLong(EXTRA_GALLERY);
         page = args.getInt(EXTRA_PAGE);
         galleryTitle = args.getString(EXTRA_TITLE);
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String qualityPref = preferences.getString(getString(R.string.pref_picture_quality), getString(R.string.pref_picture_quality_default));
-        pictureQuality = Integer.parseInt(qualityPref);
 
         pageText.setText(Integer.toString(page));
         displayPhoto();
@@ -193,7 +166,7 @@ public class PhotoFragment extends Fragment {
             inflater.inflate(R.menu.photo_fragment_loaded, menu);
 
             MenuItem shareItem = menu.findItem(R.id.menu_share);
-            ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
+            ShareActionProvider shareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
             shareActionProvider.setShareIntent(getShareIntent());
 
             boolean isDownloaded = photo.getDownloaded();
@@ -250,7 +223,7 @@ public class PhotoFragment extends Fragment {
             return;
         }
 
-        getActivity().supportInvalidateOptionsMenu();
+        getActivity().invalidateOptionsMenu();
         loadImage();
     }
 
@@ -258,7 +231,7 @@ public class PhotoFragment extends Fragment {
         if (event.getId() != photo.getId()) return;
 
         photo.setDownloaded(event.isDownloaded());
-        getActivity().supportInvalidateOptionsMenu();
+        getActivity().invalidateOptionsMenu();
     }
 
     private Intent getShareIntent() {
@@ -335,7 +308,7 @@ public class PhotoFragment extends Fragment {
 
             progressBar.setIndeterminate(false);
             progressBar.setProgress(0);
-            getActivity().supportInvalidateOptionsMenu();
+            getActivity().invalidateOptionsMenu();
         }
 
         @Override
@@ -348,7 +321,7 @@ public class PhotoFragment extends Fragment {
             mBitmap = bitmap;
             attacher.setOnViewTapListener(onPhotoTap);
 
-            getActivity().supportInvalidateOptionsMenu();
+            getActivity().invalidateOptionsMenu();
 
             BaseApplication.getTracker().send(MapBuilder.createTiming(
                     "resources", System.currentTimeMillis() - startLoadAt, "load photo", null
@@ -409,7 +382,7 @@ public class PhotoFragment extends Fragment {
             showToast(R.string.notification_bookmark_removed);
         }
 
-        getActivity().supportInvalidateOptionsMenu();
+        getActivity().invalidateOptionsMenu();
 
         BaseApplication.getTracker().send(MapBuilder.createEvent(
                 "UI", "button", "bookmark", null

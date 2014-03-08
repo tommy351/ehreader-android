@@ -134,7 +134,7 @@ public class MainActivity extends AdActivity {
                 args.putString(MainFragmentWeb.EXTRA_BASE, loggedIn ? Constant.BASE_URL_EX : Constant.BASE_URL);
         }
 
-        getSupportActionBar().setTitle(actionBarTitle);
+        getActionBar().setTitle(actionBarTitle);
         fragment.setArguments(args);
         ft.replace(R.id.container, fragment, tag);
         ft.commit();
@@ -169,11 +169,11 @@ public class MainActivity extends AdActivity {
 
     @Override
     public void onDrawerOpened(View view) {
-        getSupportActionBar().setTitle(R.string.app_name);
+        getActionBar().setTitle(R.string.app_name);
     }
 
     @Override
     public void onDrawerClosed(View view) {
-        getSupportActionBar().setTitle(actionBarTitle);
+        getActionBar().setTitle(actionBarTitle);
     }
 }

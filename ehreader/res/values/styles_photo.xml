@@ -1,12 +1,12 @@
 <resources>
-    <style name="Theme.Photo" parent="@style/Theme.AppCompat">
+    <style name="Theme.Photo" parent="android:Theme.Holo">
         <item name="android:windowBackground">@android:color/black</item>
         <item name="android:colorBackground">@android:color/black</item>
         <item name="android:windowActionBarOverlay">true</item>
         <item name="android:actionBarStyle">@style/ActionBar.Photo</item>
     </style>
 
-    <style name="ActionBar.Photo" parent="@style/Widget.AppCompat.ActionBar">
+    <style name="ActionBar.Photo" parent="android:Widget.ActionBar">
         <item name="android:background">@drawable/photo_actionbar_bg</item>
     </style>
 </resources>

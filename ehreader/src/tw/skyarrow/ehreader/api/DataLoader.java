@@ -50,7 +50,6 @@ import tw.skyarrow.ehreader.util.LoginHelper;
 public class DataLoader {
     private static DataLoader instance;
     private Context context;
-    private SQLiteDatabase db;
     private GalleryDao galleryDao;
     private PhotoDao photoDao;
     private HttpContext httpContext;
@@ -84,7 +83,7 @@ public class DataLoader {
 
     private void setupDatabase() {
         DatabaseHelper helper = DatabaseHelper.getInstance(context);
-        db = helper.getWritableDatabase();
+        SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();
