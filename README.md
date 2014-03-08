@@ -10,13 +10,13 @@ The best E-Hentai Reader for Android ever!
 
 ## Download
 
-[![](http://i.minus.com/io9s7kzkS9HkL.png)][Download]
+[![](https://raw.github.com/tommy351/ehreader-android/master/images/qrcode.png)][Download]
 
 ## Screenshots
 
-![](http://i.minus.com/jbdjClhfeq8uS0_s.jpg)
-![](http://i.minus.com/jW77Ku7Lwt42F_s.jpg)
-![](http://i.minus.com/jY1CVcLWyY725_s.jpg)
+![](https://raw.github.com/tommy351/ehreader-android/master/images/screenshot-main.png)
+![](https://raw.github.com/tommy351/ehreader-android/master/images/screenshot-gallery.png)
+![](https://raw.github.com/tommy351/ehreader-android/master/images/screenshot-photo.png)
 
 ## Development
 
@@ -58,4 +58,4 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
-[Download]: https://github.com/tommy351/ehreader-android/releases/download/0.3.1/ehreader-release.apk
+[Download]: https://github.com/tommy351/ehreader-android/releases/download/0.4.0/ehreader-release.apk
