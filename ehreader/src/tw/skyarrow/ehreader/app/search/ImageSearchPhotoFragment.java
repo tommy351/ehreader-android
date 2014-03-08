@@ -25,6 +25,8 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.api.ApiCallException;
+import tw.skyarrow.ehreader.api.ApiErrorCode;
 import tw.skyarrow.ehreader.api.DataLoader;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
@@ -33,7 +35,6 @@ import tw.skyarrow.ehreader.db.GalleryDao;
 import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.db.PhotoDao;
 import tw.skyarrow.ehreader.util.DatabaseHelper;
-import tw.skyarrow.ehreader.util.L;
 import tw.skyarrow.ehreader.util.NetworkHelper;
 
 /**
@@ -94,16 +95,25 @@ public class ImageSearchPhotoFragment extends Fragment {
 
         @Override
         protected String doInBackground(Long... longs) {
-            try {
-                Photo photo = photoDao.load(longs[0]);
-                Gallery gallery = galleryDao.load(photo.getGalleryId());
-                JSONObject json = dataLoader.getPhotoRaw(gallery, photo);
+            Photo photo = photoDao.load(longs[0]);
+            Gallery gallery = galleryDao.load(photo.getGalleryId());
+            JSONObject json;
 
-                if (json.has("error")) {
-                    L.e("error: %s", json.getString("error"));
+            try {
+                json = dataLoader.getPhotoRaw(gallery, photo);
+            } catch (ApiCallException e) {
+                if (e.getCode() == ApiErrorCode.SHOWKEY_EXPIRED || e.getCode() == ApiErrorCode.SHOWKEY_INVALID) {
+                    gallery.setShowkey(null);
+                    galleryDao.updateInTx(gallery);
+                    json = dataLoader.getPhotoRaw(gallery, photo);
+                } else {
                     return null;
                 }
+            }
 
+            if (json == null) return null;
+
+            try {
                 Matcher matcher = pSearchUrl.matcher(json.getString("i6"));
                 String prefix = "";
                 String hash = "";
