@@ -28,13 +28,6 @@
             android:defaultValue="@string/pref_screen_orientation_default"
             android:dialogTitle="@string/pref_screen_orientation_title"
             android:entryValues="@array/pref_screen_orientation_values"/>
-        <tw.skyarrow.ehreader.widget.ListPreferenceWithSummary
-            android:key="@string/pref_picture_quality"
-            android:title="@string/pref_picture_quality_title"
-            android:entries="@array/pref_picture_quality_entries"
-            android:defaultValue="@string/pref_picture_quality_default"
-            android:dialogTitle="@string/pref_picture_quality_title"
-            android:entryValues="@array/pref_picture_quality_values"/>
         <CheckBoxPreference
             android:key="@string/pref_volume_key_navigation"
             android:title="@string/pref_volume_key_navigation_title"

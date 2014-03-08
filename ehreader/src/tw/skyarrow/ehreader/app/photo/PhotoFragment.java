@@ -98,13 +98,6 @@ public class PhotoFragment extends Fragment {
     public static final String EXTRA_PAGE = "page";
     public static final String EXTRA_TITLE = "title";
 
-    private static final int QUALITY_ORIGINAL = 0;
-    private static final int QUALITY_LOW = 1;
-    private static final int QUALITY_MEDIUM = 2;
-    private static final int QUALITY_HIGH = 3;
-
-    private static final Pattern pLofiSrc = Pattern.compile("<img id=\"sm\" src=\"(.+?)\".+?>");
-
     private PhotoDao photoDao;
 
     private ImageLoader imageLoader;
@@ -321,16 +314,7 @@ public class PhotoFragment extends Fragment {
             }
         }
 
-        switch (pictureQuality) {
-            case QUALITY_LOW:
-            case QUALITY_MEDIUM:
-            case QUALITY_HIGH:
-                new PhotoLofiTask().execute(pictureQuality);
-                break;
-
-            default:
-                displayImage(photo.getSrc());
-        }
+        displayImage(photo.getSrc());
     }
 
     private void displayImage(String src) {
@@ -495,57 +479,5 @@ public class PhotoFragment extends Fragment {
         args.putLong(PhotoDeleteConfirmDialog.EXTRA_PHOTO, photo.getId());
         dialog.setArguments(args);
         dialog.show(getActivity().getSupportFragmentManager(), PhotoDeleteConfirmDialog.TAG);
-    }
-
-    private class PhotoLofiTask extends AsyncTask<Integer, Integer, String> {
-        @Override
-        protected String doInBackground(Integer... integers) {
-            try {
-                int quality = integers[0];
-                HttpContext httpContext = new BasicHttpContext();
-                CookieStore cookieStore = new BasicCookieStore();
-
-                cookieStore.addCookie(new Cookie("xres", Integer.toString(quality)));
-                httpContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
-
-                HttpClient client = new DefaultHttpClient();
-                HttpGet httpGet = new HttpGet(String.format(Constant.PHOTO_URL_LOFI,
-                        photo.getToken(), photo.getGalleryId(), photo.getPage()));
-                HttpResponse response = client.execute(httpGet, httpContext);
-                String content = HttpRequestHelper.readResponse(response);
-                Matcher matcher = pLofiSrc.matcher(content);
-                String src = "";
-
-                L.d("Photo lofi callback: %s", content);
-
-                while (matcher.find()) {
-                    src = matcher.group(1);
-                }
-
-                return src;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String src) {
-            if (src != null && !src.isEmpty()) {
-                displayImage(src);
-            } else {
-                showRetryBtn();
-            }
-        }
-    }
-
-    private class Cookie extends BasicClientCookie {
-        private Cookie(String name, String value) {
-            super(name, value);
-
-            setPath("/");
-            setDomain("lofi.e-hentai.org");
-        }
     }
 }

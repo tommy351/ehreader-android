@@ -21,14 +21,6 @@
         <item>橫向</item>
     </string-array>
 
-    <string name="pref_picture_quality_title">圖片品質</string>
-    <string-array name="pref_picture_quality_entries">
-        <item>原始</item>
-        <item>低 (460)</item>
-        <item>中 (780)</item>
-        <item>高 (980)</item>
-    </string-array>
-
     <string name="pref_volume_key_navigation_title">音量鍵導覽</string>
     <string name="pref_volume_key_navigation_summary">使用音量鍵翻頁</string>
 
