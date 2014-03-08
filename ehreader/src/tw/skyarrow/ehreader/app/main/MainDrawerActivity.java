@@ -25,8 +25,6 @@ public class MainDrawerActivity extends DrawerActivity {
 
         list.add(new DrawerItem(getString(R.string.drawer_settings), R.drawable.ic_drawer_settings));
 
-        drawerView.setAdapter(adapter);
-
         ListView headerView = (ListView) getLayoutInflater().inflate(R.layout.drawer_header, null);
         List<DrawerItem> headerList = new ArrayList<DrawerItem>();
 
@@ -44,8 +42,9 @@ public class MainDrawerActivity extends DrawerActivity {
             }
         };
 
-        headerView.setAdapter(headerAdapter);
         drawerView.addHeaderView(headerView);
+        drawerView.setAdapter(adapter);
+        headerView.setAdapter(headerAdapter);
     }
 
     public void onItemClick(int i) {
