@@ -1,11 +1,11 @@
 package tw.skyarrow.ehreader.app.photo;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.FragmentActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -21,7 +21,6 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import tw.skyarrow.ehreader.BaseApplication;
-import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.api.ApiCallException;
 import tw.skyarrow.ehreader.api.DataLoader;
@@ -30,11 +29,12 @@ import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
 import tw.skyarrow.ehreader.util.ActionBarHelper;
+import tw.skyarrow.ehreader.util.DatabaseHelper;
 
 /**
  * Created by SkyArrow on 2014/2/9.
  */
-public class PhotoIntentActivity extends ActionBarActivity {
+public class PhotoIntentActivity extends FragmentActivity {
     @InjectView(R.id.loading)
     ProgressBar loadingView;
 
@@ -48,9 +48,6 @@ public class PhotoIntentActivity extends ActionBarActivity {
 
     private Pattern pPhotoUrl = DataLoader.pPhotoUrl;
 
-    private SQLiteDatabase db;
-    private DaoMaster daoMaster;
-    private DaoSession daoSession;
     private GalleryDao galleryDao;
 
     private DataLoader dataLoader;
@@ -64,14 +61,14 @@ public class PhotoIntentActivity extends ActionBarActivity {
         setContentView(R.layout.activity_intent);
         ButterKnife.inject(this);
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, Constant.DB_NAME, null);
-        db = helper.getWritableDatabase();
-        daoMaster = new DaoMaster(db);
-        daoSession = daoMaster.newSession();
+        DatabaseHelper helper = DatabaseHelper.getInstance(this);
+        SQLiteDatabase db = helper.getWritableDatabase();
+        DaoMaster daoMaster = new DaoMaster(db);
+        DaoSession daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();
-        dataLoader = DataLoader.getInstance();
+        dataLoader = DataLoader.getInstance(this);
 
-        ActionBar actionBar = getSupportActionBar();
+        ActionBar actionBar = getActionBar();
 
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
@@ -107,12 +104,6 @@ public class PhotoIntentActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        db.close();
     }
 
     private void getGalleryInfo() {

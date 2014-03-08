@@ -1,21 +1,20 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/menu_share"
         android:title="@string/menu_share"
         android:icon="@drawable/ic_share_dark"
-        app:showAsAction="ifRoom"
-        app:actionProviderClass="android.support.v7.widget.ShareActionProvider"/>
+        android:showAsAction="ifRoom"
+        android:actionProviderClass="android.widget.ShareActionProvider"/>
     <item
         android:id="@+id/menu_save_photo"
         android:title="@string/menu_save_photo"
-        app:showAsAction="never"/>
+        android:showAsAction="never"/>
     <item
         android:id="@+id/menu_delete_photo"
         android:title="@string/menu_delete_photo"
-        app:showAsAction="never"/>
+        android:showAsAction="never"/>
     <item
         android:id="@+id/menu_set_as_wallpaper"
         android:title="@string/menu_set_as_wallpaper"
-        app:showAsAction="never"/>
+        android:showAsAction="never"/>
 </menu>

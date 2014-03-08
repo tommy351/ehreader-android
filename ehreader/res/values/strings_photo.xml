@@ -31,4 +31,12 @@
     <string name="photo_deleting">Deleting&#8230;</string>
     <string name="photo_delete_success">Photo deleted</string>
     <string name="photo_delete_failed">Failed to delete the photo</string>
+
+    // Dialog: Error
+    <string name="photo_error_title">Oops!</string>
+    <string name="photo_error_not_found">Sorry, the photo is not found. The gallery may have been deleted.</string>
+    <string name="photo_error_network">Please connect to internet and try again.</string>
+    <string name="photo_error_pinned">This gallery has been pinned. You have to log in to see it.</string>
+    <string name="photo_error_unknown">Something just went wrong. Please try again.</string>
+    <string name="network_config">Network configuration</string>
 </resources>

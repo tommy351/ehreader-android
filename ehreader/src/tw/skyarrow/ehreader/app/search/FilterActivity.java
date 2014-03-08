@@ -1,10 +1,10 @@
 package tw.skyarrow.ehreader.app.search;
 
+import android.app.ActionBar;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 
 import com.google.analytics.tracking.android.Fields;
@@ -14,9 +14,9 @@ import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.app.main.AdActivity;
-import tw.skyarrow.ehreader.app.main.MainDrawerActivity;
 import tw.skyarrow.ehreader.app.main.MainFragmentWeb;
 import tw.skyarrow.ehreader.util.ActionBarHelper;
+import tw.skyarrow.ehreader.util.LoginHelper;
 
 /**
  * Created by SkyArrow on 2014/2/2.
@@ -33,9 +33,9 @@ public class FilterActivity extends AdActivity {
         setupDrawer();
         setDrawerIndicatorEnabled(false);
 
-        ActionBar actionBar = getSupportActionBar();
+        ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        boolean isLoggedIn = BaseApplication.isLoggedIn();
+        boolean isLoggedIn = LoginHelper.getInstance(this).isLoggedIn();
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         Fragment fragment = new MainFragmentWeb();

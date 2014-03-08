@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import de.greenrobot.event.EventBus;
-import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
@@ -26,6 +25,7 @@ import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.db.PhotoDao;
 import tw.skyarrow.ehreader.event.PhotoDownloadEvent;
 import tw.skyarrow.ehreader.provider.PhotoProvider;
+import tw.skyarrow.ehreader.util.DatabaseHelper;
 
 /**
  * Created by SkyArrow on 2014/2/27.
@@ -35,7 +35,6 @@ public class PhotoSaveDialog extends DialogFragment {
 
     public static final String EXTRA_PHOTO = "photo";
 
-    private SQLiteDatabase db;
     private PhotoDao photoDao;
     private PhotoSaveTask task;
 
@@ -44,8 +43,8 @@ public class PhotoSaveDialog extends DialogFragment {
         ProgressDialog dialog = new ProgressDialog(getActivity());
         Bundle args = getArguments();
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
-        db = helper.getWritableDatabase();
+        DatabaseHelper helper = DatabaseHelper.getInstance(getActivity());
+        SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         photoDao = daoSession.getPhotoDao();
@@ -61,12 +60,6 @@ public class PhotoSaveDialog extends DialogFragment {
         task.execute(args.getLong(EXTRA_PHOTO));
 
         return dialog;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        db.close();
     }
 
     private DialogInterface.OnClickListener onCancelClick = new DialogInterface.OnClickListener() {

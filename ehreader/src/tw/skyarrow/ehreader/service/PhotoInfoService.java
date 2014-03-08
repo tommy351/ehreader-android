@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 
 import de.greenrobot.event.EventBus;
-import tw.skyarrow.ehreader.Constant;
+import tw.skyarrow.ehreader.api.ApiCallException;
 import tw.skyarrow.ehreader.api.DataLoader;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
@@ -13,6 +13,7 @@ import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
 import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.event.PhotoInfoEvent;
+import tw.skyarrow.ehreader.util.DatabaseHelper;
 import tw.skyarrow.ehreader.util.L;
 
 /**
@@ -24,9 +25,6 @@ public class PhotoInfoService extends IntentService {
     public static final String EXTRA_GALLERY = "galleryId";
     public static final String EXTRA_PAGE = "photoPage";
 
-    private SQLiteDatabase db;
-    private DaoMaster daoMaster;
-    private DaoSession daoSession;
     private GalleryDao galleryDao;
 
     private DataLoader dataLoader;
@@ -40,13 +38,13 @@ public class PhotoInfoService extends IntentService {
     public void onCreate() {
         super.onCreate();
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, Constant.DB_NAME, null);
-        db = helper.getWritableDatabase();
-        daoMaster = new DaoMaster(db);
-        daoSession = daoMaster.newSession();
+        DatabaseHelper helper = DatabaseHelper.getInstance(this);
+        SQLiteDatabase db = helper.getWritableDatabase();
+        DaoMaster daoMaster = new DaoMaster(db);
+        DaoSession daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();
 
-        dataLoader = DataLoader.getInstance();
+        dataLoader = DataLoader.getInstance(this);
         bus = EventBus.getDefault();
     }
 
@@ -76,10 +74,10 @@ public class PhotoInfoService extends IntentService {
             Photo photo = dataLoader.getPhotoInfo(gallery, page);
 
             bus.post(new PhotoInfoEvent(galleryId, page, photo));
-        } catch (Exception e) {
+        } catch (ApiCallException e) {
             e.printStackTrace();
 
-            bus.post(new PhotoInfoEvent(galleryId, page, null));
+            bus.post(new PhotoInfoEvent(galleryId, page, e));
         }
     }
 }

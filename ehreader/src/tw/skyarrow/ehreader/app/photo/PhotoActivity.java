@@ -1,5 +1,8 @@
 package tw.skyarrow.ehreader.app.photo;
 
+import android.app.ActionBar;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -12,14 +15,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.StyleSpan;
@@ -41,19 +44,24 @@ import java.util.Date;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.BaseApplication;
-import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.api.ApiCallException;
+import tw.skyarrow.ehreader.api.ApiErrorCode;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
+import tw.skyarrow.ehreader.event.PhotoBookmarkDialogEvent;
+import tw.skyarrow.ehreader.event.PhotoInfoEvent;
 import tw.skyarrow.ehreader.util.ActionBarHelper;
+import tw.skyarrow.ehreader.util.DatabaseHelper;
 
 /**
  * Created by SkyArrow on 2014/1/31.
  */
-public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiVisibilityChangeListener {
+public class PhotoActivity extends FragmentActivity implements View.OnSystemUiVisibilityChangeListener {
     @InjectView(R.id.pager)
     ViewPager pager;
 
@@ -77,9 +85,9 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
     private static final int UI_HIDE_DELAY = 3000;
     private static final int HINT_HIDE_DELAY = 500;
 
-    private SQLiteDatabase db;
     private GalleryDao galleryDao;
     private SharedPreferences preferences;
+    private EventBus bus;
 
     private Gallery gallery;
 
@@ -88,19 +96,21 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
     private boolean isKitkat = Build.VERSION.SDK_INT >= 19;
     private boolean isVolumeNavEnabled = false;
     private int tmpPage = -1;
+    private boolean isErrorDialogShow = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_photo);
         ButterKnife.inject(this);
+        bus = EventBus.getDefault();
+        bus.register(this);
 
         decorView = getWindow().getDecorView();
         decorView.setOnSystemUiVisibilityChangeListener(this);
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, Constant.DB_NAME, null);
-        db = helper.getWritableDatabase();
+        DatabaseHelper helper = DatabaseHelper.getInstance(this);
+        SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();
@@ -115,7 +125,7 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
             return;
         }
 
-        final ActionBar actionBar = getSupportActionBar();
+        final ActionBar actionBar = getActionBar();
         int page;
         final int total = gallery.getCount();
 
@@ -162,6 +172,8 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
             }
         });
 
+        pager.setOffscreenPageLimit(3);
+
         String orientation = preferences.getString(getString(R.string.pref_screen_orientation),
                 getString(R.string.pref_screen_orientation_default));
 
@@ -188,6 +200,12 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
 
         hideSystemUI();
         setSeekBarMargin();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        bus.unregister(this);
     }
 
     @Override
@@ -284,6 +302,62 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
 
         return super.onKeyUp(keyCode, event);
     }
+
+    public void onEventMainThread(PhotoInfoEvent event) {
+        if (event.getGalleryId() != gallery.getId() || isErrorDialogShow) return;
+
+        ApiCallException exception = event.getException();
+        if (exception == null) return;
+
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+        dialog.setTitle(R.string.photo_error_title)
+                .setPositiveButton(R.string.ok, onDialogSubmitClick);
+
+        switch (exception.getCode()) {
+            case ApiErrorCode.GALLERY_PINNED:
+                isErrorDialogShow = true;
+                dialog.setMessage(R.string.photo_error_pinned);
+                break;
+
+            case ApiErrorCode.IO_ERROR:
+                isErrorDialogShow = true;
+                dialog.setMessage(R.string.photo_error_network)
+                        .setPositiveButton(R.string.network_config, onDialogNetworkClick)
+                        .setNegativeButton(R.string.cancel, null);
+                break;
+
+            case ApiErrorCode.TOKEN_OR_PAGE_INVALID:
+                isErrorDialogShow = true;
+                dialog.setMessage(R.string.photo_error_not_found);
+                break;
+        }
+
+        if (isErrorDialogShow) {
+            dialog.create().show();
+        }
+    }
+
+    public void onEvent(PhotoBookmarkDialogEvent event) {
+        if (event.getGalleryId() != gallery.getId()) return;
+
+        setCurrent(event.getPage() - 1);
+    }
+
+    private DialogInterface.OnClickListener onDialogSubmitClick = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialogInterface, int i) {
+            isErrorDialogShow = false;
+        }
+    };
+
+    private DialogInterface.OnClickListener onDialogNetworkClick = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialogInterface, int i) {
+            isErrorDialogShow = false;
+            startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
+        }
+    };
 
     private boolean getBoolean(int res) {
         return getResources().getBoolean(res);
@@ -425,11 +499,7 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
     public void hideSystemUI() {
         systemUIHandler.removeMessages(0);
 
-        int uiOptions = 0;
-
-        if (Build.VERSION.SDK_INT >= 14) {
-            uiOptions |= View.SYSTEM_UI_FLAG_LOW_PROFILE;
-        }
+        int uiOptions = View.SYSTEM_UI_FLAG_LOW_PROFILE;
 
         if (Build.VERSION.SDK_INT >= 16) {
             uiOptions |= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN

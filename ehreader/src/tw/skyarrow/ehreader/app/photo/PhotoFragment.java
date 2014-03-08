@@ -8,8 +8,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.widget.ShareActionProvider;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.ShareActionProvider;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,16 +32,14 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 
 import java.io.File;
-import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
-import de.greenrobot.dao.query.QueryBuilder;
 import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.BaseApplication;
-import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.api.DataLoader;
 import tw.skyarrow.ehreader.app.search.ImageSearchActivity;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
@@ -52,6 +49,7 @@ import tw.skyarrow.ehreader.event.PhotoDownloadEvent;
 import tw.skyarrow.ehreader.event.PhotoInfoEvent;
 import tw.skyarrow.ehreader.provider.PhotoProvider;
 import tw.skyarrow.ehreader.service.PhotoInfoService;
+import tw.skyarrow.ehreader.util.DatabaseHelper;
 import tw.skyarrow.ehreader.util.FileInfoHelper;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
@@ -77,11 +75,11 @@ public class PhotoFragment extends Fragment {
     public static final String EXTRA_PAGE = "page";
     public static final String EXTRA_TITLE = "title";
 
-    private SQLiteDatabase db;
     private PhotoDao photoDao;
 
     private ImageLoader imageLoader;
     private DisplayImageOptions displayOptions;
+    private DataLoader dataLoader;
 
     private long galleryId;
     private int page;
@@ -89,7 +87,6 @@ public class PhotoFragment extends Fragment {
     private Photo photo;
     private Bitmap mBitmap;
 
-    private boolean isLoaded = false;
     private boolean isServiceCalled = false;
 
     @Override
@@ -107,11 +104,12 @@ public class PhotoFragment extends Fragment {
             }
         });
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
-        db = helper.getWritableDatabase();
+        DatabaseHelper helper = DatabaseHelper.getInstance(getActivity());
+        SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         photoDao = daoSession.getPhotoDao();
+        dataLoader = DataLoader.getInstance(getActivity());
 
         imageLoader = ImageLoader.getInstance();
         displayOptions = new DisplayImageOptions.Builder()
@@ -146,7 +144,6 @@ public class PhotoFragment extends Fragment {
         super.onDestroyView();
         imageLoader.cancelDisplayTask(imageView);
         EventBus.getDefault().unregister(this);
-        db.close();
 
         if (mBitmap != null && !mBitmap.isRecycled()) {
             mBitmap.recycle();
@@ -155,7 +152,7 @@ public class PhotoFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (!isLoaded) return;
+        if (photo == null) return;
 
         inflater.inflate(R.menu.photo_fragment, menu);
 
@@ -168,7 +165,7 @@ public class PhotoFragment extends Fragment {
             inflater.inflate(R.menu.photo_fragment_loaded, menu);
 
             MenuItem shareItem = menu.findItem(R.id.menu_share);
-            ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
+            ShareActionProvider shareActionProvider = (ShareActionProvider) shareItem.getActionProvider();
             shareActionProvider.setShareIntent(getShareIntent());
 
             boolean isDownloaded = photo.getDownloaded();
@@ -218,15 +215,14 @@ public class PhotoFragment extends Fragment {
     public void onEventMainThread(PhotoInfoEvent event) {
         if (event.getGalleryId() != galleryId || event.getPage() != page) return;
 
-        Photo photo = event.getPhoto();
+        photo = event.getPhoto();
 
         if (photo == null) {
             showRetryBtn();
             return;
         }
 
-        this.photo = photo;
-        getActivity().supportInvalidateOptionsMenu();
+        getActivity().invalidateOptionsMenu();
         loadImage();
     }
 
@@ -234,7 +230,7 @@ public class PhotoFragment extends Fragment {
         if (event.getId() != photo.getId()) return;
 
         photo.setDownloaded(event.isDownloaded());
-        getActivity().supportInvalidateOptionsMenu();
+        getActivity().invalidateOptionsMenu();
     }
 
     private Intent getShareIntent() {
@@ -253,15 +249,9 @@ public class PhotoFragment extends Fragment {
     }
 
     private void displayPhoto() {
-        QueryBuilder<Photo> qb = photoDao.queryBuilder();
-        qb.where(qb.and(
-                PhotoDao.Properties.GalleryId.eq(galleryId),
-                PhotoDao.Properties.Page.eq(page)
-        ));
-        List<Photo> photoList = qb.list();
+        photo = dataLoader.getPhotoInDb(galleryId, page);
 
-        if (photoList.size() > 0) {
-            photo = photoList.get(0);
+        if (photo != null) {
             String src = photo.getSrc();
 
             if (src != null && !src.isEmpty() && !photo.getInvalid()) {
@@ -296,7 +286,11 @@ public class PhotoFragment extends Fragment {
             }
         }
 
-        imageLoader.displayImage(photo.getSrc(), imageView, displayOptions, imageLoadingListener, imageProgressListener);
+        displayImage(photo.getSrc());
+    }
+
+    private void displayImage(String src) {
+        imageLoader.displayImage(src, imageView, displayOptions, imageLoadingListener, imageProgressListener);
     }
 
     private void showRetryBtn() {
@@ -310,11 +304,10 @@ public class PhotoFragment extends Fragment {
         @Override
         public void onLoadingStarted(String imageUri, View view) {
             startLoadAt = System.currentTimeMillis();
-            isLoaded = true;
 
             progressBar.setIndeterminate(false);
             progressBar.setProgress(0);
-            getActivity().supportInvalidateOptionsMenu();
+            getActivity().invalidateOptionsMenu();
         }
 
         @Override
@@ -327,7 +320,7 @@ public class PhotoFragment extends Fragment {
             mBitmap = bitmap;
             attacher.setOnViewTapListener(onPhotoTap);
 
-            getActivity().supportInvalidateOptionsMenu();
+            getActivity().invalidateOptionsMenu();
 
             BaseApplication.getTracker().send(MapBuilder.createTiming(
                     "resources", System.currentTimeMillis() - startLoadAt, "load photo", null
@@ -388,7 +381,7 @@ public class PhotoFragment extends Fragment {
             showToast(R.string.notification_bookmark_removed);
         }
 
-        getActivity().supportInvalidateOptionsMenu();
+        getActivity().invalidateOptionsMenu();
 
         BaseApplication.getTracker().send(MapBuilder.createEvent(
                 "UI", "button", "bookmark", null

@@ -24,7 +24,6 @@ import butterknife.InjectView;
 import de.greenrobot.dao.query.QueryBuilder;
 import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.BaseApplication;
-import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
@@ -34,6 +33,7 @@ import tw.skyarrow.ehreader.event.GalleryDeleteEvent;
 import tw.skyarrow.ehreader.event.GalleryDownloadEvent;
 import tw.skyarrow.ehreader.event.ListUpdateEvent;
 import tw.skyarrow.ehreader.service.GalleryDownloadService;
+import tw.skyarrow.ehreader.util.DatabaseHelper;
 import tw.skyarrow.ehreader.util.DownloadHelper;
 import tw.skyarrow.ehreader.widget.InfiniteScrollListener;
 
@@ -54,9 +54,6 @@ public class MainFragmentDownload extends Fragment implements AbsListView.OnScro
 
     public static final String EXTRA_POSITION = "position";
 
-    private SQLiteDatabase db;
-    private DownloadDao downloadDao;
-
     private List<Download> downloadList;
     private DownloadListAdapter adapter;
     private EventBus bus;
@@ -72,12 +69,12 @@ public class MainFragmentDownload extends Fragment implements AbsListView.OnScro
         bus = EventBus.getDefault();
         bus.register(this);
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
-        db = helper.getWritableDatabase();
+        DatabaseHelper helper = DatabaseHelper.getInstance(getActivity());
+        SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
-        downloadDao = daoSession.getDownloadDao();
-        downloadHelper = DownloadHelper.getInstance();
+        DownloadDao downloadDao = daoSession.getDownloadDao();
+        downloadHelper = DownloadHelper.getInstance(getActivity());
 
         QueryBuilder<Download> qb = downloadDao.queryBuilder();
         qb.orderDesc(DownloadDao.Properties.Created);
@@ -115,7 +112,6 @@ public class MainFragmentDownload extends Fragment implements AbsListView.OnScro
     public void onDestroyView() {
         super.onDestroyView();
         bus.unregister(this);
-        db.close();
     }
 
     @Override
@@ -234,6 +230,6 @@ public class MainFragmentDownload extends Fragment implements AbsListView.OnScro
     }
 
     private void invalidateOptionsMenu() {
-        getActivity().supportInvalidateOptionsMenu();
+        getActivity().invalidateOptionsMenu();
     }
 }

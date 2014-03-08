@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
-import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.app.gallery.GalleryActivity;
 import tw.skyarrow.ehreader.db.DaoMaster;
@@ -16,6 +15,7 @@ import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Download;
 import tw.skyarrow.ehreader.db.DownloadDao;
 import tw.skyarrow.ehreader.service.GalleryDownloadService;
+import tw.skyarrow.ehreader.util.DatabaseHelper;
 
 /**
  * Created by SkyArrow on 2014/2/1.
@@ -26,11 +26,6 @@ public class DownloadContextMenu extends DialogFragment {
     public static final String EXTRA_GALLERY = "id";
     public static final String EXTRA_TITLE = "title";
 
-    private SQLiteDatabase db;
-    private DaoMaster daoMaster;
-    private DaoSession daoSession;
-    private DownloadDao downloadDao;
-
     private long galleryId;
     private Download download;
 
@@ -40,11 +35,11 @@ public class DownloadContextMenu extends DialogFragment {
         Bundle args = getArguments();
         galleryId = args.getLong(EXTRA_GALLERY);
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
-        db = helper.getReadableDatabase();
-        daoMaster = new DaoMaster(db);
-        daoSession = daoMaster.newSession();
-        downloadDao = daoSession.getDownloadDao();
+        DatabaseHelper helper = DatabaseHelper.getInstance(getActivity());
+        SQLiteDatabase db = helper.getReadableDatabase();
+        DaoMaster daoMaster = new DaoMaster(db);
+        DaoSession daoSession = daoMaster.newSession();
+        DownloadDao downloadDao = daoSession.getDownloadDao();
 
         download = downloadDao.load(galleryId);
 
@@ -74,12 +69,6 @@ public class DownloadContextMenu extends DialogFragment {
                 .setItems(menu, onItemClick);
 
         return dialog.create();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        db.close();
     }
 
     private DialogInterface.OnClickListener onItemClick = new DialogInterface.OnClickListener() {

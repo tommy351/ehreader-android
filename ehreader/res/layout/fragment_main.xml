@@ -11,6 +11,6 @@
         android:footerDividersEnabled="false"
         android:divider="@null"
         android:dividerHeight="0dp"
-        android:listSelector="?android:attr/selectableItemBackground"/>
+        android:listSelector="?android:selectableItemBackground"/>
     <include layout="@layout/partial_error"/>
 </RelativeLayout>

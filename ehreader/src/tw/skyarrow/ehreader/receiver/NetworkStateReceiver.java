@@ -17,9 +17,9 @@ import tw.skyarrow.ehreader.util.UpdateHelper;
 public class NetworkStateReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        NetworkHelper network = new NetworkHelper(context);
+        NetworkHelper network = NetworkHelper.getInstance(context);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        DownloadHelper downloadHelper = DownloadHelper.getInstance();
+        DownloadHelper downloadHelper = DownloadHelper.getInstance(context);
         UpdateHelper updateHelper = new UpdateHelper(context);
 
         boolean autoDownload = preferences.getBoolean(context.getString(R.string.pref_auto_download),

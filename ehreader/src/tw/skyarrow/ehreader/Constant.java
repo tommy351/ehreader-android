@@ -4,8 +4,6 @@ package tw.skyarrow.ehreader;
  * Created by SkyArrow on 2014/1/25.
  */
 public class Constant {
-    public static final String DB_NAME = "ehreader.db";
-
     public static final String API_URL = "http://g.e-hentai.org/api.php";
     public static final String API_URL_EX = "http://exhentai.org/api.php";
 
@@ -29,8 +27,4 @@ public class Constant {
 
     public static final String AUTHOR_PAGE = "https://twitter.com/tommy351";
     public static final String HOMEPAGE = "https://github.com/tommy351/ehreader-android";
-
-    public static final String IPB_MEMBER_ID = "ipb_member_id";
-    public static final String IPB_PASS_HASH = "ipb_pass_hash";
-    public static final String IPB_SESSION_ID = "ipb_session_id";
 }

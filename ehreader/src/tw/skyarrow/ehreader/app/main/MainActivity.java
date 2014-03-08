@@ -2,7 +2,6 @@ package tw.skyarrow.ehreader.app.main;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
@@ -11,16 +10,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 
-import com.google.ads.AdRequest;
-import com.google.ads.AdSize;
-import com.google.ads.AdView;
-
-import butterknife.ButterKnife;
-import butterknife.InjectView;
 import de.greenrobot.event.EventBus;
-import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.app.pref.PrefActivity;
@@ -28,6 +19,7 @@ import tw.skyarrow.ehreader.app.search.FilterDialog;
 import tw.skyarrow.ehreader.app.search.ImageSearchActivity;
 import tw.skyarrow.ehreader.event.ListUpdateEvent;
 import tw.skyarrow.ehreader.util.ActionBarHelper;
+import tw.skyarrow.ehreader.util.LoginHelper;
 
 public class MainActivity extends AdActivity {
     public static final String TAG = "MainActivity";
@@ -108,11 +100,11 @@ public class MainActivity extends AdActivity {
         Fragment fragment;
         Bundle args = new Bundle();
         String tag;
-        boolean loggedIn = BaseApplication.isLoggedIn();
+        boolean loggedIn = LoginHelper.getInstance(this).isLoggedIn();
         String[] tabs = getResources().getStringArray(R.array.main_tabs);
         actionBarTitle = tabs[i];
 
-        DrawerAdapter adapter = getDrawerAdapter();
+        DrawerHeaderAdapter adapter = getDrawerAdapter();
 
         adapter.getItem(currentTab).setSelected(false);
         adapter.getItem(i).setSelected(true);
@@ -142,7 +134,7 @@ public class MainActivity extends AdActivity {
                 args.putString(MainFragmentWeb.EXTRA_BASE, loggedIn ? Constant.BASE_URL_EX : Constant.BASE_URL);
         }
 
-        getSupportActionBar().setTitle(actionBarTitle);
+        getActionBar().setTitle(actionBarTitle);
         fragment.setArguments(args);
         ft.replace(R.id.container, fragment, tag);
         ft.commit();
@@ -177,11 +169,11 @@ public class MainActivity extends AdActivity {
 
     @Override
     public void onDrawerOpened(View view) {
-        getSupportActionBar().setTitle(R.string.app_name);
+        getActionBar().setTitle(R.string.app_name);
     }
 
     @Override
     public void onDrawerClosed(View view) {
-        getSupportActionBar().setTitle(actionBarTitle);
+        getActionBar().setTitle(actionBarTitle);
     }
 }

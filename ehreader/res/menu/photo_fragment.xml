@@ -1,21 +1,20 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/menu_add_bookmark"
         android:title="@string/menu_add_bookmark"
         android:icon="@drawable/ic_add_bookmark_dark"
-        app:showAsAction="always"/>
+        android:showAsAction="always"/>
     <item
         android:id="@+id/menu_remove_bookmark"
         android:title="@string/menu_remove_bookmark"
         android:icon="@drawable/ic_remove_bookmark_dark"
-        app:showAsAction="always"/>
+        android:showAsAction="always"/>
     <item
         android:id="@+id/menu_find_similar"
         android:title="@string/menu_find_similar"
-        app:showAsAction="never"/>
+        android:showAsAction="never"/>
     <item
         android:id="@+id/menu_open_in_browser"
         android:title="@string/menu_open_in_browser"
-        app:showAsAction="never"/>
+        android:showAsAction="never"/>
 </menu>

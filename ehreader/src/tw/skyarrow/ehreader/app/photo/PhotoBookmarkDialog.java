@@ -13,13 +13,15 @@ import com.google.analytics.tracking.android.MapBuilder;
 import java.util.List;
 
 import de.greenrobot.dao.query.QueryBuilder;
+import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.BaseApplication;
-import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.db.PhotoDao;
+import tw.skyarrow.ehreader.event.PhotoBookmarkDialogEvent;
+import tw.skyarrow.ehreader.util.DatabaseHelper;
 
 /**
  * Created by SkyArrow on 2014/2/2.
@@ -29,17 +31,17 @@ public class PhotoBookmarkDialog extends DialogFragment {
 
     public static final String EXTRA_GALLERY = "id";
 
-    private SQLiteDatabase db;
+    private long galleryId;
     private List<Photo> photoList;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
         Bundle args = getArguments();
-        long galleryId = args.getLong(EXTRA_GALLERY);
+        galleryId = args.getLong(EXTRA_GALLERY);
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
-        db = helper.getReadableDatabase();
+        DatabaseHelper helper = DatabaseHelper.getInstance(getActivity());
+        SQLiteDatabase db = helper.getReadableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         PhotoDao photoDao = daoSession.getPhotoDao();
@@ -75,20 +77,13 @@ public class PhotoBookmarkDialog extends DialogFragment {
         return dialog.create();
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        db.close();
-    }
-
     private DialogInterface.OnClickListener onItemClick = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialogInterface, int i) {
             Photo photo = photoList.get(i);
-
             if (photo == null) return;
 
-            ((PhotoActivity) getActivity()).setCurrent(photo.getPage() - 1, false);
+            EventBus.getDefault().post(new PhotoBookmarkDialogEvent(galleryId, photo.getPage()));
         }
     };
 }

@@ -12,10 +12,10 @@ android {
     buildToolsVersion '19.0.1'
 
     defaultConfig {
-        minSdkVersion 11
+        minSdkVersion 14
         targetSdkVersion 19
-        versionCode 7
-        versionName '0.3.2'
+        versionCode 8
+        versionName '0.4.0'
     }
 
     signingConfigs {
@@ -65,7 +65,6 @@ android {
 
 dependencies {
     compile 'com.android.support:support-v4:19.0.+'
-    compile 'com.android.support:appcompat-v7:19.0.+'
     compile files('libs/libGoogleAnalyticsServices.jar')
     compile 'com.github.chrisbanes.photoview:library:1.2.3-SNAPSHOT'
     compile 'de.greenrobot:greendao:1.3.7'

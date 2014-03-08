@@ -1,7 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:attr/selectableItemBackground">
+    android:background="?android:selectableItemBackground">
     <ImageView
         android:id="@+id/cover"
         android:layout_height="@dimen/thumbnail_size"
@@ -14,7 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:singleLine="true"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="@dimen/text_size_medium"
         android:layout_toRightOf="@+id/cover"
         android:layout_marginTop="@dimen/list_item_margin_top"
         android:layout_marginRight="48dp"
@@ -26,11 +26,11 @@
         android:layout_toRightOf="@+id/cover"
         android:layout_below="@+id/title"
         android:layout_marginTop="@dimen/margin_medium"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="?android:attr/textColorHint"/>
+        android:textSize="@dimen/text_size_small"
+        android:textColor="?android:textColorHint"/>
     <ProgressBar
         android:id="@+id/progress_bar"
-        style="?android:attr/progressBarStyleHorizontal"
+        style="?android:progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/progress_text"
@@ -41,7 +41,7 @@
         android:id="@+id/feature"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="?android:attr/selectableItemBackground"
+        android:background="?android:selectableItemBackground"
         android:src="@drawable/ic_overflow"
         android:layout_alignParentRight="true"
         android:padding="6dp"/>
@@ -49,5 +49,5 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_alignParentBottom="true"
-        android:background="@android:drawable/divider_horizontal_bright"/>
+        android:background="?android:listDivider"/>
 </RelativeLayout>

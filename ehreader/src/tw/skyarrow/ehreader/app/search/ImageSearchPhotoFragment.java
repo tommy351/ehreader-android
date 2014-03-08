@@ -24,8 +24,9 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import tw.skyarrow.ehreader.BaseApplication;
-import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.api.ApiCallException;
+import tw.skyarrow.ehreader.api.ApiErrorCode;
 import tw.skyarrow.ehreader.api.DataLoader;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
@@ -33,7 +34,7 @@ import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
 import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.db.PhotoDao;
-import tw.skyarrow.ehreader.util.L;
+import tw.skyarrow.ehreader.util.DatabaseHelper;
 import tw.skyarrow.ehreader.util.NetworkHelper;
 
 /**
@@ -51,7 +52,6 @@ public class ImageSearchPhotoFragment extends Fragment {
 
     private static final Pattern pSearchUrl = Pattern.compile("<a href=\"http://(g.e-|ex)hentai.org/\\?f_shash=(.+?)\">");
 
-    private SQLiteDatabase db;
     private GalleryDao galleryDao;
     private PhotoDao photoDao;
     private DataLoader dataLoader;
@@ -67,14 +67,14 @@ public class ImageSearchPhotoFragment extends Fragment {
         Bundle args = getArguments();
         photoId = args.getLong("photo");
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
-        db = helper.getWritableDatabase();
+        DatabaseHelper helper = DatabaseHelper.getInstance(getActivity());
+        SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();
         photoDao = daoSession.getPhotoDao();
-        dataLoader = DataLoader.getInstance();
-        network = new NetworkHelper(getActivity());
+        dataLoader = DataLoader.getInstance(getActivity());
+        network = NetworkHelper.getInstance(getActivity());
 
         searchPhoto();
 
@@ -95,16 +95,25 @@ public class ImageSearchPhotoFragment extends Fragment {
 
         @Override
         protected String doInBackground(Long... longs) {
-            try {
-                Photo photo = photoDao.load(longs[0]);
-                Gallery gallery = galleryDao.load(photo.getGalleryId());
-                JSONObject json = dataLoader.getPhotoRaw(gallery, photo);
+            Photo photo = photoDao.load(longs[0]);
+            Gallery gallery = galleryDao.load(photo.getGalleryId());
+            JSONObject json;
 
-                if (json.has("error")) {
-                    L.e("error: %s", json.getString("error"));
+            try {
+                json = dataLoader.getPhotoRaw(gallery, photo);
+            } catch (ApiCallException e) {
+                if (e.getCode() == ApiErrorCode.SHOWKEY_EXPIRED || e.getCode() == ApiErrorCode.SHOWKEY_INVALID) {
+                    gallery.setShowkey(null);
+                    galleryDao.updateInTx(gallery);
+                    json = dataLoader.getPhotoRaw(gallery, photo);
+                } else {
                     return null;
                 }
+            }
 
+            if (json == null) return null;
+
+            try {
                 Matcher matcher = pSearchUrl.matcher(json.getString("i6"));
                 String prefix = "";
                 String hash = "";
@@ -148,12 +157,6 @@ public class ImageSearchPhotoFragment extends Fragment {
 
             ((ImageSearchActivity) getActivity()).displayPhotoResult(builder.build().toString());
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        db.close();
     }
 
     private void showError(int res, boolean retry) {

@@ -31,4 +31,12 @@
     <string name="photo_deleting">刪除中&#8230;</string>
     <string name="photo_delete_success">圖片已刪除</string>
     <string name="photo_delete_failed">圖片刪除失敗</string>
+
+    // Dialog: Error
+    <string name="photo_error_title">糟糕！</string>
+    <string name="photo_error_not_found">抱歉，找不到圖片。此相簿可能已遭刪除。</string>
+    <string name="photo_error_network">請連接到網路後再試一次。</string>
+    <string name="photo_error_pinned">此相簿已被標記，您必須登入後才能觀看。</string>
+    <string name="photo_error_unknown">發生了一些錯誤，請再試一次。</string>
+    <string name="network_config">網路設定</string>
 </resources>

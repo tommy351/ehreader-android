@@ -85,8 +85,8 @@ public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.
         bus.register(this);
 
         Context context = getActivity();
-        dataLoader = DataLoader.getInstance();
-        network = new NetworkHelper(getActivity());
+        dataLoader = DataLoader.getInstance(getActivity());
+        network = NetworkHelper.getInstance(getActivity());
 
         Bundle args = getArguments();
         baseUrl = args.getString(EXTRA_BASE);
@@ -285,7 +285,7 @@ public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.
         if (firstLoaded) {
             firstLoaded = false;
             progressBar.setVisibility(View.GONE);
-            getActivity().supportInvalidateOptionsMenu();
+            getActivity().invalidateOptionsMenu();
         } else {
             footerProgressBar.setVisibility(View.INVISIBLE);
         }
@@ -316,7 +316,7 @@ public class MainFragmentWeb extends Fragment implements InfiniteScrollListener.
         galleryIndex.clear();
         galleryList.clear();
         adapter.notifyDataSetChanged();
-        getActivity().supportInvalidateOptionsMenu();
+        getActivity().invalidateOptionsMenu();
         errorView.setVisibility(View.GONE);
         footerRetry.setVisibility(View.GONE);
 

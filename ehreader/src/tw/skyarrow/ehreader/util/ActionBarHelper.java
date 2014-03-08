@@ -6,13 +6,11 @@ import android.app.SearchableInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.widget.SearchView;
 import android.view.MenuItem;
+import android.widget.SearchView;
 
 import tw.skyarrow.ehreader.Constant;
 
@@ -40,7 +38,7 @@ public class ActionBarHelper {
 
     public static void createSearchMenu(Activity activity, MenuItem item) {
         SearchManager searchManager = (SearchManager) activity.getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
+        SearchView searchView = (SearchView) item.getActionView();
         SearchableInfo searchableInfo = searchManager.getSearchableInfo(activity.getComponentName());
 
         searchView.setOnQueryTextListener(new QueryTextListener(item));
@@ -58,10 +56,7 @@ public class ActionBarHelper {
 
         @Override
         public boolean onQueryTextSubmit(String s) {
-            if (Build.VERSION.SDK_INT >= 14) {
-                menuItem.collapseActionView();
-            }
-
+            menuItem.collapseActionView();
             return false;
         }
 
@@ -85,10 +80,7 @@ public class ActionBarHelper {
 
         @Override
         public boolean onSuggestionClick(int i) {
-            if (Build.VERSION.SDK_INT >= 14) {
-                menuItem.collapseActionView();
-            }
-
+            menuItem.collapseActionView();
             return false;
         }
     }

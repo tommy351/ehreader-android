@@ -1,5 +1,6 @@
 package tw.skyarrow.ehreader.app.photo;
 
+import android.app.ActionBar;
 import android.app.WallpaperManager;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -7,10 +8,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.FragmentActivity;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,7 +31,7 @@ import tw.skyarrow.ehreader.util.L;
 /**
  * Created by SkyArrow on 2014/2/9.
  */
-public class CropActivity extends ActionBarActivity {
+public class CropActivity extends FragmentActivity {
     @InjectView(R.id.image)
     CropImageView imageView;
 
@@ -46,7 +45,7 @@ public class CropActivity extends ActionBarActivity {
         setContentView(R.layout.activity_crop);
         ButterKnife.inject(this);
 
-        ActionBar actionBar = getSupportActionBar();
+        ActionBar actionBar = getActionBar();
 
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
@@ -64,16 +63,10 @@ public class CropActivity extends ActionBarActivity {
 
                 if (width <= 0 || height <= 0) {
                     Display display = getWindowManager().getDefaultDisplay();
-
-                    if (Build.VERSION.SDK_INT >= 13) {
-                        Point size = new Point();
-                        display.getSize(size);
-                        width = size.x;
-                        height = size.y;
-                    } else {
-                        width = display.getWidth();
-                        height = display.getHeight();
-                    }
+                    Point size = new Point();
+                    display.getSize(size);
+                    width = size.x;
+                    height = size.y;
                 }
 
                 L.d("%d x %d", width, height);

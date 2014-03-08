@@ -3,7 +3,6 @@ package tw.skyarrow.ehreader.db;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 
 import java.io.File;

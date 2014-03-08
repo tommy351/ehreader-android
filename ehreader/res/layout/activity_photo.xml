@@ -16,12 +16,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentBottom="true">
-        <!--
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="?android:attr/actionBarSize"
-            android:layout_alignParentBottom="true"
-            android:background="@drawable/photo_bottom_bg"/> -->
         <SeekBar
             android:id="@+id/seekbar"
             android:layout_width="match_parent"
@@ -36,7 +30,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="@dimen/text_size_large"
         android:background="#8000"
         android:padding="@dimen/activity_horizontal_margin"
         android:visibility="gone"/>

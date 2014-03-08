@@ -10,6 +10,7 @@
         <item>歷史</item>
         <item>下載</item>
     </string-array>
+    <string name="drawer_settings">設定</string>
 
     // Error
     <string name="error_no_results">找不到相簿，請試試其他關鍵字。</string>

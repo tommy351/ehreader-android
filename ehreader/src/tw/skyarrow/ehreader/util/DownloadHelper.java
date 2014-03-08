@@ -22,27 +22,27 @@ import tw.skyarrow.ehreader.service.GalleryDownloadService;
  * Created by SkyArrow on 2014/2/21.
  */
 public class DownloadHelper {
-    private static DownloadHelper instance = null;
+    private static DownloadHelper instance;
     private Context context;
     private SQLiteDatabase db;
     private DownloadDao downloadDao;
 
-    public static DownloadHelper getInstance() {
-        if (instance == null) {
-            instance = new DownloadHelper();
-        }
-
-        return instance;
-    }
-
-    public void init(Context context) {
+    private DownloadHelper(Context context) {
         this.context = context;
 
         setupDatabase();
     }
 
+    public static DownloadHelper getInstance(Context context) {
+        if (instance == null) {
+            instance = new DownloadHelper(context.getApplicationContext());
+        }
+
+        return instance;
+    }
+
     private void setupDatabase() {
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, Constant.DB_NAME, null);
+        DatabaseHelper helper = DatabaseHelper.getInstance(context);
         db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();

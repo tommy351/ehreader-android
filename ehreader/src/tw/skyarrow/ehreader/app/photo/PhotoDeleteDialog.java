@@ -11,13 +11,13 @@ import android.widget.Toast;
 import java.io.File;
 
 import de.greenrobot.event.EventBus;
-import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.db.PhotoDao;
 import tw.skyarrow.ehreader.event.PhotoDownloadEvent;
+import tw.skyarrow.ehreader.util.DatabaseHelper;
 
 /**
  * Created by SkyArrow on 2014/2/28.
@@ -27,7 +27,6 @@ public class PhotoDeleteDialog extends DialogFragment {
 
     public static final String EXTRA_PHOTO = "photo";
 
-    private SQLiteDatabase db;
     private PhotoDao photoDao;
 
     @Override
@@ -36,8 +35,8 @@ public class PhotoDeleteDialog extends DialogFragment {
         Bundle args = getArguments();
         long id = args.getLong(EXTRA_PHOTO);
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
-        db = helper.getWritableDatabase();
+        DatabaseHelper helper = DatabaseHelper.getInstance(getActivity());
+        SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         photoDao = daoSession.getPhotoDao();
@@ -51,12 +50,6 @@ public class PhotoDeleteDialog extends DialogFragment {
         new PhotoDeleteTask().execute(id);
 
         return dialog;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        db.close();
     }
 
     private class PhotoDeleteTask extends AsyncTask<Long, Integer, Boolean> {

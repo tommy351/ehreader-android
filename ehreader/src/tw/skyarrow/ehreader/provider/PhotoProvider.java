@@ -17,11 +17,11 @@ import com.nostra13.universalimageloader.core.assist.DiscCacheUtil;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.db.PhotoDao;
+import tw.skyarrow.ehreader.util.DatabaseHelper;
 import tw.skyarrow.ehreader.util.FileInfoHelper;
 
 /**
@@ -35,7 +35,6 @@ public class PhotoProvider extends ContentProvider {
 
     public static final Uri PHOTO_URI = Uri.parse("content://" + AUTHORITY + "/photos");
 
-    private SQLiteDatabase db;
     private PhotoDao photoDao;
     private ImageLoader imageLoader;
 
@@ -45,8 +44,8 @@ public class PhotoProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getContext(), Constant.DB_NAME, null);
-        db = helper.getWritableDatabase();
+        DatabaseHelper helper = DatabaseHelper.getInstance(getContext());
+        SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         DaoSession daoSession = daoMaster.newSession();
         photoDao = daoSession.getPhotoDao();

@@ -27,17 +27,9 @@
             android:id="@+id/read"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1">
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_play_dark"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/read_btn"
-                android:fontFamily="sans-serif-light"/>
-        </tw.skyarrow.ehreader.widget.CoverActionBarButton>
+            android:layout_weight="1"
+            android:title="@string/read_btn"
+            android:icon="@drawable/ic_play_dark"/>
         <View
             android:layout_width="2dp"
             android:layout_height="match_parent"
@@ -48,16 +40,8 @@
             android:id="@+id/download"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1">
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_download_dark"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/download_btn"
-                android:fontFamily="sans-serif-light"/>
-        </tw.skyarrow.ehreader.widget.CoverActionBarButton>
+            android:layout_weight="1"
+            android:title="@string/download_btn"
+            android:icon="@drawable/ic_download_dark"/>
     </LinearLayout>
 </merge>

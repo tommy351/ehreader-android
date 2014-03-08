@@ -20,4 +20,9 @@
     <string name="error_token_invalid">Token 無效。</string>
     <string name="error_no_data">沒有資料。</string>
     <string name="error_fetch_gallery">相簿資料獲取失敗。</string>
+
+    // Dialog: Choose page
+    <string name="choose_page_title">前往</string>
+    <string name="choose_page_prefix">第</string>
+    <string name="choose_page_suffix">頁</string>
 </resources>

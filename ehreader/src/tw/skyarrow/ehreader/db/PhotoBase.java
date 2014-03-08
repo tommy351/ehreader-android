@@ -1,7 +1,6 @@
 package tw.skyarrow.ehreader.db;
 
 import android.net.Uri;
-import android.os.Environment;
 
 import java.io.File;
 

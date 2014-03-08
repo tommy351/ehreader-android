@@ -1,6 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="TypographyDashes">
     <string name="ga_trackingId">UA-4910098-9</string>
-    <bool name="ga_autoActivityTracking">true</bool>
     <bool name="ga_reportUncaughtExceptions">true</bool>
 </resources>

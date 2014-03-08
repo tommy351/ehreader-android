@@ -3,18 +3,15 @@ package tw.skyarrow.ehreader.app.pref;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 
 import com.google.analytics.tracking.android.Fields;
 import com.google.analytics.tracking.android.MapBuilder;
 
-import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
-import tw.skyarrow.ehreader.event.LoginEvent;
+import tw.skyarrow.ehreader.util.LoginHelper;
 
 /**
  * Created by SkyArrow on 2014/2/4.
@@ -42,15 +39,7 @@ public class LogoutDialog extends DialogFragment {
     private DialogInterface.OnClickListener onSubmitClick = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialogInterface, int i) {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            SharedPreferences.Editor editor = preferences.edit();
-
-            editor.putBoolean(getString(R.string.pref_logged_in), false);
-            editor.remove(getString(R.string.pref_login_memberid));
-            editor.remove(getString(R.string.pref_login_passhash));
-            editor.commit();
-
-            EventBus.getDefault().post(new LoginEvent(LoginEvent.LOGOUT));
+            LoginHelper.getInstance(getActivity()).logout();
         }
     };
 }

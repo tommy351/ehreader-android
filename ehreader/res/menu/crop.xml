@@ -1,18 +1,17 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/menu_rotate_left"
         android:title="@string/menu_rotate_left"
         android:icon="@drawable/ic_rotate_left_dark"
-        app:showAsAction="always"/>
+        android:showAsAction="always"/>
     <item
         android:id="@+id/menu_rotate_right"
         android:title="@string/menu_rotate_right"
         android:icon="@drawable/ic_rotate_right_dark"
-        app:showAsAction="always"/>
+        android:showAsAction="always"/>
     <item
         android:id="@+id/menu_ok"
         android:title="@string/ok"
         android:icon="@drawable/ic_ok_dark"
-        app:showAsAction="always"/>
+        android:showAsAction="always"/>
 </menu>

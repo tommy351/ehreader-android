@@ -13,7 +13,6 @@ import java.util.List;
 
 import de.greenrobot.dao.query.QueryBuilder;
 import de.greenrobot.event.EventBus;
-import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
@@ -24,6 +23,7 @@ import tw.skyarrow.ehreader.db.Photo;
 import tw.skyarrow.ehreader.db.PhotoDao;
 import tw.skyarrow.ehreader.event.GalleryDeleteEvent;
 import tw.skyarrow.ehreader.service.GalleryDownloadService;
+import tw.skyarrow.ehreader.util.DatabaseHelper;
 
 /**
  * Created by SkyArrow on 2014/2/3.
@@ -33,9 +33,6 @@ public class DownloadDeleteDialog extends DialogFragment {
 
     public static final String EXTRA_GALLERY = "id";
 
-    private SQLiteDatabase db;
-    private DaoMaster daoMaster;
-    private DaoSession daoSession;
     private PhotoDao photoDao;
     private DownloadDao downloadDao;
 
@@ -50,10 +47,10 @@ public class DownloadDeleteDialog extends DialogFragment {
         Bundle args = getArguments();
         galleryId = args.getLong(EXTRA_GALLERY);
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), Constant.DB_NAME, null);
-        db = helper.getWritableDatabase();
-        daoMaster = new DaoMaster(db);
-        daoSession = daoMaster.newSession();
+        DatabaseHelper helper = DatabaseHelper.getInstance(getActivity());
+        SQLiteDatabase db = helper.getWritableDatabase();
+        DaoMaster daoMaster = new DaoMaster(db);
+        DaoSession daoSession = daoMaster.newSession();
         photoDao = daoSession.getPhotoDao();
         downloadDao = daoSession.getDownloadDao();
 
@@ -77,12 +74,6 @@ public class DownloadDeleteDialog extends DialogFragment {
         new GalleryDeleteTask().execute();
 
         return dialog;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        db.close();
     }
 
     private class GalleryDeleteTask extends AsyncTask<Integer, Integer, String> {

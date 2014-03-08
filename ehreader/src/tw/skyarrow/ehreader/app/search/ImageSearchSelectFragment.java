@@ -40,6 +40,7 @@ import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.api.DataLoader;
+import tw.skyarrow.ehreader.util.LoginHelper;
 import tw.skyarrow.ehreader.util.NetworkHelper;
 import tw.skyarrow.ehreader.util.ObservableHttpEntity;
 
@@ -92,8 +93,8 @@ public class ImageSearchSelectFragment extends Fragment {
         ButterKnife.inject(this, view);
 
         Bundle args = getArguments();
-        loggedIn = BaseApplication.isLoggedIn();
-        network = new NetworkHelper(getActivity());
+        loggedIn = LoginHelper.getInstance(getActivity()).isLoggedIn();
+        network = NetworkHelper.getInstance(getActivity());
 
         if (args != null && args.getParcelable(EXTRA_DATA) != null) {
             uri = args.getParcelable(EXTRA_DATA);
@@ -160,7 +161,7 @@ public class ImageSearchSelectFragment extends Fragment {
             try {
                 HttpClient httpClient = new DefaultHttpClient();
                 HttpPost httpPost = new HttpPost(loggedIn ? Constant.IMAGE_SEARCH_URL_EX : Constant.IMAGE_SEARCH_URL);
-                HttpContext httpContext = DataLoader.getInstance().getHttpContext();
+                HttpContext httpContext = DataLoader.getInstance(getActivity()).getHttpContext();
                 HttpParams params = httpPost.getParams();
                 MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
 

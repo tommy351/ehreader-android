@@ -46,6 +46,21 @@
         <item>landscape</item>
     </string-array>
 
+    <string name="pref_volume_key_navigation" translatable="false">volume_key_navigation</string>
+    <string name="pref_volume_key_navigation_title">Volume key navigation</string>
+    <string name="pref_volume_key_navigation_summary">Navigate between pages using volume keys</string>
+    <bool name="pref_volume_key_navigation_default">true</bool>
+
+    <string name="pref_keep_screen_on" translatable="false">keep_screen_on</string>
+    <string name="pref_keep_screen_on_title">Keep screen on</string>
+    <string name="pref_keep_screen_on_summary">Keep screen on when reading</string>
+    <bool name="pref_keep_screen_on_default">true</bool>
+
+    <string name="pref_japanese_title" translatable="false">japanese_title</string>
+    <string name="pref_japanese_title_title">Display the Japanese title</string>
+    <string name="pref_japanese_title_summary">Display the japanese title instead of the original one</string>
+    <bool name="pref_japanese_title_default">false</bool>
+
     // Slideshow
     <string name="pref_slideshow_title">Slideshow</string>
 
@@ -84,21 +99,6 @@
         <item>flip</item>
         <item>cube</item>
     </string-array>
-
-    <string name="pref_volume_key_navigation" translatable="false">volume_key_navigation</string>
-    <string name="pref_volume_key_navigation_title">Volume key navigation</string>
-    <string name="pref_volume_key_navigation_summary">Navigate between pages using volume keys</string>
-    <bool name="pref_volume_key_navigation_default">true</bool>
-
-    <string name="pref_keep_screen_on" translatable="false">keep_screen_on</string>
-    <string name="pref_keep_screen_on_title">Keep screen on</string>
-    <string name="pref_keep_screen_on_summary">Keep screen on when reading</string>
-    <bool name="pref_keep_screen_on_default">true</bool>
-
-    <string name="pref_japanese_title" translatable="false">japanese_title</string>
-    <string name="pref_japanese_title_title">Display the Japanese title</string>
-    <string name="pref_japanese_title_summary">Display the japanese title instead of the original one</string>
-    <bool name="pref_japanese_title_default">false</bool>
 
     // Download
     <string name="pref_download_title">Download</string>
