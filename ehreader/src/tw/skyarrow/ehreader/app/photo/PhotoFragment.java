@@ -253,26 +253,6 @@ public class PhotoFragment extends Fragment {
         photo = event.getPhoto();
 
         if (photo == null) {
-            ApiCallException exception = event.getException();
-
-            if (exception != null) {
-                // TODO avoid opening multiple dialogs
-                switch (exception.getCode()) {
-                    case ApiErrorCode.GALLERY_PINNED:
-                    case ApiErrorCode.IO_ERROR:
-                    case ApiErrorCode.TOKEN_OR_PAGE_INVALID:
-                        DialogFragment dialog = new PhotoErrorDialog();
-                        Bundle args = new Bundle();
-
-                        args.putInt(PhotoErrorDialog.EXTRA_ERROR_CODE, exception.getCode());
-
-                        dialog.setArguments(args);
-                        dialog.show(getActivity().getSupportFragmentManager(), PhotoErrorDialog.TAG);
-
-                        break;
-                }
-            }
-
             showRetryBtn();
             return;
         }

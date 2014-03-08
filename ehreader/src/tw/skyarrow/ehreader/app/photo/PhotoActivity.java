@@ -1,5 +1,7 @@
 package tw.skyarrow.ehreader.app.photo;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -12,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -41,12 +44,17 @@ import java.util.Date;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.BaseApplication;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.api.ApiCallException;
+import tw.skyarrow.ehreader.api.ApiErrorCode;
 import tw.skyarrow.ehreader.db.DaoMaster;
 import tw.skyarrow.ehreader.db.DaoSession;
 import tw.skyarrow.ehreader.db.Gallery;
 import tw.skyarrow.ehreader.db.GalleryDao;
+import tw.skyarrow.ehreader.event.PhotoBookmarkDialogEvent;
+import tw.skyarrow.ehreader.event.PhotoInfoEvent;
 import tw.skyarrow.ehreader.util.ActionBarHelper;
 import tw.skyarrow.ehreader.util.DatabaseHelper;
 
@@ -79,6 +87,7 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
 
     private GalleryDao galleryDao;
     private SharedPreferences preferences;
+    private EventBus bus;
 
     private Gallery gallery;
 
@@ -87,13 +96,15 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
     private boolean isKitkat = Build.VERSION.SDK_INT >= 19;
     private boolean isVolumeNavEnabled = false;
     private int tmpPage = -1;
+    private boolean isErrorDialogShow = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_photo);
         ButterKnife.inject(this);
+        bus = EventBus.getDefault();
+        bus.register(this);
 
         decorView = getWindow().getDecorView();
         decorView.setOnSystemUiVisibilityChangeListener(this);
@@ -192,6 +203,12 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        bus.unregister(this);
+    }
+
+    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         setSeekBarMargin();
@@ -285,6 +302,62 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
 
         return super.onKeyUp(keyCode, event);
     }
+
+    public void onEventMainThread(PhotoInfoEvent event) {
+        if (event.getGalleryId() != gallery.getId() || isErrorDialogShow) return;
+
+        ApiCallException exception = event.getException();
+        if (exception == null) return;
+
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+        dialog.setTitle(R.string.photo_error_title)
+                .setPositiveButton(R.string.ok, onDialogSubmitClick);
+
+        switch (exception.getCode()) {
+            case ApiErrorCode.GALLERY_PINNED:
+                isErrorDialogShow = true;
+                dialog.setMessage(R.string.photo_error_pinned);
+                break;
+
+            case ApiErrorCode.IO_ERROR:
+                isErrorDialogShow = true;
+                dialog.setMessage(R.string.photo_error_network)
+                        .setPositiveButton(R.string.network_config, onDialogNetworkClick)
+                        .setNegativeButton(R.string.cancel, null);
+                break;
+
+            case ApiErrorCode.TOKEN_OR_PAGE_INVALID:
+                isErrorDialogShow = true;
+                dialog.setMessage(R.string.photo_error_not_found);
+                break;
+        }
+
+        if (isErrorDialogShow) {
+            dialog.create().show();
+        }
+    }
+
+    public void onEvent(PhotoBookmarkDialogEvent event) {
+        if (event.getGalleryId() != gallery.getId()) return;
+
+        setCurrent(event.getPage() - 1);
+    }
+
+    private DialogInterface.OnClickListener onDialogSubmitClick = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialogInterface, int i) {
+            isErrorDialogShow = false;
+        }
+    };
+
+    private DialogInterface.OnClickListener onDialogNetworkClick = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialogInterface, int i) {
+            isErrorDialogShow = false;
+            startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
+        }
+    };
 
     private boolean getBoolean(int res) {
         return getResources().getBoolean(res);
