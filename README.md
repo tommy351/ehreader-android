@@ -31,7 +31,7 @@ The best E-Hentai Reader for Android ever!
 Run the following commands and open the project in Android Studio.
 
 ``` bash
-$ https://github.com/tommy351/ehreader-android.git
+$ git clone https://github.com/tommy351/ehreader-android.git
 $ cd ehreader-android
 $ git submodule update --init
 $ cd android-stackblur/StackBlur
