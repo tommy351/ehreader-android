@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="tw.skyarrow.ehreader">
+    package="tw.skyarrow.ehreader"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -14,7 +15,8 @@
         android:label="@string/app_name"
         android:theme="@style/Theme.Main"
         android:name=".BaseApplication"
-        android:largeHeap="true">
+        android:largeHeap="true"
+        tools:replace="android:theme">
         <meta-data
             android:name="android.app.default_searchable"
             android:value=".app.search.SearchActivity"/>
