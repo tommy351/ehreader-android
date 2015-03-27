@@ -1,3 +1,11 @@
 <resources>
-    <style name="Theme.Main" parent="android:Theme.Holo.Light"/>
+    <style name="AppTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="android:textColorPrimary">@color/icons</item>
+    </style>
+
+    <style name="AppTheme" parent="AppTheme.Base"/>
 </resources>

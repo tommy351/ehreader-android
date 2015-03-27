@@ -1,20 +1,45 @@
 <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/drawer_layout"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <LinearLayout
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-        <FrameLayout
-            android:id="@+id/container"
+        android:fitsSystemWindows="true">
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="0dip"
-            android:layout_weight="1"/>
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            android:elevation="4dp"/>
         <FrameLayout
-            android:id="@+id/ad_container"
+            android:id="@+id/frame"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-    </LinearLayout>
-    <include layout="@layout/drawer"/>
+            android:layout_height="match_parent"
+            android:layout_below="@+id/toolbar"/>
+    </RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/sidebar"
+        android:layout_width="@dimen/drawer_width"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@color/drawer_background"
+        android:clickable="true"
+        android:elevation="8dp">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/main_menu"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            android:layout_above="@+id/sub_menu"/>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/sub_menu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"/>
+    </RelativeLayout>
 </android.support.v4.widget.DrawerLayout>

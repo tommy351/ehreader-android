@@ -4,9 +4,6 @@ import android.util.Log;
 
 import tw.skyarrow.ehreader.BuildConfig;
 
-/**
- * Created by SkyArrow on 2014/1/29.
- */
 // https://github.com/ANDLABS-Git/AndlabsAndroidUtils/blob/master/library/src/com/andlabs/androidutils/logging/L.java
 public class L {
     public static void v(Throwable t) {

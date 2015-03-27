@@ -1,33 +1,21 @@
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion '19.1'
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 19
-        versionCode 8
-        versionName '0.4.0'
-    }
-
-    signingConfigs {
-        release
+        applicationId "tw.skyarrow.ehreader"
+        minSdkVersion 15
+        targetSdkVersion 22
+        versionCode 10
+        versionName "1.0"
     }
 
     buildTypes {
-        staging {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
-            signingConfig signingConfigs.release
-            debuggable true
-        }
-
         release {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
-            signingConfig signingConfigs.release
-            debuggable false
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 
@@ -47,28 +35,16 @@ android {
             java.srcDirs = ['tests/src']
         }
     }
-
-    packagingOptions {
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/DEPENDENCIES'
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/LICENSE'
-    }
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:19.0.+'
-    compile files('libs/libGoogleAnalyticsServices.jar')
-    compile 'com.github.chrisbanes.photoview:library:1.2.3'
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:22.0.0'
+    compile 'com.android.support:cardview-v7:22.0.0'
+    compile 'com.android.support:recyclerview-v7:22.0.0'
     compile 'de.greenrobot:greendao:1.3.7'
     compile 'de.greenrobot:eventbus:2.4.0'
-    compile 'org.apache.httpcomponents:httpcore:4.4'
-    compile 'org.apache.httpcomponents:httpmime:4.3.6'
-    compile 'com.jakewharton:butterknife:6.0.0'
-    compile 'org.apache.commons:commons-io:1.3.2'
-    compile 'com.edmodo:cropper:1.0.1'
-    compile project(':android-stackblur:StackBlur')
-    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.1'
-    compile 'com.github.zafarkhaja:java-semver:0.8.0'
-    compile files('libs/GoogleAdMobAdsSdk-6.4.1.jar')
+    compile 'io.realm:realm-android:0.80.0'
+    compile 'com.mcxiaoke.volley:library:1.0.15@aar'
+    compile 'com.github.zafarkhaja:java-semver:0.7.2'
 }

@@ -1,157 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="tw.skyarrow.ehreader"
-    xmlns:tools="http://schemas.android.com/tools">
+    package="tw.skyarrow.ehreader" >
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.SET_WALLPAPER"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Main"
-        android:name=".BaseApplication"
-        android:largeHeap="true"
-        tools:replace="android:theme">
-        <meta-data
-            android:name="android.app.default_searchable"
-            android:value=".app.search.SearchActivity"/>
+        android:theme="@style/AppTheme" >
         <activity
-            android:name=".app.main.MainActivity"
-            android:label="@string/app_name"
-            android:configChanges="orientation|screenSize|keyboardHidden">
+            android:name=".app.MainActivity"
+            android:label="@string/app_name" >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".app.gallery.GalleryActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".app.main.MainActivity"/>
-        </activity>
-        <activity
-            android:name=".app.gallery.GalleryIntentActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"
-            android:noHistory="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="http" android:host="g.e-hentai.org" android:pathPrefix="/g/"/>
-                <data android:scheme="http" android:host="exhentai.org" android:pathPrefix="/g/"/>
-            </intent-filter>
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".app.main.MainActivity"/>
-        </activity>
-        <activity
-            android:name=".app.photo.PhotoActivity"
-            android:theme="@style/Theme.Photo"
-            android:configChanges="orientation|screenSize|keyboardHidden">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".app.gallery.GalleryActivity"/>
-        </activity>
-        <activity
-            android:name=".app.photo.PhotoIntentActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"
-            android:noHistory="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="http" android:host="g.e-hentai.org" android:pathPrefix="/s/"/>
-                <data android:scheme="http" android:host="exhentai.org" android:pathPrefix="/s/"/>
-            </intent-filter>
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".app.main.MainActivity"/>
-        </activity>
-        <activity
-            android:name=".app.photo.CropActivity"
-            android:theme="@style/Theme.Crop"/>
-        <activity
-            android:name=".app.search.SearchActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden">
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH"/>
-            </intent-filter>
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".app.main.MainActivity"/>
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable"/>
-        </activity>
-        <activity
-            android:name=".app.search.ImageSearchActivity"
-            android:label="@string/label_image_search"
-            android:configChanges="orientation|screenSize|keyboardHidden">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".app.main.MainActivity"/>
-            <intent-filter>
-                <action android:name="android.intent.action.SEND"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="image/*"/>
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".app.pref.PrefActivity"
-            android:label="@string/label_settings">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".app.main.MainActivity"/>
-        </activity>
-        <activity
-            android:name=".app.search.FilterActivity"
-            android:label="@string/menu_filter"
-            android:configChanges="orientation|screenSize|keyboardHidden">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".app.main.MainActivity"/>
-        </activity>
-        <activity
-            android:name=".app.pref.AboutActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"
-            android:theme="@style/Theme.About">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".app.pref.PrefActivity"/>
-        </activity>
-        <activity android:name="com.google.ads.AdActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
-        <provider
-            android:name=".provider.PhotoProvider"
-            android:authorities="tw.skyarrow.ehreader.provider.PhotoProvider"
-            android:exported="true"/>
-        <provider
-            android:name=".provider.SearchSuggestionProvider"
-            android:authorities="tw.skyarrow.ehreader.provider.SearchSuggestionProvider"/>
+
         <service
-            android:name=".service.GalleryDownloadService"/>
-        <service
-            android:name=".service.PhotoInfoService"/>
-        <service
-            android:name=".service.UpdateCheckService"/>
-        <receiver
-            android:name=".receiver.NetworkStateReceiver">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
-                <action android:name="android.net.wifi.WIFI_STATE_CHANGED"/>
-            </intent-filter>
-        </receiver>
-        <receiver android:name=".receiver.BootCompletedReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-            </intent-filter>
-        </receiver>
-        <receiver android:name=".receiver.UpdateAlarmReceiver"/>
+            android:name=".services.GalleryFetchService"
+            android:exported="false" >
+        </service>
     </application>
+
 </manifest>

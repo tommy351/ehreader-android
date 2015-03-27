@@ -1,6 +1,0 @@
-<resources>
-    <declare-styleable name="CoverActionBarButton">
-        <attr name="android:title"/>
-        <attr name="android:icon"/>
-    </declare-styleable>
-</resources>

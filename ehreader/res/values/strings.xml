@@ -1,31 +1,14 @@
 <resources>
-    // App info
     <string name="app_name">E-Hentai Reader</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_search">Search</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
 
-    // Menu
-    <string name="menu_settings">Settings</string>
-    <string name="menu_share">Share</string>
-    <string name="menu_open_drawer">Open drawer</string>
-    <string name="menu_close_drawer">Close drawer</string>
-
-    // Categories
-    <string name="category_doujinshi">Doujinshi</string>
-    <string name="category_manga">Manga</string>
-    <string name="category_artistcg">Artist CG</string>
-    <string name="category_gamecg">Game CG</string>
-    <string name="category_western">Western</string>
-    <string name="category_non_h">Non-H</string>
-    <string name="category_imageset">Image Set</string>
-    <string name="category_cosplay">Cosplay</string>
-    <string name="category_asianporn">Asian Porn</string>
-    <string name="category_misc">Misc</string>
-
-    // Error
-    <string name="error_no_network">No network.</string>
-
-    // Common buttons
-    <string name="retry">Retry</string>
-    <string name="ok">OK</string>
-    <string name="cancel">Cancel</string>
-    <string name="delete">Delete</string>
+    <string-array name="main_menu">
+        <item>Latest</item>
+        <item>Bookmarks</item>
+        <item>History</item>
+        <item>Downloads</item>
+    </string-array>
 </resources>

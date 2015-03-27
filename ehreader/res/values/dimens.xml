@@ -1,28 +1,6 @@
 <resources>
-    <dimen name="margin_tiny">4dp</dimen>
-    <dimen name="margin_small">8dp</dimen>
-    <dimen name="margin_medium">16dp</dimen>
-    <dimen name="margin_large">32dp</dimen>
-    <dimen name="margin_huge">64dp</dimen>
-
-    <dimen name="text_size_large">22sp</dimen>
-    <dimen name="text_size_medium">18sp</dimen>
-    <dimen name="text_size_small">14sp</dimen>
-
-    <dimen name="activity_horizontal_margin">@dimen/margin_medium</dimen>
-    <dimen name="activity_vertical_margin">@dimen/margin_medium</dimen>
-
-    <dimen name="thumbnail_size">98sp</dimen>
-    <dimen name="list_item_margin_top">@dimen/margin_small</dimen>
-    <integer name="title_max_line">2</integer>
-
-    <dimen name="cover_size">304dp</dimen>
-    <dimen name="cover_margin">32dp</dimen>
-    <dimen name="cover_actionbar_height">48dp</dimen>
-
-    <dimen name="drawer_width">240dp</dimen>
-    <dimen name="drawer_icon_size">36dp</dimen>
-    <dimen name="drawer_text_size">20sp</dimen>
-    <dimen name="drawer_icon_size_minor">20dp</dimen>
-    <dimen name="drawer_text_size_minor">16sp</dimen>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="toolbar_padding_top">0dp</dimen>
+    <dimen name="drawer_width">320dp</dimen>
 </resources>

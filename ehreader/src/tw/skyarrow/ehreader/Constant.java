@@ -1,8 +1,5 @@
 package tw.skyarrow.ehreader;
 
-/**
- * Created by SkyArrow on 2014/1/25.
- */
 public class Constant {
     public static final String API_URL = "http://g.e-hentai.org/api.php";
     public static final String API_URL_EX = "http://exhentai.org/api.php";
