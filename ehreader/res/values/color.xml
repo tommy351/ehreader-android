@@ -4,10 +4,25 @@
     <color name="primary_dark">#5D4037</color>
     <color name="primary_light">#D7CCC8</color>
     <color name="accent">#FF9800</color>
+    <color name="accent_dark">#ffa000</color>
+    <color name="accent_light">#ffd54f</color>
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#727272</color>
     <color name="icons">#FFFFFF</color>
     <color name="divider">#B6B6B6</color>
 
     <color name="drawer_background">@color/background_material_light</color>
+
+    <color name="category_doujinshi">#f44336</color>
+    <color name="category_manga">#ff5722</color>
+    <color name="category_artistcg">#ffc107</color>
+    <color name="category_gamecg">#8bc34a</color>
+    <color name="category_western">#cddc39</color>
+    <color name="category_non_h">#03a9f4</color>
+    <color name="category_imageset">#3f51b5</color>
+    <color name="category_cosplay">#9c27b0</color>
+    <color name="category_asianporn">#e91e63</color>
+    <color name="category_misc">@color/secondary_text</color>
+
+    <color name="gallery_content_background">@android:color/white</color>
 </resources>

@@ -4,8 +4,16 @@
         <item name="android:windowNoTitle">true</item>
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
         <item name="android:textColorPrimary">@color/icons</item>
+        <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
     </style>
 
     <style name="AppTheme" parent="AppTheme.Base"/>
+
+    <style name="AppTheme.Photo.Base" parent="AppTheme">
+        <item name="android:windowBackground">@android:color/black</item>
+    </style>
+
+    <style name="AppTheme.Photo" parent="AppTheme.Photo.Base"/>
 </resources>

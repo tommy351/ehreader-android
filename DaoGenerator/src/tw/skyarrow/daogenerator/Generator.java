@@ -9,7 +9,7 @@ import de.greenrobot.daogenerator.ToMany;
 
 public class Generator {
     private static final int dbVersion = 1;
-    private static final String dbPackage = "tw.skyarrow.ehreader.models";
+    private static final String dbPackage = "tw.skyarrow.ehreader.model";
     private static final String dbPath = "../ehreader/src-gen";
 
     public static void main(String[] args) throws Exception {

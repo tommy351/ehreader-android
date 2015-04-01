@@ -1,6 +1,28 @@
 <resources>
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="toolbar_padding_top">0dp</dimen>
+    <dimen name="margin_tiny">4dp</dimen>
+    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_medium">16dp</dimen>
+    <dimen name="margin_large">32dp</dimen>
+    <dimen name="margin_huge">64dp</dimen>
+
+    <dimen name="text_size_h1">45sp</dimen>
+    <dimen name="text_size_h2">32sp</dimen>
+    <dimen name="text_size_h3">24sp</dimen>
+    <dimen name="text_size_medium">16sp</dimen>
+    <dimen name="text_size_small">13sp</dimen>
+
+    <integer name="title_max_line">2</integer>
     <dimen name="drawer_width">320dp</dimen>
+    <dimen name="card_corner_radius">2dp</dimen>
+
+    <dimen name="floating_btn_size">56dp</dimen>
+    <dimen name="floating_btn_size_mini">40dp</dimen>
+    <dimen name="floating_btn_margin">28dp</dimen>
+    <dimen name="floating_btn_margin_mini">20dp</dimen>
+
+    <dimen name="button_elevation">2dp</dimen>
+    <dimen name="cover_size">96dp</dimen>
+
+    <integer name="gallery_background_width">16</integer>
+    <integer name="gallery_background_height">9</integer>
 </resources>

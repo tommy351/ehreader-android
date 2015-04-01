@@ -1,0 +1,4 @@
+<resources>
+    <integer name="gallery_background_width">5</integer>
+    <integer name="gallery_background_height">2</integer>
+</resources>

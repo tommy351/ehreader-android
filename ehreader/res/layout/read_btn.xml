@@ -1,0 +1,7 @@
+<ImageButton xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/read_btn"
+    android:layout_width="@dimen/floating_btn_size"
+    android:layout_height="@dimen/floating_btn_size"
+    android:layout_centerInParent="true"
+    android:src="@drawable/btn_read"
+    android:background="@drawable/btn_read_background"/>
