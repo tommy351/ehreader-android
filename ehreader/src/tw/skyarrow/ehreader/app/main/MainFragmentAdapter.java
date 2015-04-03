@@ -23,7 +23,7 @@ public class MainFragmentAdapter extends FragmentPagerAdapter {
                 return SearchFragment.newInstance("");
 
             case 1:
-                return CollectionFragment.newInstance();
+                return FavoritesFragment.newInstance();
 
             case 2:
                 return HistoryFragment.newInstance();

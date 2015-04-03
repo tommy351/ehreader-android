@@ -17,6 +17,7 @@ public class Photo extends PhotoBase  {
     private String src;
     private Boolean downloaded;
     private Boolean invalid;
+    private String retryId;
     private long galleryId;
 
     public Photo() {
@@ -26,7 +27,7 @@ public class Photo extends PhotoBase  {
         this.id = id;
     }
 
-    public Photo(Long id, int page, String token, Boolean bookmarked, String filename, Integer width, Integer height, String src, Boolean downloaded, Boolean invalid, long galleryId) {
+    public Photo(Long id, int page, String token, Boolean bookmarked, String filename, Integer width, Integer height, String src, Boolean downloaded, Boolean invalid, String retryId, long galleryId) {
         this.id = id;
         this.page = page;
         this.token = token;
@@ -37,6 +38,7 @@ public class Photo extends PhotoBase  {
         this.src = src;
         this.downloaded = downloaded;
         this.invalid = invalid;
+        this.retryId = retryId;
         this.galleryId = galleryId;
     }
 
@@ -120,6 +122,14 @@ public class Photo extends PhotoBase  {
 
     public void setInvalid(Boolean invalid) {
         this.invalid = invalid;
+    }
+
+    public String getRetryId() {
+        return retryId;
+    }
+
+    public void setRetryId(String retryId) {
+        this.retryId = retryId;
     }
 
     public long getGalleryId() {

@@ -1,11 +1,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/action_star"
-        android:title="@string/action_star"
+    <item android:id="@+id/action_add_to_favorites"
+        android:title="@string/action_add_to_favorites"
         android:icon="@drawable/action_favorite_outline"
         app:showAsAction="ifRoom"/>
-    <item android:id="@+id/action_unstar"
-        android:title="@string/action_unstar"
+    <item android:id="@+id/action_remove_from_favorites"
+        android:title="@string/action_remove_from_favorites"
         android:icon="@drawable/action_favorite"
         app:showAsAction="ifRoom"/>
     <item android:id="@+id/action_download"

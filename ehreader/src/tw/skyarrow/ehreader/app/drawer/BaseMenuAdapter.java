@@ -8,15 +8,19 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.List;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.view.RecyclerViewAdapter;
 
 public class BaseMenuAdapter extends RecyclerViewAdapter {
-    private MenuItem[] menuItems;
+    private Context mContext;
+    private List<MenuItem> menuItems;
 
-    public BaseMenuAdapter(MenuItem[] items){
+    public BaseMenuAdapter(Context context, List<MenuItem> items){
+        mContext = context;
         menuItems = items;
     }
 
@@ -45,15 +49,27 @@ public class BaseMenuAdapter extends RecyclerViewAdapter {
 
     @Override
     public void onBindContentViewHolder(RecyclerView.ViewHolder holder, int position) {
-        MenuItem item = menuItems[position];
+        MenuItem item = menuItems.get(position);
         ContentViewHolder vh = (ContentViewHolder) holder;
 
         vh.titleView.setText(item.getTitle());
+        int icon = item.getIcon();
 
-        if (item.getIcon() == 0){
-            vh.iconView.setVisibility(View.GONE);
+        if (item.isSelected()){
+            vh.titleView.setTextColor(mContext.getResources().getColor(R.color.accent));
+
+            if (item.getSelectedIcon() != 0){
+                icon = item.getSelectedIcon();
+            }
         } else {
-            vh.iconView.setImageResource(item.getIcon());
+            vh.titleView.setTextColor(mContext.getResources().getColor(R.color.primary_text));
+        }
+
+        if (icon != 0){
+            vh.iconView.setVisibility(View.VISIBLE);
+            vh.iconView.setImageResource(icon);
+        } else {
+            vh.iconView.setVisibility(View.GONE);
         }
     }
 
@@ -69,7 +85,7 @@ public class BaseMenuAdapter extends RecyclerViewAdapter {
 
     @Override
     public int getContentItemCount() {
-        return menuItems.length;
+        return menuItems.size();
     }
 
     @Override

@@ -33,6 +33,22 @@ public class FixedAspectRatioLayout extends RelativeLayout {
         arr.recycle();
     }
 
+    public int getAspectRatioWidth(){
+        return mAspectRatioWidth;
+    }
+
+    public void setAspectRatioWidth(int aspectRatioWidth){
+        mAspectRatioWidth = aspectRatioWidth;
+    }
+
+    public int getAspectRatioHeight(){
+        return mAspectRatioHeight;
+    }
+
+    public void setAspectRatioHeight(int aspectRatioHeight){
+        mAspectRatioHeight = aspectRatioHeight;
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int widthMode = MeasureSpec.getMode(widthMeasureSpec);

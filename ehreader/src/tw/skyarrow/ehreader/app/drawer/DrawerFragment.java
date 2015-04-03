@@ -9,12 +9,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
-import tw.skyarrow.ehreader.app.main.CollectionFragment;
 import tw.skyarrow.ehreader.app.main.DownloadFragment;
+import tw.skyarrow.ehreader.app.main.FavoritesFragment;
 import tw.skyarrow.ehreader.app.main.HistoryFragment;
 import tw.skyarrow.ehreader.app.main.SearchFragment;
 import tw.skyarrow.ehreader.view.RecyclerViewItemClickListener;
@@ -23,7 +26,7 @@ public class DrawerFragment extends Fragment {
     public static final String TAG = DrawerFragment.class.getSimpleName();
 
     public static final int TAB_LATEST = 1;
-    public static final int TAB_COLLECTION = 2;
+    public static final int TAB_FAVORITES = 2;
     public static final int TAB_HISTORY = 3;
     public static final int TAB_DOWNLOAD = 4;
 
@@ -31,6 +34,8 @@ public class DrawerFragment extends Fragment {
     RecyclerView mRecyclerView;
 
     private int mCurrentPage;
+    private MainMenuAdapter mMenuAdapter;
+    private List<MenuItem> mMenuItems;
 
     public static DrawerFragment newInstance(){
         return new DrawerFragment();
@@ -40,6 +45,13 @@ public class DrawerFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+
+        mMenuItems = getMenuItemList(R.array.main_menu);
+
+        mMenuItems.get(0).setIcon(R.drawable.drawer_latest, R.drawable.drawer_latest_selected);
+        mMenuItems.get(1).setIcon(R.drawable.drawer_favorites, R.drawable.drawer_favorite_selected);
+        mMenuItems.get(2).setIcon(R.drawable.drawer_history, R.drawable.drawer_history_selected);
+        mMenuItems.get(3).setIcon(R.drawable.drawer_download, R.drawable.drawer_download_selected);
     }
 
     @Override
@@ -47,21 +59,8 @@ public class DrawerFragment extends Fragment {
         View view = inflater.inflate(R.layout.drawer, container, false);
         ButterKnife.inject(this, view);
 
-        createMainMenu();
-
-        return view;
-    }
-
-    private void createMainMenu(){
-        MenuItem[] menuItems = getMenuItemList(R.array.main_menu);
-
-        menuItems[0].setIcon(R.drawable.drawer_latest);
-        menuItems[1].setIcon(R.drawable.drawer_collection);
-        menuItems[2].setIcon(R.drawable.drawer_history);
-        menuItems[3].setIcon(R.drawable.drawer_download);
-
+        mMenuAdapter = new MainMenuAdapter(getActivity(), mMenuItems);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        MainMenuAdapter adapter = new MainMenuAdapter(menuItems);
         RecyclerViewItemClickListener.SimpleOnItemClickListener itemClickListener = new RecyclerViewItemClickListener.SimpleOnItemClickListener(){
             @Override
             public void onItemClick(View childView, final int position) {
@@ -70,9 +69,20 @@ public class DrawerFragment extends Fragment {
         };
 
         mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setAdapter(adapter);
+        mRecyclerView.setAdapter(mMenuAdapter);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.addOnItemTouchListener(new RecyclerViewItemClickListener(getActivity(), itemClickListener));
+
+        return view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if (mCurrentPage == 0){
+            setCurrentPage(TAB_LATEST);
+        }
     }
 
     private void onMenuMainItemClick(int position){
@@ -88,13 +98,12 @@ public class DrawerFragment extends Fragment {
         activity.closeDrawer();
     }
 
-    private MenuItem[] getMenuItemList(int res){
+    private List<MenuItem> getMenuItemList(int res){
         String[] arr = getResources().getStringArray(res);
-        int length = arr.length;
-        MenuItem[] menuItems = new MenuItem[length];
+        List<MenuItem> menuItems = new ArrayList<>();
 
-        for (int i = 0; i < length; i++){
-            menuItems[i] = new MenuItem(arr[i]);
+        for (String title : arr){
+            menuItems.add(new MenuItem(title));
         }
 
         return menuItems;
@@ -109,8 +118,6 @@ public class DrawerFragment extends Fragment {
 
         Fragment fragment = null;
         String tag = null;
-        mCurrentPage = page;
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
 
         switch (page){
             case TAB_LATEST:
@@ -118,9 +125,9 @@ public class DrawerFragment extends Fragment {
                 tag = SearchFragment.TAG;
                 break;
 
-            case TAB_COLLECTION:
-                fragment = CollectionFragment.newInstance();
-                tag = CollectionFragment.TAG;
+            case TAB_FAVORITES:
+                fragment = FavoritesFragment.newInstance();
+                tag = FavoritesFragment.TAG;
                 break;
 
             case TAB_HISTORY:
@@ -136,6 +143,14 @@ public class DrawerFragment extends Fragment {
 
         if (fragment == null) return false;
 
+        // Update menu
+        if (mCurrentPage != 0) mMenuItems.get(mCurrentPage - 1).setSelected(false);
+        mMenuItems.get(page - 1).setSelected(true);
+        mMenuAdapter.notifyDataSetChanged();
+
+        // Replace fragment
+        mCurrentPage = page;
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.frame, fragment, tag);
         ft.commit();
 

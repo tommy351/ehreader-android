@@ -1,6 +1,7 @@
 package tw.skyarrow.ehreader.app.main;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,14 +17,11 @@ import butterknife.InjectView;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.model.Gallery;
 import tw.skyarrow.ehreader.util.ImageLoaderHelper;
+import tw.skyarrow.ehreader.view.FixedAspectRatioLayout;
 
 public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.ViewHolder> {
     private List<Gallery> mGalleryList;
     private Context mContext;
-
-    public GalleryListAdapter(Context context){
-        mContext = context;
-    }
 
     public GalleryListAdapter(Context context, List<Gallery> galleryList){
         mContext = context;
@@ -41,28 +39,32 @@ public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        if (mGalleryList == null) return;
-
         Gallery data = mGalleryList.get(position);
+        Resources res = mContext.getResources();
+        String categoryString = res.getString(data.getCategoryString());
+        int categoryColor = res.getColor(data.getCategoryColor());
 
-        holder.coverView.setImageUrl(data.getThumbnail(), ImageLoaderHelper.getImageLoader(mContext));
         holder.titleView.setText(data.getTitle());
-        holder.categoryView.setText(mContext.getResources().getString(data.getCategoryString()));
-        holder.categoryView.setTextColor(mContext.getResources().getColor(data.getCategoryColor()));
+        holder.categoryView.setText(categoryString);
+        holder.categoryView.setTextColor(categoryColor);
+        holder.countView.setText(String.format("%dP", data.getCount()));
+
+        // Set the size of ImageView
+        int[] thumbnailSize = data.getThumbnailSize();
+        holder.coverContainer.setAspectRatioWidth(thumbnailSize[0]);
+        holder.coverContainer.setAspectRatioHeight(thumbnailSize[1]);
+        holder.coverView.setImageUrl(data.getThumbnail(), ImageLoaderHelper.getImageLoader(mContext));
     }
 
     @Override
     public long getItemId(int position) {
-        if (mGalleryList == null) return 0;
-
         Gallery data = mGalleryList.get(position);
-
-        return data == null ? 0 : data.getId();
+        return data.getId();
     }
 
     @Override
     public int getItemCount() {
-        return mGalleryList == null ? 0 : mGalleryList.size();
+        return  mGalleryList.size();
     }
 
     public void setGalleryList(List<Gallery> galleryList){
@@ -73,11 +75,17 @@ public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.
         @InjectView(R.id.cover)
         public NetworkImageView coverView;
 
+        @InjectView(R.id.cover_container)
+        public FixedAspectRatioLayout coverContainer;
+
         @InjectView(R.id.title)
         public TextView titleView;
 
         @InjectView(R.id.category)
         public TextView categoryView;
+
+        @InjectView(R.id.count)
+        public TextView countView;
 
         public ViewHolder(View view) {
             super(view);

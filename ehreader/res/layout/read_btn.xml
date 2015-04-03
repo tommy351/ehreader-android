@@ -3,5 +3,5 @@
     android:layout_width="@dimen/floating_btn_size"
     android:layout_height="@dimen/floating_btn_size"
     android:layout_centerInParent="true"
-    android:src="@drawable/btn_read"
+    android:src="@drawable/btn_read_icon"
     android:background="@drawable/btn_read_background"/>

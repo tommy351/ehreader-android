@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -34,6 +35,14 @@ public abstract class GalleryListFragment extends Fragment implements RecyclerVi
     private GalleryListAdapter mListAdapter;
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+
+        mGalleryList = new ArrayList<>();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.gallery_list, container, false);
         ButterKnife.inject(this, view);
@@ -45,6 +54,8 @@ public abstract class GalleryListFragment extends Fragment implements RecyclerVi
 
         // Set up RecyclerView
         mListAdapter = new GalleryListAdapter(getActivity(), mGalleryList);
+        mListAdapter.setHasStableIds(true);
+        layoutManager.setOrientation(StaggeredGridLayoutManager.VERTICAL);
         mRecyclerView.setAdapter(mListAdapter);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -60,12 +71,6 @@ public abstract class GalleryListFragment extends Fragment implements RecyclerVi
         mSwipeLayout.setOnRefreshListener(this);
 
         return view;
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        setRetainInstance(true);
     }
 
     protected List<Gallery> getGalleryList(){

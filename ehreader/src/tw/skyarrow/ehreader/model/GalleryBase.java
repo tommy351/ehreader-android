@@ -1,10 +1,15 @@
 package tw.skyarrow.ehreader.model;
 
+import android.net.Uri;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 
 public abstract class GalleryBase {
@@ -19,17 +24,42 @@ public abstract class GalleryBase {
     public static final int CATEGORY_ASIANPORN = 9;
     public static final int CATEGORY_MISC = 10;
 
+    public static final Pattern pThumb = Pattern.compile("(\\d+)-(\\d+)-\\w+_l\\.\\w+$");
+
+    public abstract Long getId();
     public abstract void setId(Long id);
+
+    public abstract String getToken();
     public abstract void setToken(String token);
+
+    public abstract String getTitle();
     public abstract void setTitle(String title);
+
+    public abstract String getSubtitle();
     public abstract void setSubtitle(String subtitle);
+
+    public abstract String getThumbnail();
     public abstract void setThumbnail(String thumbnail);
+
+    public abstract Integer getCount();
     public abstract void setCount(Integer count);
+
+    public abstract Float getRating();
     public abstract void setRating(Float rating);
+
+    public abstract String getUploader();
     public abstract void setUploader(String uploader);
+
+    public abstract Date getCreated();
     public abstract void setCreated(Date date);
+
+    public abstract Integer getCategory();
     public abstract void setCategory(Integer category);
+
+    public abstract Long getSize();
     public abstract void setSize(Long size);
+
+    public abstract String getTags();
     public abstract void setTags(String tags);
 
     public void setCategory(String category) {
@@ -55,8 +85,6 @@ public abstract class GalleryBase {
             setCategory(CATEGORY_MISC);
         }
     }
-
-    public abstract Integer getCategory();
 
     public int getCategoryString() {
         switch (getCategory()) {
@@ -121,5 +149,35 @@ public abstract class GalleryBase {
         setCreated(new Date(data.getLong("posted") * 1000));
         setSize(Long.parseLong(data.getString("filesize")));
         setTags(data.getJSONArray("tags").toString());
+    }
+
+    public String getURL(){
+        return String.format(Constant.GALLERY_URL, getId(), getToken());
+    }
+
+    public String getURL(int page){
+        Uri.Builder b = Uri.parse(getURL()).buildUpon();
+        b.appendQueryParameter("p", Integer.toString(page));
+        return b.build().toString();
+    }
+
+    public int[] getThumbnailSize(){
+        int[] result = new int[2];
+        Matcher matcher = pThumb.matcher(getThumbnail());
+
+        while (matcher.find()){
+            result[0] = Integer.parseInt(matcher.group(1), 10);
+            result[1] = Integer.parseInt(matcher.group(2), 10);
+        }
+
+        return result;
+    }
+
+    public int getThumbnailWidth(){
+        return getThumbnailSize()[0];
+    }
+
+    public int getThumbnailHeight(){
+        return getThumbnailSize()[1];
     }
 }

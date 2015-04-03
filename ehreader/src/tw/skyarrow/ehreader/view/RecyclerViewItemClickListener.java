@@ -70,9 +70,7 @@ public class RecyclerViewItemClickListener implements RecyclerView.OnItemTouchLi
 
         @Override
         public boolean onDown(MotionEvent event) {
-            // Best practice to always return true here.
-            // http://developer.android.com/training/gestures/detector.html#detect
-            return true;
+            return super.onDown(event);
         }
     }
 }

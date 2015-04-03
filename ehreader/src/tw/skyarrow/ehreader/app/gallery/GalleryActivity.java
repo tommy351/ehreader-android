@@ -1,6 +1,8 @@
 package tw.skyarrow.ehreader.app.gallery;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
@@ -25,17 +27,25 @@ public class GalleryActivity extends ActionBarActivity {
         ButterKnife.inject(this);
 
         Bundle args = getIntent().getExtras();
-        long id = args.getLong(EXTRA_ID);
-        String token = args.getString(EXTRA_TOKEN);
+        long galleryId = args.getLong(EXTRA_ID);
+        String galleryToken = args.getString(EXTRA_TOKEN);
 
+        // Set up toolbar
         mToolbar.setTitle("");
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        GalleryFragment fragment = GalleryFragment.newInstance(id, token);
+        // Attach fragment
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        Fragment lastFragment = fm.findFragmentByTag(GalleryFragment.TAG);
 
-        ft.replace(R.id.frame, fragment, GalleryFragment.TAG);
+        if (lastFragment == null){
+            ft.replace(R.id.frame, GalleryFragment.newInstance(galleryId, galleryToken), GalleryFragment.TAG);
+        } else {
+            ft.attach(lastFragment);
+        }
+
         ft.commit();
     }
 

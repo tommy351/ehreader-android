@@ -1,8 +1,9 @@
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true"
+        android:drawable="@drawable/btn_read_background_pressed"/>
 
-    <solid android:color="#88000000"/>
+    <item android:state_focused="true"
+        android:drawable="@drawable/btn_read_background_focused"/>
 
-    <size android:width="@dimen/floating_btn_size"
-        android:height="@dimen/floating_btn_size"/>
-</shape>
+    <item android:drawable="@drawable/btn_read_background_normal"/>
+</selector>

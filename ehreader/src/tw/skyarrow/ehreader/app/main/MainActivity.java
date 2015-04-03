@@ -1,6 +1,7 @@
 package tw.skyarrow.ehreader.app.main;
 
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -27,7 +28,6 @@ public class MainActivity extends ActionBarActivity implements DrawerActivity {
     View mDrawer;
 
     private ActionBarDrawerToggle mDrawerToggle;
-    private DrawerFragment mDrawerFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,16 +42,18 @@ public class MainActivity extends ActionBarActivity implements DrawerActivity {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
 
-        if (mDrawerFragment == null){
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            mDrawerFragment = DrawerFragment.newInstance();
-            ft.replace(R.id.drawer, mDrawerFragment, DrawerFragment.TAG);
-            ft.commit();
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        DrawerFragment drawerFragment = (DrawerFragment) fm.findFragmentByTag(DrawerFragment.TAG);
+
+        if (drawerFragment == null){
+            drawerFragment = DrawerFragment.newInstance();
+            ft.replace(R.id.drawer, drawerFragment, DrawerFragment.TAG);
+        } else {
+            ft.attach(drawerFragment);
         }
 
-        if (savedInstanceState == null){
-            mDrawerFragment.setCurrentPage(DrawerFragment.TAB_LATEST);
-        }
+        ft.commit();
     }
 
     @Override

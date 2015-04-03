@@ -1,12 +1,10 @@
 package tw.skyarrow.ehreader.app.gallery;
 
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -76,6 +74,7 @@ public class GalleryFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        setRetainInstance(true);
 
         SQLiteDatabase db = DatabaseHelper.getWritableDatabase(getActivity());
         DaoMaster daoMaster = new DaoMaster(db);
@@ -85,6 +84,11 @@ public class GalleryFragment extends Fragment {
         Bundle args = getArguments();
         galleryId = args.getLong(EXTRA_ID);
         galleryToken = args.getString(EXTRA_TOKEN);
+        mGallery = galleryDao.load(galleryId);
+
+        if (mGallery == null){
+            // TODO: load gallery
+        }
     }
 
     @Override
@@ -100,49 +104,36 @@ public class GalleryFragment extends Fragment {
             }
         });
 
-        int orientation = getResources().getConfiguration().orientation;
-
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            DisplayMetrics metrics = new DisplayMetrics();
-            getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-            ViewGroup.LayoutParams layoutParams = mBackgroundView.getLayoutParams();
-
-            layoutParams.height = metrics.heightPixels;
-            mBackgroundView.setLayoutParams(layoutParams);
-        }
-
         return view;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setRetainInstance(true);
 
-        if (mGallery == null) {
-            mGallery = galleryDao.load(galleryId);
+        if (mGallery != null){
+            showContent();
+        }
+    }
 
-            String title = mGallery.getTitle();
-            String subtitle = mGallery.getSubtitle();
+    private void showContent(){
+        String title = mGallery.getTitle();
+        String subtitle = mGallery.getSubtitle();
 
-            mTitleView.setText(title);
+        mTitleView.setText(title);
 
-            if (subtitle == null || subtitle.isEmpty()) {
-                mSubtitleView.setVisibility(View.GONE);
-            } else {
-                mSubtitleView.setText(subtitle);
-            }
+        if (subtitle == null || subtitle.isEmpty()) {
+            mSubtitleView.setVisibility(View.GONE);
+        } else {
+            mSubtitleView.setText(subtitle);
+        }
 
+        if (mImageContainer == null){
             ImageLoader imageLoader = ImageLoaderHelper.getImageLoader(getActivity());
             mImageContainer = imageLoader.get(mGallery.getThumbnail(), new ImageLoader.ImageListener() {
                 @Override
                 public void onResponse(ImageLoader.ImageContainer imageContainer, boolean isImmediate) {
-                    Bitmap bitmap = imageContainer.getBitmap();
-
-                    if (bitmap != null) {
-                        mCoverView.setImageBitmap(bitmap);
-                        mBackgroundView.setImageBitmap(BitmapHelper.blur(getActivity(), bitmap, 20.f));
-                    }
+                    setCoverImage(imageContainer);
                 }
 
                 @Override
@@ -150,17 +141,28 @@ public class GalleryFragment extends Fragment {
                     L.e(volleyError);
                 }
             });
+        } else {
+            setCoverImage(mImageContainer);
+        }
+    }
+
+    private void setCoverImage(ImageLoader.ImageContainer container){
+        Bitmap bitmap = container.getBitmap();
+
+        if (bitmap != null) {
+            mCoverView.setImageBitmap(bitmap);
+            mBackgroundView.setImageBitmap(BitmapHelper.blur(getActivity(), bitmap, 20.f));
         }
     }
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
-
         if (mImageContainer != null){
             mImageContainer.cancelRequest();
             mImageContainer = null;
         }
+
+        super.onDestroy();
     }
 
     @Override
@@ -169,25 +171,25 @@ public class GalleryFragment extends Fragment {
 
         inflater.inflate(R.menu.gallery, menu);
 
-        MenuItem star = menu.findItem(R.id.action_star);
-        MenuItem unstar = menu.findItem(R.id.action_unstar);
+        MenuItem addFavorite = menu.findItem(R.id.action_add_to_favorites);
+        MenuItem removeFavorite = menu.findItem(R.id.action_remove_from_favorites);
 
         if (mGallery.getStarred()){
-            star.setVisible(false);
+            addFavorite.setVisible(false);
         } else {
-            unstar.setVisible(false);
+            removeFavorite.setVisible(false);
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.action_star:
-                onStarClick();
+            case R.id.action_add_to_favorites:
+                addToFavorites();
                 return true;
 
-            case R.id.action_unstar:
-                onUnstarClick();
+            case R.id.action_remove_from_favorites:
+                removeFromFavorites();
                 return true;
 
             case R.id.action_download:
@@ -208,18 +210,18 @@ public class GalleryFragment extends Fragment {
         startActivity(intent);
     }
 
-    private void onStarClick(){
+    private void addToFavorites(){
         mGallery.setStarred(true);
         galleryDao.updateInTx(mGallery);
         invalidateOptionsMenu();
-        showToast("Added to collection");
+        showToast(getResources().getString(R.string.toast_added_to_favorites));
     }
 
-    private void onUnstarClick(){
+    private void removeFromFavorites(){
         mGallery.setStarred(false);
         galleryDao.updateInTx(mGallery);
         invalidateOptionsMenu();
-        showToast("Removed from collection");
+        showToast(getResources().getString(R.string.toast_removed_from_favorites));
     }
 
     private void onDownloadClick(){

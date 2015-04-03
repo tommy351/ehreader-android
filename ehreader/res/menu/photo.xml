@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/action_bookmark"
+        android:title="@string/action_bookmark"
+        android:icon="@drawable/action_bookmark_outline"
+        app:showAsAction="ifRoom"/>
+    <item android:id="@+id/action_unbookmark"
+        android:title="@string/action_unbookmark"
+        android:icon="@drawable/action_bookmark"
+        app:showAsAction="ifRoom"/>
+    <item android:id="@+id/action_download"
+        android:title="@string/action_download"
+        android:icon="@drawable/action_download"
+        app:showAsAction="ifRoom"/>
+</menu>

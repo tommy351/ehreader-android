@@ -13,12 +13,18 @@
         android:background="?attr/selectableItemBackground"
         android:clickable="true"
         android:focusable="true">
-        <com.android.volley.toolbox.NetworkImageView
-            android:id="@+id/cover"
+        <tw.skyarrow.ehreader.view.FixedAspectRatioLayout
+            android:id="@+id/cover_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scaleType="fitCenter"
-            android:adjustViewBounds="true"/>
+            android:background="@color/divider">
+            <com.android.volley.toolbox.NetworkImageView
+                android:id="@+id/cover"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitCenter"
+                android:adjustViewBounds="true"/>
+        </tw.skyarrow.ehreader.view.FixedAspectRatioLayout>
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -29,6 +35,14 @@
                 android:layout_height="wrap_content"
                 android:text="Category"
                 android:textSize="@dimen/text_size_small"/>
+            <TextView
+                android:id="@+id/count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="30P"
+                android:textSize="@dimen/text_size_small"
+                android:textColor="@color/secondary_text"
+                android:layout_alignParentRight="true"/>
             <TextView
                 android:id="@+id/title"
                 android:layout_width="wrap_content"

@@ -12,6 +12,7 @@
     <color name="divider">#B6B6B6</color>
 
     <color name="drawer_background">@color/background_material_light</color>
+    <color name="drawer_background_selected">?attr/selectableItemBackground</color>
 
     <color name="category_doujinshi">#f44336</color>
     <color name="category_manga">#ff5722</color>
@@ -25,4 +26,8 @@
     <color name="category_misc">@color/secondary_text</color>
 
     <color name="gallery_content_background">@android:color/white</color>
+
+    <color name="read_btn_background_normal">#8000</color>
+    <color name="read_btn_background_pressed">@color/accent</color>
+    <color name="read_btn_background_focused">@color/read_btn_background_pressed</color>
 </resources>

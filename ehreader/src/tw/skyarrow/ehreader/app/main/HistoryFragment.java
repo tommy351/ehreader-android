@@ -39,11 +39,11 @@ public class HistoryFragment extends GalleryListFragment {
         ActionBarActivity activity = (ActionBarActivity) getActivity();
         activity.getSupportActionBar().setTitle("History");
 
-        if (getGalleryList() == null){
+        if (savedInstanceState == null){
             QueryBuilder<Gallery> qb = galleryDao.queryBuilder();
             qb.where(GalleryDao.Properties.Lastread.isNotNull());
             qb.orderDesc(GalleryDao.Properties.Lastread);
-            setGalleryList(qb.list());
+            addGalleryList(qb.list());
             notifyDataSetChanged();
         }
     }

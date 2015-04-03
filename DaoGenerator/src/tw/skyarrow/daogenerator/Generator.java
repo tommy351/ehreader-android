@@ -8,7 +8,7 @@ import de.greenrobot.daogenerator.Schema;
 import de.greenrobot.daogenerator.ToMany;
 
 public class Generator {
-    private static final int dbVersion = 1;
+    private static final int dbVersion = 2;
     private static final String dbPackage = "tw.skyarrow.ehreader.model";
     private static final String dbPath = "../ehreader/src-gen";
 
@@ -29,12 +29,7 @@ public class Generator {
         photo.addStringProperty("src");
         photo.addBooleanProperty("downloaded");
         photo.addBooleanProperty("invalid");
-
-        // Recent Image Search
-        Entity imageSearch = schema.addEntity("ImageSearch");
-
-        imageSearch.addIdProperty().autoincrement();
-        imageSearch.addStringProperty("path");
+        photo.addStringProperty("retryId");
 
         // Gallery
         Entity gallery = schema.addEntity("Gallery");
@@ -56,6 +51,7 @@ public class Generator {
         gallery.addIntProperty("progress");
         gallery.addStringProperty("showkey");
         gallery.addLongProperty("size");
+        gallery.addIntProperty("photoPerPage");
 
         Property photoProperty = photo.addLongProperty("galleryId").notNull().getProperty();
         ToMany galleryToPhotos = gallery.addToMany(photo, photoProperty);

@@ -11,11 +11,11 @@ import tw.skyarrow.ehreader.model.Gallery;
 import tw.skyarrow.ehreader.model.GalleryDao;
 import tw.skyarrow.ehreader.util.DatabaseHelper;
 
-public class CollectionFragment extends GalleryListFragment {
-    public static final String TAG = CollectionFragment.class.getSimpleName();
+public class FavoritesFragment extends GalleryListFragment {
+    public static final String TAG = FavoritesFragment.class.getSimpleName();
 
-    public static CollectionFragment newInstance(){
-        return new CollectionFragment();
+    public static FavoritesFragment newInstance(){
+        return new FavoritesFragment();
     }
 
     private GalleryDao galleryDao;
@@ -39,11 +39,11 @@ public class CollectionFragment extends GalleryListFragment {
         ActionBarActivity activity = (ActionBarActivity) getActivity();
         activity.getSupportActionBar().setTitle("Collection");
 
-        if (getGalleryList() == null){
+        if (savedInstanceState == null){
             QueryBuilder<Gallery> qb = galleryDao.queryBuilder();
             qb.where(GalleryDao.Properties.Starred.eq(true));
             qb.orderDesc(GalleryDao.Properties.Lastread);
-            setGalleryList(qb.list());
+            addGalleryList(qb.list());
             notifyDataSetChanged();
         }
     }

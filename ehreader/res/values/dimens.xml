@@ -11,6 +11,8 @@
     <dimen name="text_size_medium">16sp</dimen>
     <dimen name="text_size_small">13sp</dimen>
 
+    <dimen name="toolbar_padding_top">0dp</dimen>
+
     <integer name="title_max_line">2</integer>
     <dimen name="drawer_width">320dp</dimen>
     <dimen name="card_corner_radius">2dp</dimen>
@@ -22,7 +24,9 @@
 
     <dimen name="button_elevation">2dp</dimen>
     <dimen name="cover_size">96dp</dimen>
+    <dimen name="cover_max_height">144dp</dimen>
 
-    <integer name="gallery_background_width">16</integer>
-    <integer name="gallery_background_height">9</integer>
+    <dimen name="gallery_background_height">240dp</dimen>
+    <dimen name="gallery_placeholder_height">@dimen/gallery_background_height</dimen>
+    <dimen name="gallery_cover_margin_top">-32dp</dimen>
 </resources>

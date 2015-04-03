@@ -80,13 +80,11 @@ public class SearchFragment extends GalleryListFragment {
         activity.getSupportActionBar().setTitle(mToolbarTitle);
 
         // Load the first page
-        if (getGalleryList() == null){
-            List<Gallery> galleryList = new ArrayList<>();
+        if (savedInstanceState == null){
             mPage = 0;
             isLoading = false;
             isRefreshing = false;
 
-            setGalleryList(galleryList);
             loadIndex(mPage);
         }
     }
@@ -165,9 +163,9 @@ public class SearchFragment extends GalleryListFragment {
                 }
 
                 Gallery gallery = galleryDao.load(id);
-                boolean isNew = gallery == null;
+                //boolean isNew = gallery == null;
 
-                if (isNew) {
+                if (gallery == null) {
                     gallery = new Gallery();
 
                     gallery.setStarred(false);
@@ -175,15 +173,17 @@ public class SearchFragment extends GalleryListFragment {
                 }
 
                 gallery.fromJSON(data);
-
+/*
                 if (isNew){
                     galleryDao.insertInTx(gallery);
                 } else {
                     galleryDao.updateInTx(gallery);
                 }
-
+*/
                 result.add(gallery);
             }
+
+            galleryDao.insertOrReplaceInTx(result);
 
             if (isRefreshing){
                 isRefreshing = false;
