@@ -29,5 +29,9 @@
             android:name=".app.photo.PhotoActivity"
             android:parentActivityName=".app.gallery.GalleryActivity"
             android:theme="@style/AppTheme.Photo"/>
+
+        <activity
+            android:name=".app.pref.PrefActivity"
+            android:parentActivityName=".app.main.MainActivity"/>
     </application>
 </manifest>

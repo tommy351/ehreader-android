@@ -1,5 +1,6 @@
 package tw.skyarrow.ehreader.app.drawer;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -20,6 +21,7 @@ import tw.skyarrow.ehreader.app.main.DownloadFragment;
 import tw.skyarrow.ehreader.app.main.FavoritesFragment;
 import tw.skyarrow.ehreader.app.main.HistoryFragment;
 import tw.skyarrow.ehreader.app.main.SearchFragment;
+import tw.skyarrow.ehreader.app.pref.PrefActivity;
 import tw.skyarrow.ehreader.view.RecyclerViewItemClickListener;
 
 public class DrawerFragment extends Fragment {
@@ -29,6 +31,8 @@ public class DrawerFragment extends Fragment {
     public static final int TAB_FAVORITES = 2;
     public static final int TAB_HISTORY = 3;
     public static final int TAB_DOWNLOAD = 4;
+    public static final int TAB_PREF = 5;
+    public static final int TAB_DONATE = 6;
 
     @InjectView(R.id.main_menu)
     RecyclerView mRecyclerView;
@@ -48,10 +52,14 @@ public class DrawerFragment extends Fragment {
 
         mMenuItems = getMenuItemList(R.array.main_menu);
 
+        // Main menu
         mMenuItems.get(0).setIcon(R.drawable.drawer_latest, R.drawable.drawer_latest_selected);
         mMenuItems.get(1).setIcon(R.drawable.drawer_favorites, R.drawable.drawer_favorite_selected);
         mMenuItems.get(2).setIcon(R.drawable.drawer_history, R.drawable.drawer_history_selected);
         mMenuItems.get(3).setIcon(R.drawable.drawer_download, R.drawable.drawer_download_selected);
+
+        // Sub menu
+        mMenuItems.addAll(getMenuItemList(R.array.sub_menu));
     }
 
     @Override
@@ -87,7 +95,15 @@ public class DrawerFragment extends Fragment {
 
     private void onMenuMainItemClick(int position){
         if (!setCurrentPage(position)){
-            //
+            switch (position){
+                case TAB_PREF:
+                    openPreference();
+                    break;
+
+                case TAB_DONATE:
+                    openDonate();
+                    break;
+            }
         }
 
         closeDrawer();
@@ -155,5 +171,14 @@ public class DrawerFragment extends Fragment {
         ft.commit();
 
         return true;
+    }
+
+    private void openPreference(){
+        Intent intent = new Intent(getActivity(), PrefActivity.class);
+        getActivity().startActivity(intent);
+    }
+
+    private void openDonate(){
+        //
     }
 }
