@@ -59,4 +59,5 @@ dependencies {
     compile 'com.jakewharton:disklrucache:2.0.2'
     compile 'com.jakewharton:butterknife:6.1.0'
     compile 'org.lucasr.twowayview:twowayview:0.1.4'
+    compile 'com.github.rey5137:material:1.0.0'
 }
