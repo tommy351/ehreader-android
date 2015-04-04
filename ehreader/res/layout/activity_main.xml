@@ -11,7 +11,7 @@
             android:layout_height="wrap_content"
             android:background="?attr/colorPrimary"
             android:fitsSystemWindows="true"
-            android:elevation="4dp">
+            android:elevation="@dimen/toolbar_elevation">
             <include layout="@layout/toolbar"/>
         </FrameLayout>
         <FrameLayout

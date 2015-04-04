@@ -15,3 +15,6 @@
 -keepclasseswithmembernames class * {
     @butterknife.* <methods>;
 }
+
+# TwoWayView
+-keep class org.lucasr.twowayview.** { *; }

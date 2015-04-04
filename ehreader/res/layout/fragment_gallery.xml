@@ -13,12 +13,7 @@
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
                 android:adjustViewBounds="true"/>
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="@dimen/toolbar_padding_top">
-                <include layout="@layout/read_btn"/>
-            </RelativeLayout>
+            <include layout="@layout/read_btn"/>
         </RelativeLayout>
         <RelativeLayout
             android:layout_width="match_parent"

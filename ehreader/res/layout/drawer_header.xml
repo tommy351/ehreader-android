@@ -5,9 +5,19 @@
     app:aspectRatioWidth="16"
     app:aspectRatioHeight="9"
     android:layout_marginBottom="@dimen/margin_small"
-    android:background="@android:color/darker_gray">
+    android:background="@drawable/drawer_header_background"
+    android:padding="@dimen/margin_medium">
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_launcher"/>
     <TextView
         android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:id="@+id/hint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 </tw.skyarrow.ehreader.view.FixedAspectRatioLayout>

@@ -31,9 +31,9 @@ public class GalleryActivity extends ActionBarActivity {
         String galleryToken = args.getString(EXTRA_TOKEN);
 
         // Set up toolbar
-        mToolbar.setTitle("");
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         // Attach fragment
         FragmentManager fm = getSupportFragmentManager();

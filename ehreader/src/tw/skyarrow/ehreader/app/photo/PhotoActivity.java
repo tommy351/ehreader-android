@@ -1,7 +1,6 @@
 package tw.skyarrow.ehreader.app.photo;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,7 +12,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 
 import java.lang.ref.WeakReference;
@@ -69,11 +67,6 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
         }
 
         ft.commit();
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
     }
 
     @Override

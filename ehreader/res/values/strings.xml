@@ -8,6 +8,9 @@
     <string name="action_download">Download</string>
     <string name="action_bookmark">Add bookmark</string>
     <string name="action_unbookmark">Remove bookmark</string>
+    <string name="action_share">Share</string>
+    <string name="action_filter">Filter</string>
+    <string name="action_image_search">Image search</string>
 
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
@@ -42,6 +45,11 @@
     <string name="toast_removed_from_favorites">Removed from favorites</string>
 
     <string name="label_settings">Settings</string>
+    <string name="label_latest">Latest</string>
+    <string name="label_favorites">Favorites</string>
+    <string name="label_history">History</string>
+    <string name="label_download">Download</string>
+    <string name="search_hint">Search</string>
 
     <string name="pref_first_installed" translatable="false">first_installed</string>
 

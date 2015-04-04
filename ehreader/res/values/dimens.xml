@@ -23,6 +23,7 @@
     <dimen name="floating_btn_margin_mini">20dp</dimen>
 
     <dimen name="button_elevation">2dp</dimen>
+    <dimen name="toolbar_elevation">4dp</dimen>
     <dimen name="cover_size">96dp</dimen>
     <dimen name="cover_max_height">144dp</dimen>
 

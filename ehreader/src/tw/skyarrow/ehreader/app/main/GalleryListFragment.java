@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -24,6 +25,8 @@ import tw.skyarrow.ehreader.view.RecyclerViewItemClickListener;
 
 public abstract class GalleryListFragment extends Fragment implements RecyclerViewItemClickListener.OnItemClickListener,
         SwipeRefreshLayout.OnRefreshListener {
+
+    private static final int LOAD_THRESHOLD = 3;
 
     @InjectView(R.id.list)
     RecyclerView mRecyclerView;
@@ -50,7 +53,7 @@ public abstract class GalleryListFragment extends Fragment implements RecyclerVi
         // Set up layout manger
         int orientation = getResources().getConfiguration().orientation;
         int columns = orientation == Configuration.ORIENTATION_LANDSCAPE ? 3 : 2;
-        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(columns, StaggeredGridLayoutManager.VERTICAL);
+        final StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(columns, StaggeredGridLayoutManager.VERTICAL);
 
         // Set up RecyclerView
         mListAdapter = new GalleryListAdapter(getActivity(), mGalleryList);
@@ -61,7 +64,14 @@ public abstract class GalleryListFragment extends Fragment implements RecyclerVi
         mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
+                int totalCount = layoutManager.getItemCount();
+                int[] visibleItems = layoutManager.findLastVisibleItemPositions(null);
+                Arrays.sort(visibleItems);
+                int lastVisibleItem = visibleItems[visibleItems.length - 1];
+
+                if (dy > 0 && lastVisibleItem > totalCount - LOAD_THRESHOLD){
+                    onScrollToBottom();
+                }
             }
         });
         mRecyclerView.addOnItemTouchListener(new RecyclerViewItemClickListener(getActivity(), this));
@@ -108,7 +118,7 @@ public abstract class GalleryListFragment extends Fragment implements RecyclerVi
 
     @Override
     public void onItemClick(View childView, int position) {
-        if (mGalleryList == null) return;
+        if (mGalleryList == null || position >= mGalleryList.size()) return;
 
         Gallery data = mGalleryList.get(position);
         if (data == null) return;
@@ -128,6 +138,10 @@ public abstract class GalleryListFragment extends Fragment implements RecyclerVi
 
     @Override
     public void onRefresh() {
+        //
+    }
 
+    public void onScrollToBottom(){
+        //
     }
 }

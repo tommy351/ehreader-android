@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import tw.skyarrow.ehreader.Constant;
+import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.model.DaoMaster;
 import tw.skyarrow.ehreader.model.DaoSession;
 import tw.skyarrow.ehreader.model.Gallery;
@@ -32,24 +33,17 @@ public class SearchFragment extends GalleryListFragment {
     public static final String TAG = SearchFragment.class.getSimpleName();
 
     public static final String EXTRA_BASE_URL = "base_url";
-    public static final String EXTRA_TOOLBAR_TITLE = "toolbar_title";
 
     private GalleryDao galleryDao;
     private int mPage;
     private String mBaseUrl;
-    private String mToolbarTitle;
     private boolean isLoading;
     private boolean isRefreshing;
 
     public static SearchFragment newInstance(String baseUrl){
-        return newInstance(baseUrl, null);
-    }
-
-    public static SearchFragment newInstance(String baseUrl, String toolbarTitle){
         SearchFragment fragment = new SearchFragment();
         Bundle args = new Bundle();
         args.putString(EXTRA_BASE_URL, baseUrl);
-        args.putString(EXTRA_TOOLBAR_TITLE, toolbarTitle);
         fragment.setArguments(args);
 
         return fragment;
@@ -68,7 +62,6 @@ public class SearchFragment extends GalleryListFragment {
         // Get arguments
         Bundle args = getArguments();
         mBaseUrl = args.getString(EXTRA_BASE_URL);
-        mToolbarTitle = args.getString(EXTRA_TOOLBAR_TITLE, "Latest");
     }
 
     @Override
@@ -77,7 +70,7 @@ public class SearchFragment extends GalleryListFragment {
 
         // Set toolbar title
         ActionBarActivity activity = (ActionBarActivity) getActivity();
-        activity.getSupportActionBar().setTitle(mToolbarTitle);
+        activity.getSupportActionBar().setTitle(getString(R.string.label_latest));
 
         // Load the first page
         if (savedInstanceState == null){
@@ -163,7 +156,6 @@ public class SearchFragment extends GalleryListFragment {
                 }
 
                 Gallery gallery = galleryDao.load(id);
-                //boolean isNew = gallery == null;
 
                 if (gallery == null) {
                     gallery = new Gallery();
@@ -173,13 +165,6 @@ public class SearchFragment extends GalleryListFragment {
                 }
 
                 gallery.fromJSON(data);
-/*
-                if (isNew){
-                    galleryDao.insertInTx(gallery);
-                } else {
-                    galleryDao.updateInTx(gallery);
-                }
-*/
                 result.add(gallery);
             }
 
@@ -212,5 +197,10 @@ public class SearchFragment extends GalleryListFragment {
 
     private void addToRequestQueue(Request req){
         RequestHelper.getInstance(getActivity()).addToRequestQueue(req, TAG);
+    }
+
+    @Override
+    public void onScrollToBottom() {
+        L.d("onScrollToBottom");
     }
 }

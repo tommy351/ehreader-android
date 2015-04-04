@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 
 import de.greenrobot.dao.query.QueryBuilder;
+import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.model.DaoMaster;
 import tw.skyarrow.ehreader.model.DaoSession;
 import tw.skyarrow.ehreader.model.Gallery;
@@ -37,7 +38,7 @@ public class FavoritesFragment extends GalleryListFragment {
 
         // Set toolbar title
         ActionBarActivity activity = (ActionBarActivity) getActivity();
-        activity.getSupportActionBar().setTitle("Collection");
+        activity.getSupportActionBar().setTitle(getResources().getString(R.string.label_favorites));
 
         if (savedInstanceState == null){
             QueryBuilder<Gallery> qb = galleryDao.queryBuilder();

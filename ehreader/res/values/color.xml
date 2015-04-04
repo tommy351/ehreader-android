@@ -30,4 +30,6 @@
     <color name="read_btn_background_normal">#8000</color>
     <color name="read_btn_background_pressed">@color/accent</color>
     <color name="read_btn_background_focused">@color/read_btn_background_pressed</color>
+
+    <color name="search_status_bar">#6000</color>
 </resources>

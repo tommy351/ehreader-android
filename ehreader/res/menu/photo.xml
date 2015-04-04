@@ -8,6 +8,10 @@
         android:title="@string/action_unbookmark"
         android:icon="@drawable/action_bookmark"
         app:showAsAction="ifRoom"/>
+    <item android:id="@+id/action_share"
+        android:title="@string/action_share"
+        android:icon="@drawable/action_share"
+        app:showAsAction="ifRoom"/>
     <item android:id="@+id/action_download"
         android:title="@string/action_download"
         android:icon="@drawable/action_download"

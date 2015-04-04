@@ -25,26 +25,11 @@ public class BaseMenuAdapter extends RecyclerViewAdapter {
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateHeaderViewHolder(ViewGroup parent, int viewType) {
-        return null;
-    }
-
-    @Override
     public RecyclerView.ViewHolder onCreateContentViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         View view = LayoutInflater.from(context).inflate(R.layout.drawer_row, parent, false);
 
         return new ContentViewHolder(view);
-    }
-
-    @Override
-    public RecyclerView.ViewHolder onCreateFooterViewHolder(ViewGroup parent, int viewType) {
-        return null;
-    }
-
-    @Override
-    public void onBindHeaderViewHolder(RecyclerView.ViewHolder holder, int position) {
-
     }
 
     @Override
@@ -74,23 +59,8 @@ public class BaseMenuAdapter extends RecyclerViewAdapter {
     }
 
     @Override
-    public void onBindFooterViewHolder(RecyclerView.ViewHolder holder, int position) {
-
-    }
-
-    @Override
-    public int getHeaderItemCount() {
-        return 0;
-    }
-
-    @Override
     public int getContentItemCount() {
         return menuItems.size();
-    }
-
-    @Override
-    public int getFooterItemCount() {
-        return 0;
     }
 
     public static class ContentViewHolder extends RecyclerView.ViewHolder {

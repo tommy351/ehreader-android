@@ -1,5 +1,6 @@
 package tw.skyarrow.ehreader.app.main;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -16,6 +17,7 @@ import butterknife.InjectView;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.app.drawer.DrawerActivity;
 import tw.skyarrow.ehreader.app.drawer.DrawerFragment;
+import tw.skyarrow.ehreader.app.search.SearchActivity;
 
 public class MainActivity extends ActionBarActivity implements DrawerActivity {
     @InjectView(R.id.toolbar)
@@ -70,6 +72,7 @@ public class MainActivity extends ActionBarActivity implements DrawerActivity {
 
         switch (item.getItemId()){
             case R.id.action_search:
+                openSearch();
                 return true;
         }
 
@@ -78,5 +81,10 @@ public class MainActivity extends ActionBarActivity implements DrawerActivity {
 
     public void closeDrawer(){
         mDrawerLayout.closeDrawer(mDrawer);
+    }
+
+    private void openSearch(){
+        Intent intent = new Intent(this, SearchActivity.class);
+        startActivity(intent);
     }
 }

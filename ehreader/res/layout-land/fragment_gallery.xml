@@ -18,8 +18,7 @@
             <RelativeLayout
                 android:id="@+id/placeholder"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/gallery_placeholder_height"
-                android:layout_marginTop="@dimen/toolbar_padding_top">
+                android:layout_height="@dimen/gallery_placeholder_height">
                 <include layout="@layout/read_btn"/>
             </RelativeLayout>
             <LinearLayout

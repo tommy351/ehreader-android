@@ -53,11 +53,25 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter {
     public final int getItemViewType(int position) {
         if (position < headerItemCount){
             return TYPE_HEADER;
-        } else if (position > headerItemCount + contentItemCount){
+        } else if (position >= headerItemCount + contentItemCount){
             return TYPE_FOOTER;
         }
 
         return 0;
+    }
+
+    @Override
+    public final long getItemId(int position) {
+        switch (getItemViewType(position)){
+            case TYPE_HEADER:
+                return getHeaderItemId(position);
+
+            case TYPE_FOOTER:
+                return getFooterItemId(position - headerItemCount - contentItemCount);
+
+            default:
+                return getContentItemId(position - headerItemCount);
+        }
     }
 
     public final void notifyHeaderDataSetChanged(){
@@ -156,21 +170,45 @@ public abstract class RecyclerViewAdapter extends RecyclerView.Adapter {
         notifyItemRemoved(headerItemCount + contentItemCount + position);
     }
 
-    public abstract RecyclerView.ViewHolder onCreateHeaderViewHolder(ViewGroup parent, int viewType);
+    public RecyclerView.ViewHolder onCreateHeaderViewHolder(ViewGroup parent, int viewType){
+        return null;
+    }
 
     public abstract RecyclerView.ViewHolder onCreateContentViewHolder(ViewGroup parent, int viewType);
 
-    public abstract RecyclerView.ViewHolder onCreateFooterViewHolder(ViewGroup parent, int viewType);
+    public RecyclerView.ViewHolder onCreateFooterViewHolder(ViewGroup parent, int viewType){
+        return null;
+    }
 
-    public abstract void onBindHeaderViewHolder(RecyclerView.ViewHolder holder, int position);
+    public void onBindHeaderViewHolder(RecyclerView.ViewHolder holder, int position){
+
+    }
 
     public abstract void onBindContentViewHolder(RecyclerView.ViewHolder holder, int position);
 
-    public abstract void onBindFooterViewHolder(RecyclerView.ViewHolder holder, int position);
+    public void onBindFooterViewHolder(RecyclerView.ViewHolder holder, int position){
 
-    public abstract int getHeaderItemCount();
+    }
+
+    public int getHeaderItemCount(){
+        return 0;
+    }
 
     public abstract int getContentItemCount();
 
-    public abstract int getFooterItemCount();
+    public int getFooterItemCount(){
+        return 0;
+    }
+
+    public long getHeaderItemId(int position){
+        return RecyclerView.NO_ID;
+    }
+
+    public long getContentItemId(int position){
+        return RecyclerView.NO_ID;
+    }
+
+    public long getFooterItemId(int position){
+        return RecyclerView.NO_ID;
+    }
 }

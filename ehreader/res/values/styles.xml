@@ -12,9 +12,26 @@
 
     <style name="AppTheme" parent="AppTheme.Base"/>
 
+    <style name="AppTheme.Main.Base" parent="AppTheme"></style>
+
+    <style name="AppTheme.Main" parent="AppTheme.Main.Base"></style>
+
+    <style name="AppTheme.Search.Base" parent="AppTheme">
+        <item name="colorPrimary">@android:color/white</item>
+        <item name="colorPrimaryDark">@color/search_status_bar</item>
+        <item name="colorAccent">@android:color/darker_gray</item>
+        <item name="searchViewStyle">@style/SearchView</item>
+    </style>
+
+    <style name="AppTheme.Search" parent="AppTheme.Search.Base"/>
+
     <style name="AppTheme.Photo.Base" parent="AppTheme">
         <item name="android:windowBackground">@android:color/black</item>
     </style>
 
     <style name="AppTheme.Photo" parent="AppTheme.Photo.Base"/>
+
+    <style name="SearchView" parent="Widget.AppCompat.Light.SearchView">
+        <!-- TODO: customize the search view -->
+    </style>
 </resources>
