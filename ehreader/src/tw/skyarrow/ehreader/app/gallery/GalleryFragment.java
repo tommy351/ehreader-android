@@ -205,7 +205,6 @@ public class GalleryFragment extends Fragment {
         Bundle args = new Bundle();
 
         args.putLong(PhotoActivity.EXTRA_GALLERY_ID, mGallery.getId());
-        args.putInt(PhotoActivity.EXTRA_PAGE, mGallery.getProgress() > 0 ? mGallery.getProgress() : 1);
         intent.putExtras(args);
         startActivity(intent);
     }

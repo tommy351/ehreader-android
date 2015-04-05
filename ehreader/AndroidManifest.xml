@@ -87,5 +87,11 @@
         <provider
             android:name=".provider.SearchSuggestionProvider"
             android:authorities="tw.skyarrow.ehreader.provider.SearchSuggestionProvider"/>
+
+        <provider
+            android:name=".provider.PhotoProvider"
+            android:authorities="tw.skyarrow.ehreader.provider.PhotoProvider"
+            android:exported="true"/>
+
     </application>
 </manifest>

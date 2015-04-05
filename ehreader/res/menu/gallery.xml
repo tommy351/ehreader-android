@@ -11,7 +11,8 @@
     <item android:id="@+id/action_share"
         android:title="@string/action_share"
         android:icon="@drawable/action_share"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom"
+        app:actionProviderClass="android.support.v7.widget.ShareActionProvider"/>
     <item android:id="@+id/action_download"
         android:title="@string/action_download"
         android:icon="@drawable/action_download"

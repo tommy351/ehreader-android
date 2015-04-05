@@ -23,7 +23,6 @@ import tw.skyarrow.ehreader.util.ActionBarHelper;
 
 public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiVisibilityChangeListener {
     public static final String EXTRA_GALLERY_ID = "gallery_id";
-    public static final String EXTRA_PAGE = "page";
 
     @InjectView(R.id.toolbar)
     Toolbar mToolbar;
@@ -53,7 +52,6 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
         // Read arguments
         Bundle args = getIntent().getExtras();
         long galleryId = args.getLong(EXTRA_GALLERY_ID);
-        int galleryPage = args.getInt(EXTRA_PAGE);
 
         // Attach fragment
         FragmentManager fm = getSupportFragmentManager();
@@ -61,7 +59,7 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
         Fragment lastFragment = fm.findFragmentByTag(PhotoFragment.TAG);
 
         if (lastFragment == null){
-            ft.replace(R.id.frame, PhotoFragment.newInstance(galleryId, galleryPage), PhotoFragment.TAG);
+            ft.replace(R.id.frame, PhotoFragment.newInstance(galleryId), PhotoFragment.TAG);
         } else {
             ft.attach(lastFragment);
         }

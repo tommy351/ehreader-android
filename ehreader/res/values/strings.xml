@@ -11,6 +11,7 @@
     <string name="action_share">Share</string>
     <string name="action_filter">Filter</string>
     <string name="action_image_search">Image search</string>
+    <string name="action_retry">Retry</string>
 
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
@@ -73,7 +74,7 @@
     <string name="pref_view_title">View</string>
 
     <string name="pref_launch_page" translatable="false">launch_page</string>
-    <string name="pref_launch_page_title">Launch page</string>
+    <string name="pref_launch_page_title">Launch position</string>
     <string name="pref_launch_page_default" translatable="false">0</string>
     <string-array name="pref_launch_page_values" translatable="false">
         <item>0</item>
