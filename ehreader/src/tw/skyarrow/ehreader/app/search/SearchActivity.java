@@ -25,9 +25,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import de.greenrobot.event.EventBus;
@@ -37,7 +34,6 @@ import tw.skyarrow.ehreader.app.main.WebFragment;
 import tw.skyarrow.ehreader.event.SearchFilterEvent;
 import tw.skyarrow.ehreader.provider.SearchSuggestionProvider;
 import tw.skyarrow.ehreader.util.ActionBarHelper;
-import tw.skyarrow.ehreader.util.L;
 import tw.skyarrow.ehreader.util.LoginHelper;
 import tw.skyarrow.ehreader.view.RecyclerViewItemClickListener;
 
@@ -151,9 +147,9 @@ public class SearchActivity extends ActionBarActivity implements RecyclerViewIte
             ft.attach(lastFragment);
             ft.commit();
         } else if (Intent.ACTION_SEARCH.equals(intent.getAction())){
-            lastQuery = intent.getStringExtra(SearchManager.QUERY);
-            mTextInput.setText(lastQuery);
-            doSearch(lastQuery);
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            mTextInput.setText(query);
+            doSearch(query);
         } else {
             mTextInput.requestFocus();
         }
@@ -175,7 +171,7 @@ public class SearchActivity extends ActionBarActivity implements RecyclerViewIte
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
-                if (mTextInput.isFocused()){
+                if (!lastQuery.isEmpty() && mTextInput.isFocused()){
                     restoreTextInput();
                 } else {
                     ActionBarHelper.upNavigation(this);
@@ -197,7 +193,7 @@ public class SearchActivity extends ActionBarActivity implements RecyclerViewIte
 
     @Override
     public void onBackPressed() {
-        if (mTextInput.isFocused()){
+        if (!lastQuery.isEmpty() && mTextInput.isFocused()){
             restoreTextInput();
         } else {
             super.onBackPressed();

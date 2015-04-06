@@ -1,41 +1,42 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <FrameLayout
+    <ImageView
+        android:id="@+id/background"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/gallery_background_height">
-            <ImageView
-                android:id="@+id/background"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:adjustViewBounds="true"/>
-            <include layout="@layout/read_btn"/>
-        </RelativeLayout>
+        android:layout_height="@dimen/gallery_background_height"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"/>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <View
+            <RelativeLayout
                 android:id="@+id/placeholder"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/gallery_placeholder_height"/>
+                android:layout_height="@dimen/gallery_placeholder_height"
+                android:paddingTop="@dimen/toolbar_padding_top">
+                <include layout="@layout/read_btn"/>
+            </RelativeLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/placeholder"
-                android:padding="@dimen/margin_medium"
                 android:background="@color/gallery_content_background"
-                android:layout_centerHorizontal="true">
+                android:layout_centerHorizontal="true"
+                android:orientation="vertical"
+                android:paddingTop="@dimen/margin_medium">
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/cover_size"
+                    android:layout_marginRight="@dimen/margin_medium"
                     android:paddingLeft="@dimen/margin_medium">
                     <include layout="@layout/gallery_header"/>
                 </FrameLayout>
+                <include layout="@layout/gallery_content"/>
             </LinearLayout>
             <ImageView
                 android:id="@+id/cover"
@@ -49,5 +50,5 @@
                 android:layout_below="@+id/placeholder"
                 android:layout_marginTop="@dimen/gallery_cover_margin_top"/>
         </RelativeLayout>
-    </FrameLayout>
-</ScrollView>
+    </ScrollView>
+</FrameLayout>

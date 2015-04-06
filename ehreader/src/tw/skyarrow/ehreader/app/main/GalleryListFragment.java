@@ -63,6 +63,7 @@ public abstract class GalleryListFragment extends Fragment implements RecyclerVi
         mListAdapter = new GalleryListAdapter(getActivity(), mGalleryList);
         mListAdapter.setHasStableIds(true);
         layoutManager.setOrientation(StaggeredGridLayoutManager.VERTICAL);
+        mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mListAdapter);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {

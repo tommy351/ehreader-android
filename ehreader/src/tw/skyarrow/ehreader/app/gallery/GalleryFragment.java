@@ -1,5 +1,6 @@
 package tw.skyarrow.ehreader.app.gallery;
 
+import android.app.SearchManager;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -10,12 +11,12 @@ import android.support.v7.widget.ShareActionProvider;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,8 +25,10 @@ import com.android.volley.toolbox.ImageLoader;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.app.photo.PhotoActivity;
+import tw.skyarrow.ehreader.app.search.SearchActivity;
 import tw.skyarrow.ehreader.model.APIFetcher;
 import tw.skyarrow.ehreader.model.DaoMaster;
 import tw.skyarrow.ehreader.model.DaoSession;
@@ -57,6 +60,21 @@ public class GalleryFragment extends Fragment {
 
     @InjectView(R.id.background)
     ImageView mBackgroundView;
+
+    @InjectView(R.id.category)
+    TextView mCategoryView;
+
+    @InjectView(R.id.page)
+    TextView mPageView;
+
+    @InjectView(R.id.rating_bar)
+    RatingBar mRatingBar;
+
+    @InjectView(R.id.rating_text)
+    TextView mRatingText;
+
+    @InjectView(R.id.uploader)
+    TextView mUploaderView;
 
     private SQLiteDatabase mDatabase;
     private GalleryDao galleryDao;
@@ -135,6 +153,13 @@ public class GalleryFragment extends Fragment {
         } else {
             mSubtitleView.setText(subtitle);
         }
+
+        mCategoryView.setText(mGallery.getCategoryString());
+        mCategoryView.setTextColor(getResources().getColor(mGallery.getCategoryColor()));
+        mPageView.setText(" / " + mGallery.getCount() + "P");
+        mRatingBar.setRating(mGallery.getRating());
+        mUploaderView.setText(mGallery.getUploader());
+        mRatingText.setText(String.format("%.1f", mGallery.getRating()));
 
         if (mImageContainer == null){
             ImageLoader imageLoader = ImageLoaderHelper.getImageLoader(getActivity());
@@ -273,5 +298,15 @@ public class GalleryFragment extends Fragment {
                 L.e(e);
             }
         });
+    }
+
+    @OnClick(R.id.uploader_container)
+    void onUploaderClick(){
+        Intent intent = new Intent(getActivity(), SearchActivity.class);
+
+        intent.setAction(Intent.ACTION_SEARCH);
+        intent.putExtra(SearchManager.QUERY, "uploader:" + mGallery.getUploader());
+
+        startActivity(intent);
     }
 }

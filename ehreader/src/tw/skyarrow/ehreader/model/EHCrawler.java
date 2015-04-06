@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 
 import tw.skyarrow.ehreader.util.DatabaseHelper;
 import tw.skyarrow.ehreader.util.EHStringRequest;
+import tw.skyarrow.ehreader.util.L;
 import tw.skyarrow.ehreader.util.RequestHelper;
 
 public class EHCrawler {
@@ -66,6 +67,8 @@ public class EHCrawler {
         Uri.Builder builder = Uri.parse(baseUrl).buildUpon();
         builder.appendQueryParameter("page", Integer.toString(page));
         String url = builder.build().toString();
+
+        L.d("Get gallery list: %s", url);
 
         EHStringRequest req = new EHStringRequest(mContext, url, new Response.Listener<String>() {
             @Override
@@ -120,6 +123,8 @@ public class EHCrawler {
         builder.appendQueryParameter("p", Integer.toString(page));
         String url = builder.build().toString();
 
+        L.d("Get photo list: %s", url);
+
         EHStringRequest req = new EHStringRequest(mContext, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String html) {
@@ -157,6 +162,8 @@ public class EHCrawler {
     }
 
     public void getPhoto(final Photo photo, final Listener listener){
+        L.d("Get photo: %s", photo.getURL());
+
         EHStringRequest req = new EHStringRequest(mContext, photo.getURL(), new Response.Listener<String>() {
             @Override
             public void onResponse(String html) {

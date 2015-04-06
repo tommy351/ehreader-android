@@ -29,4 +29,14 @@
     </style>
 
     <style name="AppTheme.Photo" parent="AppTheme.Photo.Base"/>
+
+    <style name="SectionTitleText">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/text_size_small</item>
+        <item name="android:textColor">@color/secondary_text</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:layout_marginBottom">@dimen/margin_medium</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
 </resources>

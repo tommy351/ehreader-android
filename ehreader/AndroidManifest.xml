@@ -27,7 +27,8 @@
         </activity>
 
         <activity
-            android:name=".app.gallery.GalleryActivity">
+            android:name=".app.gallery.GalleryActivity"
+            android:theme="@style/AppTheme.Main">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".app.main.MainActivity"/>

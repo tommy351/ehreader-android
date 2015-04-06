@@ -18,7 +18,8 @@
             <RelativeLayout
                 android:id="@+id/placeholder"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/gallery_placeholder_height">
+                android:layout_height="@dimen/gallery_placeholder_height"
+                android:paddingTop="@dimen/toolbar_padding_top">
                 <include layout="@layout/read_btn"/>
             </RelativeLayout>
             <LinearLayout
@@ -27,14 +28,16 @@
                 android:layout_below="@+id/placeholder"
                 android:orientation="vertical"
                 android:background="@color/gallery_content_background"
-                android:padding="@dimen/margin_medium">
+                android:paddingTop="@dimen/margin_medium">
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/cover_size"
-                    android:paddingLeft="@dimen/margin_medium">
+                    android:paddingLeft="@dimen/margin_medium"
+                    android:layout_marginRight="@dimen/margin_medium">
                     <include layout="@layout/gallery_header"/>
                 </FrameLayout>
+                <include layout="@layout/gallery_content"/>
             </LinearLayout>
             <ImageView
                 android:id="@+id/cover"

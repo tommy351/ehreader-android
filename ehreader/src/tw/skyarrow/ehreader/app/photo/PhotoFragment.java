@@ -88,6 +88,7 @@ public class PhotoFragment extends Fragment {
         args.putLong(EXTRA_GALLERY_ID, galleryId);
         args.putString(EXTRA_PHOTO_TOKEN, photoToken);
         args.putInt(EXTRA_PHOTO_PAGE, photoPage);
+        fragment.setArguments(args);
 
         return fragment;
     }
@@ -151,6 +152,7 @@ public class PhotoFragment extends Fragment {
 
         mRecyclerView.setAdapter(mListAdapter);
         mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -282,6 +284,10 @@ public class PhotoFragment extends Fragment {
                 photo = new Photo();
                 photo.setGalleryId(galleryId);
                 photo.setPage(i);
+                photo.setToken("");
+                photo.setBookmarked(false);
+                photo.setDownloaded(false);
+                photo.setInvalid(false);
             }
 
             mPhotoList.add(photo);
@@ -294,7 +300,7 @@ public class PhotoFragment extends Fragment {
     private void handleNeedSrcEvent(final int position) {
         Photo photo = mPhotoList.get(position);
 
-        if (photo.getToken() == null){
+        if (photo.getToken().isEmpty()){
             loadPhotoList(photo.getPage() / mGallery.getPhotoPerPage());
         } else {
             loadPhotoSrc(photo);
@@ -318,6 +324,7 @@ public class PhotoFragment extends Fragment {
         });
     }
 
+    // FIXME: loadPhotoList called too many times
     private void loadPhotoList(final int galleryPage){
         if (mPhotoListReqQueue.contains(galleryPage)) return;
 

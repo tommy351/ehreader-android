@@ -128,6 +128,8 @@ public class APIFetcher {
             obj.put("method", "gtoken");
             obj.put("pagelist", pagelist);
 
+            L.d("Request gtoken: %s", pagelist.toString());
+
             EHAPIRequest req = new EHAPIRequest(mContext, obj, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject json) {
