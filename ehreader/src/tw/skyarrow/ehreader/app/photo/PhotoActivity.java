@@ -1,6 +1,7 @@
 package tw.skyarrow.ehreader.app.photo;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,6 +16,8 @@ import android.view.View;
 import android.view.WindowManager;
 
 import java.lang.ref.WeakReference;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -30,6 +33,7 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
     private static final boolean IS_JELLY_BEAN = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
     private static final boolean IS_KITKAT = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
     private static final int UI_HIDE_DELAY = 3000;
+    private static final Pattern pPhotoURL = Pattern.compile("http://(?:g\\.e-|ex)hentai\\.org/s/(\\w+?)/(\\d+)-(\\w+)");
 
     private View decorView;
     private Handler systemUIHandler;
@@ -49,17 +53,35 @@ public class PhotoActivity extends ActionBarActivity implements View.OnSystemUiV
         decorView.setOnSystemUiVisibilityChangeListener(this);
         systemUIHandler = new SystemUIHandler(this);
 
-        // Read arguments
-        Bundle args = getIntent().getExtras();
-        long galleryId = args.getLong(EXTRA_GALLERY_ID);
-
         // Attach fragment
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         Fragment lastFragment = fm.findFragmentByTag(PhotoFragment.TAG);
 
         if (lastFragment == null){
-            ft.replace(R.id.frame, PhotoFragment.newInstance(galleryId), PhotoFragment.TAG);
+            Intent intent = getIntent();
+            long galleryId;
+            String photoToken = "";
+            int photoPage = 0;
+
+            if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null){
+                String url = intent.getData().toString();
+                Matcher matcher = pPhotoURL.matcher(url);
+
+                if (matcher.find()){
+                    galleryId = Long.parseLong(matcher.group(2), 10);
+                    photoToken = matcher.group(1);
+                    photoPage = Integer.parseInt(matcher.group(3), 10);
+                } else {
+                    // TODO: error handling
+                    return;
+                }
+            } else {
+                Bundle args = intent.getExtras();
+                galleryId = args.getLong(EXTRA_GALLERY_ID);
+            }
+
+            ft.replace(R.id.frame, PhotoFragment.newInstance(galleryId, photoToken, photoPage), PhotoFragment.TAG);
         } else {
             ft.attach(lastFragment);
         }

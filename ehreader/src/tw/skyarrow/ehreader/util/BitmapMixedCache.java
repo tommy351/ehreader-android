@@ -22,6 +22,7 @@ public class BitmapMixedCache implements ImageLoader.ImageCache {
     public static final String CACHE_DIR = "images";
     public static final Bitmap.CompressFormat COMPRESS_FORMAT = Bitmap.CompressFormat.JPEG;
     public static final int COMPRESS_QUALITY = 70;
+    public static final int MEMORY_CACHE_RESTRICT = 300;
 
     private Context mContext;
     private BitmapLruCache mMemoryCache;
@@ -122,7 +123,9 @@ public class BitmapMixedCache implements ImageLoader.ImageCache {
     }
 
     private void putBitmapToMemoryCache(String url, Bitmap bitmap){
-        mMemoryCache.put(url, bitmap);
+        if (shouldPutToMemoryCache(bitmap)){
+            mMemoryCache.put(url, bitmap);
+        }
     }
 
     private Bitmap getBitmapFromDiskCache(String url) {
@@ -175,5 +178,9 @@ public class BitmapMixedCache implements ImageLoader.ImageCache {
 
     private String getHashKey(String url){
         return String.valueOf(url.hashCode());
+    }
+
+    private boolean shouldPutToMemoryCache(Bitmap bitmap){
+        return bitmap.getWidth() < MEMORY_CACHE_RESTRICT;
     }
 }

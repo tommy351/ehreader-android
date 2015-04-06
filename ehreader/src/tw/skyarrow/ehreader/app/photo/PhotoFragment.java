@@ -1,13 +1,16 @@
 package tw.skyarrow.ehreader.app.photo;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.ShareActionProvider;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,13 +18,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -33,23 +31,23 @@ import butterknife.InjectView;
 import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.event.PhotoListAdapterEvent;
+import tw.skyarrow.ehreader.model.APIFetcher;
 import tw.skyarrow.ehreader.model.DaoMaster;
 import tw.skyarrow.ehreader.model.DaoSession;
+import tw.skyarrow.ehreader.model.EHCrawler;
 import tw.skyarrow.ehreader.model.Gallery;
 import tw.skyarrow.ehreader.model.GalleryDao;
-import tw.skyarrow.ehreader.model.GalleryHelper;
 import tw.skyarrow.ehreader.model.Photo;
 import tw.skyarrow.ehreader.model.PhotoDao;
-import tw.skyarrow.ehreader.model.PhotoHelper;
-import tw.skyarrow.ehreader.model.PhotoPageData;
 import tw.skyarrow.ehreader.util.DatabaseHelper;
 import tw.skyarrow.ehreader.util.L;
-import tw.skyarrow.ehreader.util.RequestHelper;
 
 public class PhotoFragment extends Fragment {
     public static final String TAG = PhotoFragment.class.getSimpleName();
 
     public static final String EXTRA_GALLERY_ID = "gallery_id";
+    public static final String EXTRA_PHOTO_TOKEN = "photo_token";
+    public static final String EXTRA_PHOTO_PAGE = "photo_page";
 
     @InjectView(R.id.list)
     RecyclerView mRecyclerView;
@@ -58,14 +56,20 @@ public class PhotoFragment extends Fragment {
     SeekBar mSlider;
 
     private long galleryId;
+    private String photoToken;
+    private int photoPage;
     private List<Photo> mPhotoList;
     private PhotoListAdapter mListAdapter;
+    private SQLiteDatabase mDatabase;
     private GalleryDao galleryDao;
     private PhotoDao photoDao;
     private Gallery mGallery;
     private LinearLayoutManager mLayoutManager;
     private Set<Integer> mPhotoListReqQueue;
     private Set<Integer> mPhotoPageReqQueue;
+    private APIFetcher apiFetcher;
+    private EHCrawler ehCrawler;
+    private int lastProgress;
 
     public static PhotoFragment newInstance(long galleryId){
         PhotoFragment fragment = new PhotoFragment();
@@ -73,6 +77,17 @@ public class PhotoFragment extends Fragment {
 
         args.putLong(EXTRA_GALLERY_ID, galleryId);
         fragment.setArguments(args);
+
+        return fragment;
+    }
+
+    public static PhotoFragment newInstance(long galleryId, String photoToken, int photoPage){
+        PhotoFragment fragment = new PhotoFragment();
+        Bundle args = new Bundle();
+
+        args.putLong(EXTRA_GALLERY_ID, galleryId);
+        args.putString(EXTRA_PHOTO_TOKEN, photoToken);
+        args.putInt(EXTRA_PHOTO_PAGE, photoPage);
 
         return fragment;
     }
@@ -86,14 +101,17 @@ public class PhotoFragment extends Fragment {
 
         mPhotoListReqQueue = new HashSet<>();
         mPhotoPageReqQueue = new HashSet<>();
+        lastProgress = 0;
 
         // Read arguments
         Bundle args = getArguments();
         galleryId = args.getLong(EXTRA_GALLERY_ID);
+        photoToken = args.getString(EXTRA_PHOTO_TOKEN);
+        photoPage = args.getInt(EXTRA_PHOTO_PAGE);
 
         // Set up database
-        SQLiteDatabase db = DatabaseHelper.getWritableDatabase(getActivity());
-        DaoMaster daoMaster = new DaoMaster(db);
+        mDatabase = DatabaseHelper.getWritableDatabase(getActivity());
+        DaoMaster daoMaster = new DaoMaster(mDatabase);
         DaoSession daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();
         photoDao = daoSession.getPhotoDao();
@@ -102,11 +120,17 @@ public class PhotoFragment extends Fragment {
         mGallery = galleryDao.load(galleryId);
         mPhotoList = new ArrayList<>();
         mListAdapter = new PhotoListAdapter(getActivity(), mPhotoList);
+        apiFetcher = new APIFetcher(getActivity());
+        ehCrawler = new EHCrawler(getActivity());
 
-        if (mGallery.getPhotoPerPage() == null){
-            getPhotoPerPage();
+        if (mGallery == null){
+            loadGallery();
         } else {
-            loadPhotos();
+            if (mGallery.getPhotoPerPage() == null){
+                getPhotoPerPage();
+            } else {
+                loadPhotos();
+            }
         }
     }
 
@@ -130,12 +154,7 @@ public class PhotoFragment extends Fragment {
         mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                int progress = getProgress();
-                ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
-
-                actionBar.setTitle(String.format("%d / %d", progress + 1, mGallery.getCount()));
-                mSlider.setProgress(progress);
-                actionBar.invalidateOptionsMenu();
+                updateProgress();
             }
         });
 
@@ -172,8 +191,10 @@ public class PhotoFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        RequestHelper.getInstance(getActivity()).cancelAllRequests(TAG);
         EventBus.getDefault().unregister(this);
+        apiFetcher.close();
+        ehCrawler.close();
+        mDatabase.close();
         super.onDestroy();
     }
 
@@ -187,16 +208,36 @@ public class PhotoFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if (mPhotoList.size() == 0) return;
+
         inflater.inflate(R.menu.photo, menu);
+
+        Photo photo = mPhotoList.get(getProgress());
+        if (photo == null) return;
+
+        MenuItem bookmark = menu.findItem(R.id.action_bookmark);
+        MenuItem unbookmark = menu.findItem(R.id.action_unbookmark);
+
+        if (photo.getBookmarked()){
+            bookmark.setVisible(false);
+        } else {
+            unbookmark.setVisible(false);
+        }
+
+        MenuItem share = menu.findItem(R.id.action_share);
+        ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(share);
+        shareActionProvider.setShareIntent(getShareIntent());
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.action_bookmark:
+                addBookmark();
                 return true;
 
             case R.id.action_unbookmark:
+                removeBookmark();
                 return true;
 
             case R.id.action_download:
@@ -207,6 +248,30 @@ public class PhotoFragment extends Fragment {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void addBookmark(){
+        Photo photo = mPhotoList.get(getProgress());
+        photo.setBookmarked(true);
+        photoDao.updateInTx(photo);
+        invalidateOptionsMenu();
+        showToast(getString(R.string.toast_bookmark_added));
+    }
+
+    private void removeBookmark(){
+        Photo photo = mPhotoList.get(getProgress());
+        photo.setBookmarked(false);
+        photoDao.updateInTx(photo);
+        invalidateOptionsMenu();
+        showToast(getString(R.string.toast_bookmark_removed));
+    }
+
+    private Intent getShareIntent(){
+        Intent intent = new Intent(Intent.ACTION_SEND);
+
+        // TODO: photo sharing
+
+        return intent;
     }
 
     private void loadPhotos(){
@@ -222,45 +287,25 @@ public class PhotoFragment extends Fragment {
             mPhotoList.add(photo);
         }
 
+        photoDao.insertOrReplaceInTx(mPhotoList);
         mListAdapter.notifyDataSetChanged();
     }
 
-    private void handleNeedSrcEvent(final int position){
+    private void handleNeedSrcEvent(final int position) {
         Photo photo = mPhotoList.get(position);
 
-        if (photo.getId() == null){
-            int galleryPage = photo.getPage() / mGallery.getPhotoPerPage();
-
-            loadPhotoList(galleryPage, new LoadPhotoListCallback() {
-                @Override
-                public void onSuccess(List<Photo> list) {
-                    for (Photo photo : list){
-                        mPhotoList.set(photo.getPage() - 1, photo);
-                    }
-
-                    loadPhotoSrc(mPhotoList.get(position));
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    // TODO: error handling
-                    L.e(e);
-                }
-            });
+        if (photo.getToken() == null){
+            loadPhotoList(photo.getPage() / mGallery.getPhotoPerPage());
         } else {
             loadPhotoSrc(photo);
         }
     }
 
-    private void addRequestToQueue(Request req){
-        RequestHelper.getInstance(getActivity()).addToRequestQueue(req, PhotoFragment.TAG);
-    }
-
     private void getPhotoPerPage(){
-        loadPhotoList(0, new LoadPhotoListCallback() {
+        ehCrawler.getPhotoList(mGallery.getURL(), 0, new EHCrawler.Listener() {
             @Override
-            public void onSuccess(List<Photo> list) {
-                mGallery.setPhotoPerPage(list.size());
+            public void onPhotoListResponse(List<Photo> photoList) {
+                mGallery.setPhotoPerPage(photoList.size());
                 galleryDao.updateInTx(mGallery);
                 loadPhotos();
             }
@@ -273,77 +318,90 @@ public class PhotoFragment extends Fragment {
         });
     }
 
-
-    private void loadPhotoList(final int galleryPage, final LoadPhotoListCallback callback){
+    private void loadPhotoList(final int galleryPage){
         if (mPhotoListReqQueue.contains(galleryPage)) return;
 
-        String url = mGallery.getURL(galleryPage);
-        StringRequest req = new StringRequest(url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String html) {
-                List<Photo> list = GalleryHelper.findPhotosInGallery(html);
-
-                // TODO: error handling
-                if (list.size() == 0) return;
-
-                photoDao.insertInTx(list);
-                mPhotoListReqQueue.remove(galleryPage);
-                callback.onSuccess(list);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                callback.onError(volleyError);
-            }
-        });
-
         mPhotoListReqQueue.add(galleryPage);
-        addRequestToQueue(req);
-    }
-
-    private interface LoadPhotoListCallback {
-        void onSuccess(List<Photo> list);
-        void onError(Exception e);
-    }
-
-    private void loadPhotoSrc(final Photo photo) {
-        if (mPhotoPageReqQueue.contains(photo.getPage())) return;
-
-        String url = photo.getURL();
-        StringRequest req = new StringRequest(url, new Response.Listener<String>() {
+        ehCrawler.getPhotoList(mGallery.getURL(), galleryPage, new EHCrawler.Listener() {
             @Override
-            public void onResponse(String html) {
-                try {
-                    PhotoPageData data = PhotoHelper.readPhotoPage(html);
-
-                    photo.setRetryId(data.getRetryId());
-                    photo.setSrc(data.getSrc());
-                    photo.setWidth(data.getWidth());
-                    photo.setHeight(data.getHeight());
-                    photoDao.updateInTx(photo);
-
-                    mGallery.setShowkey(data.getShowkey());
-                    galleryDao.updateInTx(mGallery);
-
-                    mListAdapter.notifyItemChanged(photo.getPage() - 1);
-                } catch (UnsupportedEncodingException e) {
+            public void onPhotoListResponse(List<Photo> photoList) {
+                if (photoList.size() == 0){
                     // TODO: error handling
-                    L.e(e);
+                    return;
                 }
+
+                mPhotoListReqQueue.remove(galleryPage);
+                mListAdapter.notifyItemRangeChanged(photoList.get(0).getPage() - 1, photoList.size());
             }
-        }, new Response.ErrorListener() {
+
             @Override
-            public void onErrorResponse(VolleyError volleyError) {
+            public void onError(Exception e) {
                 // TODO: error handling
-                L.e(volleyError);
+                L.e(e);
             }
         });
+    }
 
-        mPhotoPageReqQueue.add(photo.getPage());
-        addRequestToQueue(req);
+    private void loadPhotoSrc(Photo photo){
+        final int photoPage = photo.getPage();
+        if (mPhotoPageReqQueue.contains(photoPage)) return;
+
+        mPhotoPageReqQueue.add(photoPage);
+        ehCrawler.getPhoto(photo, new EHCrawler.Listener() {
+            @Override
+            public void onPhotoResponse(Photo photo) {
+                int position = photo.getPage() - 1;
+
+                mPhotoList.set(position, photo);
+                mPhotoPageReqQueue.remove(photoPage);
+                mListAdapter.notifyItemChanged(position);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                // TODO: error handling
+                L.e(e);
+            }
+        });
     }
 
     private int getProgress(){
         return mLayoutManager.findFirstVisibleItemPosition();
+    }
+
+    private void updateProgress(){
+        int progress = getProgress();
+        if (progress == lastProgress) return;
+
+        lastProgress = progress;
+        ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+
+        actionBar.setTitle(String.format("%d / %d", progress + 1, mGallery.getCount()));
+        mSlider.setProgress(progress);
+        actionBar.invalidateOptionsMenu();
+    }
+
+    private void loadGallery(){
+        apiFetcher.getGalleryByPhotoInfo(galleryId, photoToken, photoPage, new APIFetcher.Listener() {
+            @Override
+            public void onGalleryResponse(Gallery gallery) {
+                mGallery = gallery;
+                getPhotoPerPage();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                // TODO: error handling
+                L.e(e);
+            }
+        });
+    }
+
+    private void invalidateOptionsMenu(){
+        getActivity().invalidateOptionsMenu();
+    }
+
+    private void showToast(String s){
+        Toast.makeText(getActivity(), s, Toast.LENGTH_SHORT).show();
     }
 }

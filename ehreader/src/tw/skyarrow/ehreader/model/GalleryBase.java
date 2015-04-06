@@ -152,11 +152,20 @@ public abstract class GalleryBase {
     }
 
     public String getURL(){
-        return String.format(Constant.GALLERY_URL, getId(), getToken());
+        return getURL(false);
     }
 
     public String getURL(int page){
-        Uri.Builder b = Uri.parse(getURL()).buildUpon();
+        return getURL(false, page);
+    }
+
+    public String getURL(boolean loggedIn){
+        String base = loggedIn ? Constant.GALLERY_URL_EX : Constant.GALLERY_URL;
+        return String.format(base, getId(), getToken());
+    }
+
+    public String getURL(boolean loggedIn, int page){
+        Uri.Builder b = Uri.parse(getURL(loggedIn)).buildUpon();
         b.appendQueryParameter("p", Integer.toString(page));
         return b.build().toString();
     }

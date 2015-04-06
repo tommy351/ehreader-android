@@ -24,6 +24,7 @@ import tw.skyarrow.ehreader.view.RecyclerViewAdapter;
 public class GalleryListAdapter extends RecyclerViewAdapter {
     private List<Gallery> mGalleryList;
     private Context mContext;
+    private boolean mIsLoading;
 
     public GalleryListAdapter(Context context, List<Gallery> galleryList){
         mContext = context;
@@ -69,6 +70,12 @@ public class GalleryListAdapter extends RecyclerViewAdapter {
     @Override
     public void onBindFooterViewHolder(RecyclerView.ViewHolder holder, int position) {
         FooterViewHolder vh = (FooterViewHolder) holder;
+
+        if (isLoading()){
+            vh.loadingView.setVisibility(View.VISIBLE);
+        } else {
+            vh.loadingView.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -89,6 +96,15 @@ public class GalleryListAdapter extends RecyclerViewAdapter {
 
     public void setGalleryList(List<Gallery> galleryList){
         mGalleryList = galleryList;
+    }
+
+    public boolean isLoading(){
+        return mIsLoading;
+    }
+
+    public void setLoading(boolean loading){
+        mIsLoading = loading;
+        notifyFooterDataSetChanged();
     }
 
     public static class ContentViewHolder extends RecyclerView.ViewHolder {

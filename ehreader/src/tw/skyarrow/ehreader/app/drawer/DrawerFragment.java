@@ -1,7 +1,9 @@
 package tw.skyarrow.ehreader.app.drawer;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,8 +22,9 @@ import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.app.main.DownloadFragment;
 import tw.skyarrow.ehreader.app.main.FavoritesFragment;
 import tw.skyarrow.ehreader.app.main.HistoryFragment;
-import tw.skyarrow.ehreader.app.main.SearchFragment;
+import tw.skyarrow.ehreader.app.main.WebFragment;
 import tw.skyarrow.ehreader.app.pref.PrefActivity;
+import tw.skyarrow.ehreader.util.LoginHelper;
 import tw.skyarrow.ehreader.view.RecyclerViewItemClickListener;
 
 public class DrawerFragment extends Fragment {
@@ -89,7 +92,11 @@ public class DrawerFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         if (mCurrentPage == 0){
-            setCurrentPage(TAB_LATEST);
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String launchPagePref = preferences.getString(getString(R.string.pref_launch_page), getString(R.string.pref_launch_page_default));
+            int tab = Integer.parseInt(launchPagePref);
+
+            setCurrentPage(tab + 1);
         }
     }
 
@@ -134,11 +141,12 @@ public class DrawerFragment extends Fragment {
 
         Fragment fragment = null;
         String tag = null;
+        boolean loggedIn = LoginHelper.getInstance(getActivity()).isLoggedIn();
 
         switch (page){
             case TAB_LATEST:
-                fragment = SearchFragment.newInstance(Constant.BASE_URL);
-                tag = SearchFragment.TAG;
+                fragment = WebFragment.newInstance(loggedIn ? Constant.BASE_URL_EX : Constant.BASE_URL);
+                tag = WebFragment.TAG;
                 break;
 
             case TAB_FAVORITES:

@@ -10,8 +10,6 @@ import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.webkit.MimeTypeMap;
 
-import com.android.volley.toolbox.ImageLoader;
-
 import java.io.FileNotFoundException;
 
 import tw.skyarrow.ehreader.model.DaoMaster;
@@ -20,16 +18,13 @@ import tw.skyarrow.ehreader.model.Photo;
 import tw.skyarrow.ehreader.model.PhotoDao;
 import tw.skyarrow.ehreader.util.DatabaseHelper;
 
-/**
- * Created by SkyArrow on 15/4/5.
- */
 public class PhotoProvider extends ContentProvider {
     public static final String AUTHORITY = "tw.skyarrow.ehreader.provider.PhotoProvider";
 
     private static UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     private static final int PHOTO_ID = 1;
 
-    public static final Uri PHOTO_URI = Uri.parse("content://" + AUTHORITY + "/photos");
+    public static final Uri URI = Uri.parse("content://" + AUTHORITY + "/photos");
 
     private PhotoDao photoDao;
 

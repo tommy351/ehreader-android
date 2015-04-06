@@ -19,6 +19,7 @@ public class HistoryFragment extends GalleryListFragment {
         return new HistoryFragment();
     }
 
+    private SQLiteDatabase mDatabase;
     private GalleryDao galleryDao;
 
     @Override
@@ -26,8 +27,8 @@ public class HistoryFragment extends GalleryListFragment {
         super.onCreate(savedInstanceState);
 
         // Get database instance
-        SQLiteDatabase db = DatabaseHelper.getWritableDatabase(getActivity());
-        DaoMaster daoMaster = new DaoMaster(db);
+        mDatabase = DatabaseHelper.getReadableDatabase(getActivity());
+        DaoMaster daoMaster = new DaoMaster(mDatabase);
         DaoSession daoSession = daoMaster.newSession();
         galleryDao = daoSession.getGalleryDao();
     }
@@ -35,6 +36,8 @@ public class HistoryFragment extends GalleryListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        getSwipeRefreshLayout().setEnabled(false);
 
         // Set toolbar title
         ActionBarActivity activity = (ActionBarActivity) getActivity();
@@ -47,5 +50,11 @@ public class HistoryFragment extends GalleryListFragment {
             addGalleryList(qb.list());
             notifyDataSetChanged();
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        mDatabase.close();
+        super.onDestroy();
     }
 }

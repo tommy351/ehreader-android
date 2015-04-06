@@ -11,6 +11,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +34,9 @@ public abstract class GalleryListFragment extends Fragment implements RecyclerVi
 
     @InjectView(R.id.container)
     SwipeRefreshLayout mSwipeLayout;
+
+    @InjectView(R.id.loading)
+    ProgressBar mLoadingView;
 
     private List<Gallery> mGalleryList;
     private GalleryListAdapter mListAdapter;
@@ -116,6 +120,10 @@ public abstract class GalleryListFragment extends Fragment implements RecyclerVi
         return mListAdapter;
     }
 
+    protected ProgressBar getLoadingView(){
+        return mLoadingView;
+    }
+
     @Override
     public void onItemClick(View childView, int position) {
         if (mGalleryList == null || position >= mGalleryList.size()) return;
@@ -143,5 +151,9 @@ public abstract class GalleryListFragment extends Fragment implements RecyclerVi
 
     public void onScrollToBottom(){
         //
+    }
+
+    public boolean isLoading(){
+        return mListAdapter.isLoading();
     }
 }

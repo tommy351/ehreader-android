@@ -44,6 +44,8 @@
 
     <string name="toast_added_to_favorites">Added to favorites</string>
     <string name="toast_removed_from_favorites">Removed from favorites</string>
+    <string name="toast_bookmark_added">Bookmark added</string>
+    <string name="toast_bookmark_removed">Bookmark removed</string>
 
     <string name="label_settings">Settings</string>
     <string name="label_latest">Latest</string>
