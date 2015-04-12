@@ -1,0 +1,8 @@
+<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_menu"
+    android:layout_width="@dimen/drawer_width"
+    android:layout_height="match_parent"
+    android:background="@color/drawer_background"
+    android:clickable="true"
+    android:scrollbars="vertical"
+    android:elevation="@dimen/drawer_elevation"/>

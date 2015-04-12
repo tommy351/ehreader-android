@@ -1,4 +1,0 @@
-<ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="@color/read_btn_background_pressed">
-    <item android:drawable="@drawable/btn_read_background_normal"/>
-</ripple>

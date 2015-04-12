@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "tw.skyarrow.ehreader"
-        minSdkVersion 15
+        minSdkVersion 14
         targetSdkVersion 22
         versionCode 10
         versionName "1.0.0"
@@ -17,19 +17,27 @@ android {
     buildTypes {
         release {
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            // Library specific proguard files
+            proguardFile 'proguard-butterknife.pro'
+            proguardFile 'proguard-eventbus.pro'
+            proguardFile 'proguard-greendao.pro'
+            proguardFile 'proguard-support-v7-appcompat.pro'
+
+            // Default proguard files
+            proguardFile 'proguard-project.pro'
+            proguardFile getDefaultProguardFile('proguard-android.txt')
+        }
+
+        debug {
+            applicationIdSuffix '.dev'
+            versionNameSuffix '-dev'
         }
     }
 
     sourceSets {
         main {
-            manifest.srcFile 'AndroidManifest.xml'
-            java.srcDirs = ['src', 'src-gen']
-            resources.srcDirs = ['src']
-            aidl.srcDirs = ['src']
-            renderscript.srcDirs = ['src']
-            res.srcDirs = ['res']
-            assets.srcDirs = ['assets']
+            java.srcDirs += 'src-gen'
         }
 
         instrumentTest {
@@ -54,4 +62,5 @@ dependencies {
     compile 'com.github.zafarkhaja:java-semver:0.9.0'
     compile 'com.jakewharton:disklrucache:2.0.2'
     compile 'com.jakewharton:butterknife:6.1.0'
+    compile 'de.hdodenhof:circleimageview:1.2.2'
 }

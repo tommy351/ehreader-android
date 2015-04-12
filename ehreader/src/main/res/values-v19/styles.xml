@@ -1,0 +1,14 @@
+<resources>
+    <style name="AppTheme.Main" parent="AppTheme.Main.Base">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <style name="AppTheme.Photo" parent="AppTheme.Photo.Base">
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+
+    <style name="AppTheme.Login" parent="AppTheme.Login.Base">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+</resources>
