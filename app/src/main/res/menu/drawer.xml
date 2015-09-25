@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/drawer_item_gallery"
+            android:title="Gallery"/>
+        <item android:id="@+id/drawer_item_favorites"
+            android:title="Favorites"/>
+        <item android:id="@+id/drawer_item_history"
+            android:title="History"/>
+        <item android:id="@+id/drawer_item_download"
+            android:title="Download"/>
+    </group>
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/drawer_item_settings"
+            android:title="Settings"/>
+    </group>
+</menu>
