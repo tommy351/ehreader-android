@@ -5,13 +5,12 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Created by SkyArrow on 2015/9/24.
  */
-public class GalleryDataRequest {
-    private final String method;
+public class GalleryDataRequest extends APIRequest {
     @SerializedName("gidlist")
     private GalleryId[] list;
 
-    public GalleryDataRequest(){
-        this.method = "gdata";
+    public GalleryDataRequest() {
+        setMethod("gdata");
     }
 
     public GalleryDataRequest(GalleryId[] list) {

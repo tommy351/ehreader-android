@@ -5,12 +5,18 @@ import com.google.gson.JsonPrimitive;
 
 import java.util.Date;
 
+import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
 
 /**
  * Created by SkyArrow on 2015/9/24.
  */
 public abstract class GalleryBase {
+    public GalleryBase(){
+        setStarred(false);
+        setProgress(0);
+    }
+
     public static final int CATEGORY_DOUJINSHI = 1;
     public static final int CATEGORY_MANGA = 2;
     public static final int CATEGORY_ARTISTCG = 3;
@@ -58,24 +64,39 @@ public abstract class GalleryBase {
     public abstract String getTags();
     public abstract void setTags(String tags);
 
+    public abstract Boolean getStarred();
+    public abstract void setStarred(Boolean starred);
+
+    public abstract Date getLastread();
+    public abstract void setLastread(Date lastread);
+
+    public abstract Integer getProgress();
+    public abstract void setProgress(Integer progress);
+
+    public abstract String getShowkey();
+    public abstract void setShowkey(String showkey);
+
+    public abstract Integer getPhotoPerPage();
+    public abstract void setPhotoPerPage(Integer photoPerPage);
+
     public void setCategory(String category) {
-        if (category.equals("Doujinshi")){
+        if (category.equals("Doujinshi")) {
             setCategory(CATEGORY_DOUJINSHI);
-        } else if (category.equals("Manga")){
+        } else if (category.equals("Manga")) {
             setCategory(CATEGORY_MANGA);
-        } else if (category.equals("Artist CG Sets")){
+        } else if (category.equals("Artist CG Sets")) {
             setCategory(CATEGORY_ARTISTCG);
-        } else if (category.equals("Game CG Sets")){
+        } else if (category.equals("Game CG Sets")) {
             setCategory(CATEGORY_GAMECG);
-        } else if (category.equals("Western")){
+        } else if (category.equals("Western")) {
             setCategory(CATEGORY_WESTERN);
-        } else if (category.equals("Non-H")){
+        } else if (category.equals("Non-H")) {
             setCategory(CATEGORY_NON_H);
-        } else if (category.equals("Image Sets")){
+        } else if (category.equals("Image Sets")) {
             setCategory(CATEGORY_IMAGESET);
-        } else if (category.equals("Cosplay")){
+        } else if (category.equals("Cosplay")) {
             setCategory(CATEGORY_COSPLAY);
-        } else if (category.equals("Asian Porn")){
+        } else if (category.equals("Asian Porn")) {
             setCategory(CATEGORY_ASIANPORN);
         } else {
             setCategory(CATEGORY_MISC);
@@ -107,7 +128,7 @@ public abstract class GalleryBase {
         }
     }
 
-    public int getCategoryColor(){
+    public int getCategoryColor() {
         switch (getCategory()) {
             case CATEGORY_DOUJINSHI:
                 return R.color.category_doujinshi;
@@ -132,13 +153,34 @@ public abstract class GalleryBase {
         }
     }
 
-    public void setTags(String[] tags){
+    public void setTags(String[] tags) {
         JsonArray arr = new JsonArray();
 
-        for (String tag : tags){
+        for (String tag : tags) {
             arr.add(new JsonPrimitive(tag));
         }
 
         setTags(arr.toString());
+    }
+
+    public String getUrl(){
+        return Constant.BASE_URL + String.format(Constant.GALLERY_URL, getId(), getToken());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o instanceof GalleryBase){
+            GalleryBase gallery = (GalleryBase) o;
+            return getId().equals(gallery.getId());
+        }
+
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return getId().intValue();
     }
 }

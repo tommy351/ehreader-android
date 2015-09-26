@@ -7,5 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
  */
 public interface BaseMigration {
     void up(SQLiteDatabase db);
+
     void down(SQLiteDatabase db);
 }

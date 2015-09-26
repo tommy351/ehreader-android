@@ -2,6 +2,7 @@ package tw.skyarrow.ehreader.app.entry;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,8 +11,9 @@ import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -22,10 +24,12 @@ import tw.skyarrow.ehreader.model.Gallery;
  * Created by SkyArrow on 2015/9/25.
  */
 public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.ViewHolder> {
+    private static final Pattern pThumbUrl = Pattern.compile("(\\d+)-(\\d+)-\\w+_l\\.jpg$");
+
     private Context context;
     private List<Gallery> list;
 
-    public GalleryListAdapter(Context context, List<Gallery> list){
+    public GalleryListAdapter(Context context, List<Gallery> list) {
         this.context = context;
         this.list = list;
     }
@@ -39,8 +43,22 @@ public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Gallery gallery = list.get(position);
+        String thumb = gallery.getThumbnail();
+        Matcher matcher = pThumbUrl.matcher(thumb);
+
+        if (matcher.find()) {
+            int width = Integer.parseInt(matcher.group(1), 10);
+            int height = Integer.parseInt(matcher.group(2), 10);
+            holder.cover.setAspectRatio((float) width / height);
+        } else {
+            holder.cover.setAspectRatio(1f);
+        }
+
         holder.title.setText(gallery.getTitle());
-        holder.cover.setImageURI(Uri.parse(gallery.getThumbnail()));
+        holder.cover.setImageURI(Uri.parse(thumb));
+        holder.category.setText(gallery.getCategoryString());
+        holder.category.setTextColor(ContextCompat.getColor(context, gallery.getCategoryColor()));
+        holder.count.setText(String.format("%dP", gallery.getCount()));
     }
 
     @Override
@@ -60,6 +78,12 @@ public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.
 
         @InjectView(R.id.title)
         TextView title;
+
+        @InjectView(R.id.category)
+        TextView category;
+
+        @InjectView(R.id.count)
+        TextView count;
 
         public ViewHolder(View itemView) {
             super(itemView);

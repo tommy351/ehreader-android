@@ -37,7 +37,6 @@ android {
             proguardFile 'proguard-appcompat.pro'
             proguardFile 'proguard-butterknife.pro'
             proguardFile 'proguard-crashlytics.pro'
-            proguardFile 'proguard-eventbus.pro'
             proguardFile 'proguard-fresco.pro'
             proguardFile 'proguard-greendao.pro'
             proguardFile 'proguard-mopub.pro'
@@ -77,7 +76,6 @@ dependencies {
     compile 'com.android.support:preference-v7:23.0.1'
     compile 'com.android.support:preference-v14:23.0.1'
     compile 'de.greenrobot:greendao:2.0.0'
-    compile 'de.greenrobot:eventbus:2.4.0'
     compile 'com.jakewharton:butterknife:6.1.0'
     compile 'com.google.code.gson:gson:2.3.1'
     compile 'com.squareup.retrofit:retrofit:2.0.0-beta1'
@@ -85,6 +83,10 @@ dependencies {
     compile 'com.facebook.fresco:fresco:0.7.0'
     compile 'com.squareup.okhttp:okhttp:2.5.0'
     compile 'com.facebook.fresco:imagepipeline-okhttp:0.7.0'
+    compile 'com.squareup.retrofit:adapter-rxjava:2.0.0-beta1'
+    compile 'io.reactivex:rxjava:1.0.14'
+    compile 'io.reactivex:rxandroid:1.0.1'
+    compile 'org.jsoup:jsoup:1.8.3'
 
     compile('com.crashlytics.sdk.android:crashlytics:2.5.2@aar') {
         transitive = true;

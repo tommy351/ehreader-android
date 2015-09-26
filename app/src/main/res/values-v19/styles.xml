@@ -2,4 +2,9 @@
     <style name="AppTheme" parent="AppTheme.Base">
         <item name="android:windowTranslucentStatus">true</item>
     </style>
+
+    <style name="AppTheme.Photo" parent="AppTheme.Photo.Base">
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
 </resources>

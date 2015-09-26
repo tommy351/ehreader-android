@@ -8,6 +8,7 @@ import com.google.gson.GsonBuilder;
 
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
+import retrofit.RxJavaCallAdapterFactory;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.model.GalleryId;
 import tw.skyarrow.ehreader.model.GalleryIdTypeAdapter;
@@ -24,11 +25,12 @@ public class API {
 
     private APIService service;
 
-    public API(Context context){
+    public API(Context context) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Constant.BASE_URL)
                 .addConverter(String.class, new StringConverter())
                 .addConverterFactory(GsonConverterFactory.create(gson))
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
 
 //        retrofit.client().interceptors().add(new APIInterceptor(context));
@@ -36,11 +38,11 @@ public class API {
         this.service = retrofit.create(APIService.class);
     }
 
-    public APIService getService(){
+    public APIService getService() {
         return service;
     }
 
-    public static APIService getService(Context context){
+    public static APIService getService(Context context) {
         return new API(context).getService();
     }
 }

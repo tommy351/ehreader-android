@@ -2,48 +2,42 @@ package tw.skyarrow.ehreader.app.entry;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import de.greenrobot.dao.query.QueryBuilder;
 import tw.skyarrow.ehreader.R;
-import tw.skyarrow.ehreader.api.API;
 import tw.skyarrow.ehreader.model.DaoSession;
 import tw.skyarrow.ehreader.model.Gallery;
 import tw.skyarrow.ehreader.model.GalleryDao;
 import tw.skyarrow.ehreader.util.DatabaseHelper;
+import tw.skyarrow.ehreader.view.RecyclerViewItemClickListener;
 
 /**
  * Created by SkyArrow on 2015/9/24.
  */
-public class FavoritesFragment extends Fragment {
+public class FavoritesFragment extends GalleryListFragment {
     @InjectView(R.id.list)
     RecyclerView recyclerView;
 
-    private List<Gallery> galleryList;
     private GalleryListAdapter listAdapter;
     private DatabaseHelper dbHelper;
     private GalleryDao galleryDao;
 
-    public static FavoritesFragment create(){
+    public static FavoritesFragment create() {
         return new FavoritesFragment();
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
 
-        galleryList = new ArrayList<>();
         dbHelper = DatabaseHelper.get(getActivity());
         DaoSession daoSession = dbHelper.open();
         galleryDao = daoSession.getGalleryDao();
@@ -52,7 +46,7 @@ public class FavoritesFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_gallery_list_web, container, false);
+        View view = inflater.inflate(R.layout.fragment_gallery_list, container, false);
         ButterKnife.inject(this, view);
 
         StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
@@ -61,6 +55,7 @@ public class FavoritesFragment extends Fragment {
         recyclerView.setAdapter(listAdapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addOnItemTouchListener(new RecyclerViewItemClickListener(getActivity(), this));
 
         return view;
     }
@@ -69,9 +64,15 @@ public class FavoritesFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if (savedInstanceState == null){
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        activity.getSupportActionBar().setTitle(R.string.label_favorites);
+
+        if (savedInstanceState == null) {
             QueryBuilder<Gallery> qb = galleryDao.queryBuilder();
             qb.where(GalleryDao.Properties.Starred.eq(true));
+            qb.orderDesc(GalleryDao.Properties.Lastread);
+            galleryList.addAll(qb.list());
+            listAdapter.notifyDataSetChanged();
         }
     }
 

@@ -11,7 +11,7 @@ import java.io.IOException;
  * Created by SkyArrow on 2015/9/24.
  */
 public class APIInterceptor implements Interceptor {
-    public APIInterceptor(Context context){
+    public APIInterceptor(Context context) {
         //
     }
 

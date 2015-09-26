@@ -1,13 +1,11 @@
 package tw.skyarrow.ehreader.api;
 
-import java.util.Map;
-
-import retrofit.Call;
 import retrofit.http.Body;
 import retrofit.http.GET;
 import retrofit.http.POST;
+import retrofit.http.Path;
 import retrofit.http.Query;
-import retrofit.http.QueryMap;
+import rx.Observable;
 import tw.skyarrow.ehreader.model.GalleryDataRequest;
 import tw.skyarrow.ehreader.model.GalleryDataResponse;
 
@@ -16,8 +14,14 @@ import tw.skyarrow.ehreader.model.GalleryDataResponse;
  */
 public interface APIService {
     @POST("api.php")
-    Call<GalleryDataResponse> getGalleryData(@Body GalleryDataRequest body);
+    Observable<GalleryDataResponse> getGalleryData(@Body GalleryDataRequest body);
 
     @GET("/")
-    Call<String> getIndex(@Query("page") int page);
+    Observable<String> getIndex(@Query("page") int page);
+
+    @GET("g/{id}/{token}")
+    Observable<String> getGalleryPage(@Path("id") long galleryId, @Path("token") String galleryToken, @Query("p") int page);
+
+    @GET("s/{token}/{id}-{page}")
+    Observable<String> getPhotoPage(@Path("id") long galleryId, @Path("token") String photoToken, @Path("page") int page);
 }

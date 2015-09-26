@@ -1,16 +1,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:checkableBehavior="single">
-        <item android:id="@+id/drawer_item_gallery"
-            android:title="Gallery"/>
+    <group android:checkableBehavior="none">
+        <item android:id="@+id/drawer_item_latest"
+            android:title="@string/drawer_item_latest"/>
         <item android:id="@+id/drawer_item_favorites"
-            android:title="Favorites"/>
+            android:title="@string/drawer_item_favorites"/>
         <item android:id="@+id/drawer_item_history"
-            android:title="History"/>
+            android:title="@string/drawer_item_history"/>
         <item android:id="@+id/drawer_item_download"
-            android:title="Download"/>
+            android:title="@string/drawer_item_downloads"/>
     </group>
-    <group android:checkableBehavior="single">
+    <group android:checkableBehavior="none">
         <item android:id="@+id/drawer_item_settings"
-            android:title="Settings"/>
+            android:title="@string/drawer_item_settings"/>
     </group>
 </menu>

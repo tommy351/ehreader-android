@@ -13,7 +13,7 @@ import tw.skyarrow.ehreader.BuildConfig;
  * Created by SkyArrow on 2015/9/25.
  */
 public class FabricHelper {
-    public static void setupFabric(Context context){
+    public static void setupFabric(Context context) {
         Crashlytics crashlytics = new Crashlytics.Builder()
                 .core(new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
                 .build();

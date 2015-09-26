@@ -13,8 +13,10 @@
         android:background="?attr/selectableItemBackground">
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/cover"
-            android:layout_width="100dp"
-            android:layout_height="100dp"/>
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:actualImageScaleType="fitCenter"
+            android:adjustViewBounds="true"/>
         <TextView
             android:id="@+id/category"
             android:layout_width="wrap_content"

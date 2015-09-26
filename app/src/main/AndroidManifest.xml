@@ -1,6 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="tw.skyarrow.ehreader"
-    android:installLocation="internalOnly">
+    package="tw.skyarrow.ehreader">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -18,12 +17,44 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".app.MainActivity">
+        <activity android:name=".app.entry.EntryActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <activity android:name=".app.gallery.GalleryActivity"
+            android:parentActivityName=".app.entry.EntryActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".app.entry.EntryActivity"/>
+        </activity>
+
+        <activity android:name=".app.photo.PhotoActivity"
+            android:parentActivityName=".app.gallery.GalleryActivity"
+            android:theme="@style/AppTheme.Photo"
+            android:screenOrientation="landscape">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".app.gallery.GalleryActivity"/>
+        </activity>
+
+        <activity android:name=".app.login.LoginActivity"/>
+
+        <service android:name=".service.PhotoFetchService"/>
+        
+        <service android:name=".auth.AuthenticatorService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator"/>
+        </service>
 
         <meta-data
             android:name="io.fabric.ApiKey"
