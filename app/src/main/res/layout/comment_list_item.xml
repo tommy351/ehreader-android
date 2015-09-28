@@ -1,19 +1,26 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="@dimen/margin_medium">
     <TextView
         android:id="@+id/author"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:text="Author"/>
     <TextView
         android:id="@+id/date"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_small"
+        android:text="2015/9/26"
+        android:textSize="@dimen/text_size_caption"/>
     <TextView
         android:id="@+id/content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:autoLink="all"/>
+        android:autoLink="all"
+        android:text="Content"
+        android:textSize="@dimen/text_size_body"/>
 </LinearLayout>

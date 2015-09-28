@@ -1,21 +1,18 @@
 package tw.skyarrow.ehreader.model;
 
+import android.content.Context;
 import android.text.TextUtils;
 
+import java.io.File;
 import java.util.List;
 
 import de.greenrobot.dao.query.QueryBuilder;
+import tw.skyarrow.ehreader.util.StorageHelper;
 
 /**
  * Created by SkyArrow on 2015/9/24.
  */
 public abstract class PhotoBase {
-    public PhotoBase() {
-        setBookmarked(false);
-        setDownloaded(false);
-        setInvalid(false);
-    }
-
     public abstract Long getId();
     public abstract void setId(Long id);
 
@@ -52,6 +49,12 @@ public abstract class PhotoBase {
     public abstract String getRetryId();
     public abstract void setRetryId(String retryId);
 
+    public void setDefaultFields(){
+        setBookmarked(false);
+        setDownloaded(false);
+        setInvalid(false);
+    }
+
     public static Photo findPhoto(PhotoDao photoDao, long galleryId, int photoPage){
         QueryBuilder<Photo> qb = photoDao.queryBuilder();
         qb.where(qb.and(
@@ -72,6 +75,17 @@ public abstract class PhotoBase {
 
     public boolean shouldReload() {
         return TextUtils.isEmpty(getSrc()) || getInvalid();
+    }
+
+    public File getFile(Context context){
+        String src = getSrc();
+
+        if (src == null) return null;
+
+        String filename = src.substring(src.lastIndexOf("/") + 1, src.length());
+        File downloadDir = StorageHelper.getDownloadDir(context);
+
+        return new File(downloadDir, getGalleryId() + File.separator + filename);
     }
 
     @Override

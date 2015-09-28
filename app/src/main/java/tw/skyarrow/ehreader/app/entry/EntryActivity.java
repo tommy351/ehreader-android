@@ -1,13 +1,18 @@
 package tw.skyarrow.ehreader.app.entry;
 
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -21,13 +26,13 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import tw.skyarrow.ehreader.R;
-import tw.skyarrow.ehreader.model.Download;
+import tw.skyarrow.ehreader.app.pref.PrefActivity;
 import tw.skyarrow.ehreader.util.FabricHelper;
 
 /**
  * Created by SkyArrow on 2015/9/24.
  */
-public class EntryActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class EntryActivity extends AppCompatActivity {
     public static final String EXTRA_TAB = "TAB";
 
     public static final int TAB_LATEST = 0;
@@ -38,13 +43,31 @@ public class EntryActivity extends AppCompatActivity implements NavigationView.O
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
 
-    @InjectView(R.id.drawer_layout)
-    DrawerLayout drawerLayout;
+    @InjectView(R.id.view_pager)
+    ViewPager viewPager;
 
-    @InjectView(R.id.nav_view)
-    NavigationView navigationView;
+    @InjectView(R.id.tab_layout)
+    TabLayout tabLayout;
 
-    ActionBarDrawerToggle drawerToggle;
+    @InjectView(R.id.coordinator)
+    CoordinatorLayout coordinatorLayout;
+
+    public static Intent intent(Context context, int tab){
+        Intent intent = new Intent(context, EntryActivity.class);
+        Bundle args = bundle(tab);
+
+        intent.putExtras(args);
+
+        return intent;
+    }
+
+    public static Bundle bundle(int tab){
+        Bundle bundle = new Bundle();
+
+        bundle.putLong(EXTRA_TAB, tab);
+
+        return bundle;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,43 +79,16 @@ public class EntryActivity extends AppCompatActivity implements NavigationView.O
 
         setSupportActionBar(toolbar);
 
-        ActionBar actionBar = getSupportActionBar();
-        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
-                R.string.menu_open_drawer, R.string.menu_close_drawer);
+        viewPager.setAdapter(new EntryPagerAdapter(getSupportFragmentManager()));
+        tabLayout.setupWithViewPager(viewPager);
 
-        drawerLayout.setDrawerListener(drawerToggle);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
-
-        navigationView.setNavigationItemSelectedListener(this);
-
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-        Fragment fragment = fm.findFragmentById(R.id.frame);
-
-        if (fragment != null) {
-            ft.attach(fragment);
-        } else {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            String launchPagePref = prefs.getString(getString(R.string.pref_launch_page), getString(R.string.pref_launch_page_default));
-            int tab = Integer.parseInt(launchPagePref, 10);
-
-            ft.replace(R.id.frame, getTabFragment(tab));
-        }
-
-        ft.commit();
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        drawerToggle.syncState();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        drawerToggle.onConfigurationChanged(newConfig);
+        Intent intent = getIntent();
+        Bundle args = intent.getExtras();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String launchPagePref = prefs.getString(getString(R.string.pref_launch_page), getString(R.string.pref_launch_page_default));
+        int defaultTab = Integer.parseInt(launchPagePref, 10);
+        int tab = args != null ? args.getInt(EXTRA_TAB, defaultTab) : defaultTab;
+        viewPager.setCurrentItem(tab, false);
     }
 
     @Override
@@ -103,84 +99,57 @@ public class EntryActivity extends AppCompatActivity implements NavigationView.O
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (drawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-
         switch (item.getItemId()){
             case R.id.action_search:
+                return true;
+
+            case R.id.action_settings:
+                showSettings();
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public boolean onNavigationItemSelected(MenuItem menuItem) {
-        boolean setBackStack = false;
-        Fragment fragment;
-
-        switch (menuItem.getItemId()){
-            case R.id.drawer_item_latest:
-                fragment = getTabFragment(TAB_LATEST);
-                break;
-
-            case R.id.drawer_item_favorites:
-                fragment = getTabFragment(TAB_FAVORITES);
-                break;
-
-            case R.id.drawer_item_history:
-                fragment = getTabFragment(TAB_HISTORY);
-                break;
-
-            case R.id.drawer_item_download:
-                fragment = getTabFragment(TAB_DOWNLOAD);
-                break;
-
-            case R.id.drawer_item_settings:
-                fragment = SettingFragment.create();
-                setBackStack = true;
-                break;
-
-            default:
-                return false;
-        }
-
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-
-        ft.replace(R.id.frame, fragment);
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-
-        if (setBackStack){
-            ft.addToBackStack(null);
-        }
-
-        ft.commit();
-        drawerLayout.closeDrawers();
-
-        return true;
+    private void showSettings(){
+        Intent intent = PrefActivity.intent(this);
+        startActivity(intent);
     }
 
-    private Fragment getTabFragment(int tab){
-        switch (tab){
-            case TAB_LATEST:
-                return WebFragment.create();
+    private class EntryPagerAdapter extends FragmentPagerAdapter {
+        private final String tabTitles[] = new String[]{"Latest", "Favorites", "History", "Downloads"};
 
-            case TAB_FAVORITES:
-                return FavoritesFragment.create();
-
-            case TAB_HISTORY:
-                return HistoryFragment.create();
-
-            case TAB_DOWNLOAD:
-                return DownloadListFragment.create();
+        public EntryPagerAdapter(FragmentManager fm) {
+            super(fm);
         }
 
-        return null;
-    }
+        @Override
+        public Fragment getItem(int position) {
+            switch (position){
+                case TAB_LATEST:
+                    return WebFragment.create();
 
-    public void setDrawerIndicatorEnabled(boolean enabled){
-        drawerToggle.setDrawerIndicatorEnabled(enabled);
+                case TAB_FAVORITES:
+                    return FavoritesFragment.create();
+
+                case TAB_HISTORY:
+                    return HistoryFragment.create();
+
+                case TAB_DOWNLOAD:
+                    return DownloadListFragment.create();
+            }
+
+            return null;
+        }
+
+        @Override
+        public int getCount() {
+            return 4;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return tabTitles[position];
+        }
     }
 }

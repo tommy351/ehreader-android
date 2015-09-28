@@ -29,7 +29,8 @@
             android:maxLines="1"
             android:ellipsize="end"
             android:text="Category"
-            android:layout_margin="@dimen/margin_small"/>
+            android:layout_margin="@dimen/margin_small"
+            android:textSize="@dimen/text_size_caption"/>
         <TextView
             android:id="@+id/count"
             android:layout_width="wrap_content"
@@ -39,7 +40,8 @@
             android:maxLines="1"
             android:text="30P"
             android:layout_below="@id/cover"
-            android:layout_margin="@dimen/margin_small"/>
+            android:layout_margin="@dimen/margin_small"
+            android:textSize="@dimen/text_size_caption"/>
         <TextView
             android:id="@+id/title"
             android:layout_width="wrap_content"

@@ -5,6 +5,7 @@ import android.content.Context;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.squareup.okhttp.OkHttpClient;
 
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
@@ -28,6 +29,7 @@ public class API {
     public API(Context context) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Constant.BASE_URL)
+                .client(getOkHttpClient(context))
                 .addConverter(String.class, new StringConverter())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
@@ -44,5 +46,11 @@ public class API {
 
     public static APIService getService(Context context) {
         return new API(context).getService();
+    }
+
+    public OkHttpClient getOkHttpClient(Context context){
+        OkHttpClient client = new OkHttpClient();
+
+        return client;
     }
 }

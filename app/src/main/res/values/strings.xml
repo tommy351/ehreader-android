@@ -47,6 +47,7 @@
     <string name="label_rating">Rating</string>
     <string name="label_tags">Tags</string>
     <string name="label_uploader">Uploader</string>
+    <string name="label_comments">Comments</string>
 
     <string-array name="main_menu">
         <item>Latest</item>

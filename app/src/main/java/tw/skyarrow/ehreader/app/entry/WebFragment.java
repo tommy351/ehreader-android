@@ -12,13 +12,13 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import rx.Observable;
-import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -32,6 +32,7 @@ import tw.skyarrow.ehreader.model.GalleryDao;
 import tw.skyarrow.ehreader.model.GalleryDataRequest;
 import tw.skyarrow.ehreader.model.GalleryId;
 import tw.skyarrow.ehreader.util.DatabaseHelper;
+import tw.skyarrow.ehreader.util.L;
 import tw.skyarrow.ehreader.view.InfiniteScrollListener;
 import tw.skyarrow.ehreader.view.RecyclerViewItemClickListener;
 
@@ -51,7 +52,7 @@ public class WebFragment extends GalleryListFragment implements InfiniteScrollLi
     private GalleryListAdapter listAdapter;
     private DatabaseHelper dbHelper;
     private GalleryDao galleryDao;
-    private BehaviorSubject<Integer> refreshSubject = BehaviorSubject.create();
+    private BehaviorSubject<Integer> subject;
     private Subscription subscription;
     private int currentPage = 0;
     private boolean fragmentCreated = false;
@@ -68,6 +69,7 @@ public class WebFragment extends GalleryListFragment implements InfiniteScrollLi
         dbHelper = DatabaseHelper.get(getActivity());
         DaoSession daoSession = dbHelper.open();
         galleryDao = daoSession.getGalleryDao();
+        subject = BehaviorSubject.create();
     }
 
     @Nullable
@@ -76,9 +78,16 @@ public class WebFragment extends GalleryListFragment implements InfiniteScrollLi
         View view = inflater.inflate(R.layout.fragment_gallery_list_web, container, false);
         ButterKnife.inject(this, view);
 
-        subscription = refreshSubject
+        subscription = subject
                 .distinct()
-                .subscribe(this::loadGalleryList);
+                .flatMap(this::loadGalleryList)
+                .debounce(100, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(g -> {
+                    refreshLayout.setRefreshing(false);
+                    listAdapter.notifyDataSetChanged();
+                }, L::e);
 
         StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         listAdapter = new GalleryListAdapter(getActivity(), galleryList);
@@ -87,7 +96,7 @@ public class WebFragment extends GalleryListFragment implements InfiniteScrollLi
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addOnItemTouchListener(new RecyclerViewItemClickListener(getActivity(), this));
-        refreshLayout.setOnRefreshListener(() -> refreshSubject.onNext(0));
+        refreshLayout.setOnRefreshListener(() -> subject.onNext(0));
         //recyclerView.addOnScrollListener(new InfiniteScrollListener(this));
 
         return view;
@@ -97,15 +106,12 @@ public class WebFragment extends GalleryListFragment implements InfiniteScrollLi
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
-        activity.getSupportActionBar().setTitle(R.string.label_latest);
-
         if (!fragmentCreated) {
             fragmentCreated = true;
 
             refreshLayout.post(() -> {
                 refreshLayout.setRefreshing(true);
-                refreshSubject.onNext(0);
+                subject.onNext(0);
             });
         }
     }
@@ -122,16 +128,20 @@ public class WebFragment extends GalleryListFragment implements InfiniteScrollLi
         super.onDestroy();
     }
 
-    private void loadGalleryList(int page) {
-        api.getIndex(page)
+    private Observable<Gallery> loadGalleryList(int page){
+        L.d("loadGalleryList: %d", page);
+
+        return api.getIndex(page)
                 .flatMap(html -> {
                     List<GalleryId> list = new ArrayList<>();
                     Matcher matcher = pGalleryUrl.matcher(html);
 
                     while (matcher.find()) {
                         long id = Long.parseLong(matcher.group(1), 10);
-                        GalleryId galleryId = new GalleryId(id, matcher.group(2));
-                        list.add(galleryId);
+                        String token = matcher.group(2);
+
+                        L.d("Gallery found: %d - %s", id, token);
+                        list.add(new GalleryId(id, token));
                     }
 
                     GalleryId[] arr = list.toArray(new GalleryId[list.size()]);
@@ -141,10 +151,13 @@ public class WebFragment extends GalleryListFragment implements InfiniteScrollLi
                 })
                 .flatMap(res -> Observable.from(res.getData()))
                 .map(metaData -> {
+                    L.d("Gallery data retrieved: %d", metaData.getId());
+
                     Gallery gallery = galleryDao.load(metaData.getId());
 
                     if (gallery == null) {
                         gallery = new Gallery();
+                        gallery.setDefaultFields();
                     }
 
                     gallery.setId(metaData.getId());
@@ -165,33 +178,13 @@ public class WebFragment extends GalleryListFragment implements InfiniteScrollLi
 
                     return gallery;
                 })
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Gallery>() {
-                    @Override
-                    public void onCompleted() {
-                        currentPage++;
-                        listAdapter.notifyDataSetChanged();
-                        refreshLayout.setRefreshing(false);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-                        refreshLayout.setRefreshing(false);
-                    }
-
-                    @Override
-                    public void onNext(Gallery gallery) {
-
-                    }
-                });
+                .doOnCompleted(() -> currentPage++);
     }
 
     @Override
     public void onScrollToEnd() {
         if (galleryList.isEmpty() || galleryList.size() < 25) return;
 
-        refreshSubject.onNext(currentPage);
+        subject.onNext(currentPage);
     }
 }

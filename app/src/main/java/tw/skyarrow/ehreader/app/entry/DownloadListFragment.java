@@ -1,7 +1,9 @@
 package tw.skyarrow.ehreader.app.entry;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,18 +16,30 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import de.greenrobot.dao.query.QueryBuilder;
+import rx.Subscription;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.app.gallery.GalleryActivity;
+import tw.skyarrow.ehreader.model.DaoSession;
 import tw.skyarrow.ehreader.model.Download;
+import tw.skyarrow.ehreader.model.DownloadDao;
+import tw.skyarrow.ehreader.model.Gallery;
+import tw.skyarrow.ehreader.service.GalleryDownloadService;
+import tw.skyarrow.ehreader.util.DatabaseHelper;
+import tw.skyarrow.ehreader.view.RecyclerViewItemClickListener;
 
 /**
  * Created by SkyArrow on 2015/9/24.
  */
-public class DownloadListFragment extends GalleryListFragment {
+public class DownloadListFragment extends Fragment implements RecyclerViewItemClickListener.OnItemClickListener {
     @InjectView(R.id.list)
     RecyclerView recyclerView;
 
     private DownloadListAdapter listAdapter;
     private List<Download> downloadList;
+    private DatabaseHelper dbHelper;
+    private DownloadDao downloadDao;
+    private Subscription subscription;
 
     public static DownloadListFragment create(){
         return new DownloadListFragment();
@@ -34,7 +48,11 @@ public class DownloadListFragment extends GalleryListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
 
+        dbHelper = DatabaseHelper.get(getActivity());
+        DaoSession daoSession = dbHelper.open();
+        downloadDao = daoSession.getDownloadDao();
         downloadList = new ArrayList<>();
     }
 
@@ -50,6 +68,14 @@ public class DownloadListFragment extends GalleryListFragment {
         recyclerView.setAdapter(listAdapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addOnItemTouchListener(new RecyclerViewItemClickListener(getActivity(), this));
+
+        subscription = GalleryDownloadService.getBus()
+                .subscribe(download -> {
+                    int index = downloadList.indexOf(download);
+                    downloadList.set(index, download);
+                    listAdapter.notifyItemChanged(index);
+                });
 
         return view;
     }
@@ -58,7 +84,36 @@ public class DownloadListFragment extends GalleryListFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
-        activity.getSupportActionBar().setTitle(R.string.label_downloads);
+        if (savedInstanceState == null){
+            QueryBuilder<Download> qb = downloadDao.queryBuilder();
+            qb.orderDesc(DownloadDao.Properties.Created);
+            downloadList.addAll(qb.list());
+            listAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        dbHelper.close();
+        super.onDestroy();
+    }
+
+    @Override
+    public void onDestroyView() {
+        subscription.unsubscribe();
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onItemClick(View view, int position) {
+        Download download = downloadList.get(position);
+        Intent intent = GalleryActivity.intent(getActivity(), download.getId());
+
+        startActivity(intent);
+    }
+
+    @Override
+    public void onItemLongPress(View view, int position) {
+
     }
 }

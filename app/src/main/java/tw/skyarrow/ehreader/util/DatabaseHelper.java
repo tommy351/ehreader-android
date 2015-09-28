@@ -2,7 +2,6 @@ package tw.skyarrow.ehreader.util;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,8 +16,6 @@ import tw.skyarrow.ehreader.model.DaoSession;
  * Created by SkyArrow on 2015/9/24.
  */
 public class DatabaseHelper extends DaoMaster.OpenHelper {
-    public static final String TAG = DatabaseHelper.class.getSimpleName();
-
     private static final String DB_NAME = "ehreader.db";
 
     private static DatabaseHelper instance;
@@ -72,7 +69,7 @@ public class DatabaseHelper extends DaoMaster.OpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVer, int newVer) {
-        Log.d(TAG, String.format("Upgrading tables from schema version %d to %d", oldVer, newVer));
+        L.d("Upgrading tables from schema version %d to %d", oldVer, newVer);
 
         for (int i = oldVer; i <= newVer; i++) {
             if (migrations.containsKey(i)) {
@@ -83,7 +80,7 @@ public class DatabaseHelper extends DaoMaster.OpenHelper {
 
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVer, int newVer) {
-        Log.d(TAG, String.format("Downgrading tables from schema version %d to %d", oldVer, newVer));
+        L.d("Downgrading tables from schema version %d to %d", oldVer, newVer);
 
         for (int i = oldVer + 1; i > newVer; i--) {
             if (migrations.containsKey(i)) {

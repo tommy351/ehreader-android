@@ -24,6 +24,12 @@ public abstract class DownloadBase {
     public abstract Date getCreated();
     public abstract void setCreated(Date created);
 
+    public void setDefaultFields(){
+        setStatus(STATUS_PENDING);
+        setProgress(0);
+        setCreated(new Date(System.currentTimeMillis()));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

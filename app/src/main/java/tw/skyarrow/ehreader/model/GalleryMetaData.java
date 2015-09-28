@@ -50,7 +50,7 @@ public class GalleryMetaData {
     }
 
     public Date getPosted() {
-        return new Date(Integer.valueOf(posted) * 1000);
+        return new Date(Long.valueOf(posted) * 1000);
     }
 
     public float getRating() {

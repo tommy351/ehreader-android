@@ -30,7 +30,9 @@ import de.greenrobot.dao.query.QueryBuilder;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.app.gallery.GalleryActivity;
 import tw.skyarrow.ehreader.model.DaoSession;
 import tw.skyarrow.ehreader.model.Gallery;
 import tw.skyarrow.ehreader.model.GalleryDao;
@@ -39,6 +41,7 @@ import tw.skyarrow.ehreader.model.PhotoDao;
 import tw.skyarrow.ehreader.service.PhotoFetchService;
 import tw.skyarrow.ehreader.util.DatabaseHelper;
 import tw.skyarrow.ehreader.util.FabricHelper;
+import tw.skyarrow.ehreader.util.L;
 import tw.skyarrow.ehreader.util.ToolbarHelper;
 
 /**
@@ -64,17 +67,26 @@ public class PhotoActivity extends AppCompatActivity implements View.OnSystemUiV
     private Gallery gallery;
     private PhotoListAdapter listAdapter;
     private Map<Integer, Photo> photoMap;
-    private Subscription subscription;
     private View decorView;
     private Handler systemUIHandler;
     private LinearLayoutManager layoutManager;
+    private CompositeSubscription subscriptions;
 
     public static Intent intent(Context context, long galleryId){
         Intent intent = new Intent(context, PhotoActivity.class);
+        Bundle args = bundle(galleryId);
 
-        intent.putExtra(GALLERY_ID, galleryId);
+        intent.putExtras(args);
 
         return intent;
+    }
+
+    public static Bundle bundle(long galleryId){
+        Bundle bundle = new Bundle();
+
+        bundle.putLong(GALLERY_ID, galleryId);
+
+        return bundle;
     }
 
     @Override
@@ -87,6 +99,8 @@ public class PhotoActivity extends AppCompatActivity implements View.OnSystemUiV
 
         Intent intent = getIntent();
         galleryId = intent.getLongExtra(GALLERY_ID, 0);
+        subscriptions = new CompositeSubscription();
+
         dbHelper = DatabaseHelper.get(this);
         DaoSession daoSession = dbHelper.open();
         galleryDao = daoSession.getGalleryDao();
@@ -102,18 +116,36 @@ public class PhotoActivity extends AppCompatActivity implements View.OnSystemUiV
             photoMap.put(photo.getPage(), photo);
         }
 
-        subscription = PhotoFetchService.getPhotoBus()
+        Subscription subscription = PhotoFetchService.getBus()
+                .filter(photo -> photo.getGalleryId() == galleryId)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(photo -> {
+                    L.d("Received PhotoFetchService event: %d - %d", photo.getGalleryId(), photo.getPage());
+
                     photoMap.put(photo.getPage(), photo);
                     listAdapter.notifyDataSetChanged();
-                });
+                }, L::e);
+
+        subscriptions.add(subscription);
 
         setupActionBar();
 
         layoutManager = new LinearLayoutManager(this);
         listAdapter = new PhotoListAdapter(this, gallery, photoMap);
+
+        subscription = listAdapter.getEventBus()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(event -> {
+                    Photo photo = event.photo;
+                    photo.setInvalid(true);
+                    photoDao.updateInTx(photo);
+                    photoMap.put(photo.getPage(), photo);
+                    listAdapter.notifyItemChanged(photo.getPage() - 1);
+                }, L::e);
+
+        subscriptions.add(subscription);
         recyclerView.setAdapter(listAdapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
@@ -123,7 +155,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnSystemUiV
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
-                ToolbarHelper.upNavigation(this);
+                ToolbarHelper.upNavigation(this, GalleryActivity.bundle(galleryId));
                 return true;
         }
 
@@ -141,7 +173,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnSystemUiV
 
     @Override
     protected void onDestroy() {
-        subscription.unsubscribe();
+        subscriptions.unsubscribe();
         dbHelper.close();
         super.onDestroy();
     }

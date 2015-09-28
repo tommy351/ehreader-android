@@ -12,11 +12,6 @@ import tw.skyarrow.ehreader.R;
  * Created by SkyArrow on 2015/9/24.
  */
 public abstract class GalleryBase {
-    public GalleryBase(){
-        setStarred(false);
-        setProgress(0);
-    }
-
     public static final int CATEGORY_DOUJINSHI = 1;
     public static final int CATEGORY_MANGA = 2;
     public static final int CATEGORY_ARTISTCG = 3;
@@ -165,6 +160,11 @@ public abstract class GalleryBase {
 
     public String getUrl(){
         return Constant.BASE_URL + String.format(Constant.GALLERY_URL, getId(), getToken());
+    }
+
+    public void setDefaultFields(){
+        setStarred(false);
+        setProgress(0);
     }
 
     @Override

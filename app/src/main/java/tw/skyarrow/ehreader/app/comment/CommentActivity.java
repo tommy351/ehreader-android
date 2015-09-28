@@ -1,14 +1,18 @@
-package tw.skyarrow.ehreader.app.gallery;
+package tw.skyarrow.ehreader.app.comment;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ProgressBar;
+
+import com.facebook.drawee.backends.pipeline.Fresco;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -30,20 +34,27 @@ import rx.schedulers.Schedulers;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.api.API;
 import tw.skyarrow.ehreader.api.APIService;
+import tw.skyarrow.ehreader.app.gallery.GalleryActivity;
 import tw.skyarrow.ehreader.model.Comment;
 import tw.skyarrow.ehreader.model.DaoSession;
 import tw.skyarrow.ehreader.model.Gallery;
 import tw.skyarrow.ehreader.model.GalleryDao;
 import tw.skyarrow.ehreader.util.DatabaseHelper;
+import tw.skyarrow.ehreader.util.FabricHelper;
+import tw.skyarrow.ehreader.util.L;
+import tw.skyarrow.ehreader.util.ToolbarHelper;
 
 /**
- * Created by SkyArrow on 2015/9/26.
+ * Created by SkyArrow on 2015/9/27.
  */
-public class GalleryCommentFragment extends Fragment {
-    private static final String GALLERY_ID = "GALLERY_ID";
+public class CommentActivity extends AppCompatActivity {
+    public static final String GALLERY_ID = "GALLERY_ID";
 
     // Posted on 26 September 2015, 01:36 UTC by:
     private static final SimpleDateFormat commentDateFormat = new SimpleDateFormat("'Posted on 'd MMMMM yyyy', 'HH:mm z' by:'", Locale.ENGLISH);
+
+    @InjectView(R.id.toolbar)
+    Toolbar toolbar;
 
     @InjectView(R.id.list)
     RecyclerView recyclerView;
@@ -51,71 +62,85 @@ public class GalleryCommentFragment extends Fragment {
     @InjectView(R.id.loading)
     ProgressBar progressBar;
 
-    private APIService api;
-    private CommentListAdapter listAdapter;
-    private List<Comment> commentList;
     private long galleryId;
     private DatabaseHelper dbHelper;
     private GalleryDao galleryDao;
     private Gallery gallery;
+    private APIService api;
+    private CommentListAdapter listAdapter;
+    private List<Comment> commentList;
 
-    public static GalleryCommentFragment create(long galleryId) {
-        GalleryCommentFragment fragment = new GalleryCommentFragment();
-        Bundle args = new Bundle();
+    public static Intent intent(Context context, long galleryId) {
+        Intent intent = new Intent(context, CommentActivity.class);
+        Bundle args = bundle(galleryId);
 
-        args.putLong(GALLERY_ID, galleryId);
-        fragment.setArguments(args);
+        intent.putExtras(args);
 
-        return fragment;
+        return intent;
+    }
+
+    public static Bundle bundle(long galleryId){
+        Bundle bundle = new Bundle();
+
+        bundle.putLong(GALLERY_ID, galleryId);
+
+        return bundle;
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
+        FabricHelper.setupFabric(this);
+        Fresco.initialize(this);
+        setContentView(R.layout.activity_comment);
+        ButterKnife.inject(this);
 
-        Bundle args = getArguments();
+        setSupportActionBar(toolbar);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(R.string.label_comments);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
+        Intent intent = getIntent();
+        Bundle args = intent.getExtras();
         galleryId = args.getLong(GALLERY_ID);
-        commentList = new ArrayList<>();
-        api = API.getService(getActivity());
-        dbHelper = DatabaseHelper.get(getActivity());
+        dbHelper = DatabaseHelper.get(this);
         DaoSession daoSession = dbHelper.open();
         galleryDao = daoSession.getGalleryDao();
         gallery = galleryDao.load(galleryId);
-    }
+        api = API.getService(this);
+        commentList = new ArrayList<>();
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_gallery_comment, container, false);
-        ButterKnife.inject(this, view);
-
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        listAdapter = new CommentListAdapter(getActivity(), commentList);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        listAdapter = new CommentListAdapter(this, commentList);
         recyclerView.setAdapter(listAdapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
 
-        return view;
+        loadCommentList();
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        if (savedInstanceState == null) {
-            loadCommentList();
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                ToolbarHelper.upNavigation(this, GalleryActivity.bundle(galleryId));
+                return true;
         }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
-    public void onDestroy() {
+    protected void onDestroy() {
         dbHelper.close();
         super.onDestroy();
     }
 
     private void loadCommentList(){
         progressBar.setVisibility(View.VISIBLE);
+
+        L.d("loadCommentList: %d", galleryId);
 
         api.getGalleryPage(galleryId, gallery.getToken(), 0)
                 .flatMap(html -> {
@@ -132,7 +157,7 @@ public class GalleryCommentFragment extends Fragment {
                         try {
                             comment.setDate(commentDateFormat.parse(dateText));
                         } catch (ParseException e){
-                            // Do nothing
+                            return Observable.error(e);
                         }
 
                         comment.setAuthor(header.child(0).text());
@@ -154,7 +179,7 @@ public class GalleryCommentFragment extends Fragment {
 
                     @Override
                     public void onError(Throwable e) {
-                        e.printStackTrace();
+                        L.e(e, "loadCommentList");
                         progressBar.setVisibility(View.GONE);
                     }
 

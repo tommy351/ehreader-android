@@ -1,4 +1,4 @@
-package tw.skyarrow.ehreader.app.gallery;
+package tw.skyarrow.ehreader.app.comment;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -19,7 +19,7 @@ import tw.skyarrow.ehreader.model.Comment;
  * Created by SkyArrow on 2015/9/26.
  */
 public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.ViewHolder> {
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+    private final static DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
 
     private Context context;
     private List<Comment> list;

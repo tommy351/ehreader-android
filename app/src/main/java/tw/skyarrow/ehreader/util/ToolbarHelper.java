@@ -1,10 +1,11 @@
 package tw.skyarrow.ehreader.util;
 
 import android.app.Activity;
-import android.app.TaskStackBuilder;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.support.v4.app.TaskStackBuilder;
 
 /**
  * Created by SkyArrow on 2015/9/26.

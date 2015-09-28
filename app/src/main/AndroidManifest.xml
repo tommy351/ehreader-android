@@ -8,6 +8,8 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18"/>
 
     <application
         android:allowBackup="true"
@@ -27,7 +29,8 @@
 
         <activity android:name=".app.gallery.GalleryActivity"
             android:parentActivityName=".app.entry.EntryActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Gallery">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".app.entry.EntryActivity"/>
@@ -42,9 +45,27 @@
                 android:value=".app.gallery.GalleryActivity"/>
         </activity>
 
+        <activity android:name=".app.pref.PrefActivity"
+            android:parentActivityName=".app.entry.EntryActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".app.entry.EntryActivity"/>
+        </activity>
+
+        <activity android:name=".app.comment.CommentActivity"
+            android:parentActivityName=".app.gallery.GalleryActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".app.gallery.GalleryActivity"/>
+        </activity>
+
         <activity android:name=".app.login.LoginActivity"/>
 
         <service android:name=".service.PhotoFetchService"/>
+
+        <service android:name=".service.GalleryDownloadService"/>
         
         <service android:name=".auth.AuthenticatorService"
             android:exported="false">
@@ -55,6 +76,8 @@
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator"/>
         </service>
+
+        <receiver android:name=".receiver.NetworkStateReceiver"/>
 
         <meta-data
             android:name="io.fabric.ApiKey"

@@ -64,9 +64,6 @@ public class FavoritesFragment extends GalleryListFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
-        activity.getSupportActionBar().setTitle(R.string.label_favorites);
-
         if (savedInstanceState == null) {
             QueryBuilder<Gallery> qb = galleryDao.queryBuilder();
             qb.where(GalleryDao.Properties.Starred.eq(true));

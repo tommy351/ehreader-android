@@ -1,5 +1,5 @@
 <resources>
-    <style name="AppTheme" parent="AppTheme.Base">
+    <style name="AppTheme.Gallery" parent="AppTheme.Gallery.Base">
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 

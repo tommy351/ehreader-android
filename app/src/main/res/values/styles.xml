@@ -13,6 +13,10 @@
 
     <style name="AppTheme" parent="AppTheme.Base"/>
 
+    <style name="AppTheme.Gallery.Base" parent="AppTheme"/>
+
+    <style name="AppTheme.Gallery" parent="AppTheme.Gallery.Base"/>
+
     <style name="AppTheme.Photo.Base" parent="Theme.AppCompat">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
