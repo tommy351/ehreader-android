@@ -48,9 +48,10 @@ public class DownloadListAdapter extends RecyclerView.Adapter<DownloadListAdapte
         Gallery gallery = download.getGallery();
         int progress = download.getProgress();
         int total = gallery.getCount();
+        String[] titles = gallery.getPreferredTitles(context);
 
         holder.cover.setImageURI(Uri.parse(gallery.getThumbnail()));
-        holder.title.setText(gallery.getTitle());
+        holder.title.setText(titles[0]);
         holder.progressBar.setIndeterminate(false);
         holder.progressBar.setMax(total);
         holder.progressBar.setProgress(progress);

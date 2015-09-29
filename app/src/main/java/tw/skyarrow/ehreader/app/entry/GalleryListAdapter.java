@@ -46,6 +46,7 @@ public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.
         Gallery gallery = list.get(position);
         String thumb = gallery.getThumbnail();
         Matcher matcher = pThumbUrl.matcher(thumb);
+        String[] titles = gallery.getPreferredTitles(context);
 
         if (matcher.find()) {
             int width = Integer.parseInt(matcher.group(1), 10);
@@ -55,7 +56,7 @@ public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.
             holder.cover.setAspectRatio(1f);
         }
 
-        holder.title.setText(gallery.getTitle());
+        holder.title.setText(titles[0]);
         holder.cover.setImageURI(Uri.parse(thumb));
         holder.category.setText(gallery.getCategoryString());
         holder.category.setTextColor(ContextCompat.getColor(context, gallery.getCategoryColor()));

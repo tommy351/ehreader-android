@@ -1,5 +1,10 @@
 package tw.skyarrow.ehreader.model;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.text.TextUtils;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 
@@ -165,6 +170,23 @@ public abstract class GalleryBase {
 
     public String getUrl(){
         return Constant.BASE_URL + String.format(Constant.GALLERY_URL, getId(), getToken());
+    }
+
+    public String[] getPreferredTitles(Context context){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean displayJapaneseTitle = preferences.getBoolean(context.getString(R.string.pref_japanese_title),
+                context.getResources().getBoolean(R.bool.pref_japanese_title_default));
+        String title = getTitle();
+        String subtitle = getSubtitle();
+
+        if (displayJapaneseTitle && !TextUtils.isEmpty(subtitle)) {
+            title = getSubtitle();
+            subtitle = getTitle();
+        }
+
+        String[] arr = {title, subtitle};
+
+        return arr;
     }
 
     public void setDefaultFields(){

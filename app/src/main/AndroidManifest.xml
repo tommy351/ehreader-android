@@ -107,18 +107,18 @@
 
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="6a709f4dfa8b2c5ca5aae34378af9b1a5c4564f6" />
+            android:value="6a709f4dfa8b2c5ca5aae34378af9b1a5c4564f6"/>
         <activity
             android:name="com.mopub.mobileads.MoPubActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
         <activity
             android:name="com.mopub.mobileads.MraidActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
         <activity
             android:name="com.mopub.common.MoPubBrowser"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
         <activity
             android:name="com.mopub.mobileads.MraidVideoPlayerActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
     </application>
 </manifest>

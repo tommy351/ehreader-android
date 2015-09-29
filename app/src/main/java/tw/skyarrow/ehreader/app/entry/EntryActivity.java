@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.mopub.mobileads.MoPubView;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -47,6 +48,9 @@ public class EntryActivity extends AppCompatActivity {
 
     @InjectView(R.id.coordinator)
     CoordinatorLayout coordinatorLayout;
+
+    @InjectView(R.id.mopub_banner)
+    MoPubView moPubView;
 
     public static Intent intent(Context context, int tab){
         Intent intent = new Intent(context, EntryActivity.class);
@@ -85,6 +89,9 @@ public class EntryActivity extends AppCompatActivity {
         int defaultTab = Integer.parseInt(launchPagePref, 10);
         int tab = args != null ? args.getInt(EXTRA_TAB, defaultTab) : defaultTab;
         viewPager.setCurrentItem(tab, false);
+
+        moPubView.setAdUnitId(getString(R.string.mopub_ad_unit_id));
+        moPubView.loadAd();
     }
 
     @Override
@@ -106,6 +113,12 @@ public class EntryActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        moPubView.destroy();
+        super.onDestroy();
     }
 
     private void showSearch(){

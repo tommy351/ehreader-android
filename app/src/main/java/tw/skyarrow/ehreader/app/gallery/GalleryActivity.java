@@ -189,10 +189,12 @@ public class GalleryActivity extends AppCompatActivity {
     }
 
     private void loadGalleryInfo(){
-        titleText.setText(gallery.getTitle());
+        String[] titles = gallery.getPreferredTitles(this);
+
+        titleText.setText(titles[0]);
         ratingBar.setRating(gallery.getRating());
 
-        String subtitle = gallery.getSubtitle();
+        String subtitle = titles[1];
 
         if (TextUtils.isEmpty(subtitle)){
             subtitleText.setVisibility(View.GONE);
