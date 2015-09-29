@@ -18,7 +18,7 @@ import tw.skyarrow.ehreader.model.GalleryIdTypeAdapter;
  * Created by SkyArrow on 2015/9/24.
  */
 public class API {
-    public static final Gson gson = new GsonBuilder()
+    private static final Gson gson = new GsonBuilder()
             .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .registerTypeAdapter(GalleryId.class, new GalleryIdTypeAdapter())
@@ -52,5 +52,9 @@ public class API {
         OkHttpClient client = new OkHttpClient();
 
         return client;
+    }
+
+    public static Gson getGson() {
+        return gson;
     }
 }

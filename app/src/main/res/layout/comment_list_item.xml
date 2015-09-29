@@ -20,7 +20,7 @@
         android:id="@+id/content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:autoLink="all"
+        android:autoLink="web"
         android:text="Content"
         android:textSize="@dimen/text_size_body"/>
 </LinearLayout>

@@ -77,33 +77,57 @@
                 android:text="Subtitle"
                 android:layout_marginBottom="@dimen/margin_medium"
                 android:textSize="@dimen/text_size_body"/>
-            <RelativeLayout
+            <Button
+                android:id="@+id/read_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Read"
+                android:layout_gravity="right"/>
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical">
+                android:orientation="horizontal"
+                android:layout_marginTop="@dimen/margin_medium">
                 <RatingBar
                     android:id="@+id/rating"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:numStars="5"
                     android:stepSize="0.5"
                     android:isIndicator="true"
-                    style="?android:ratingBarStyleIndicator"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"/>
+                    style="?android:ratingBarStyleIndicator"/>
                 <Button
-                    android:id="@+id/read_btn"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/comment_btn"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Read"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true"/>
-            </RelativeLayout>
-            <Button
-                android:id="@+id/comment_btn"
-                android:layout_width="wrap_content"
+                    android:text="Comment"
+                    style="?attr/borderlessButtonStyle"
+                    android:layout_weight="1"/>
+            </LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Comment"/>
+                android:text="Uploader"
+                style="?android:attr/listSeparatorTextViewStyle"
+                android:layout_marginTop="@dimen/margin_medium"/>
+            <Button
+                android:id="@+id/uploader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="?attr/borderlessButtonStyle"
+                android:text="Uploader"
+                android:gravity="start"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tags"
+                style="?android:attr/listSeparatorTextViewStyle"
+                android:layout_marginTop="@dimen/margin_medium"/>
+            <TextView
+                android:id="@+id/tags"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 </android.support.design.widget.CoordinatorLayout>

@@ -1,14 +1,33 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/list"
+    android:layout_height="match_parent">
+    <tw.skyarrow.ehreader.view.ZoomView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="none"/>
+    </tw.skyarrow.ehreader.view.ZoomView>
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
-        android:scrollbars="none"/>
-    <include layout="@layout/toolbar"
-        android:fitsSystemWindows="true"/>
-</RelativeLayout>
+        android:fitsSystemWindows="true">
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#6000"
+            android:fitsSystemWindows="true"
+            android:animateLayoutChanges="true">
+            <include layout="@layout/toolbar"/>
+        </android.support.design.widget.AppBarLayout>
+        <SeekBar
+            android:id="@+id/seekbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:fitsSystemWindows="true"/>
+    </RelativeLayout>
+</FrameLayout>

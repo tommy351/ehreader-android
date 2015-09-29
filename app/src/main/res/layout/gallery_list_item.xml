@@ -51,5 +51,13 @@
             android:ellipsize="middle"
             android:text="Title"
             android:layout_margin="@dimen/margin_small"/>
+        <ImageView
+            android:id="@+id/favorite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/favorite_badge"
+            android:layout_margin="@dimen/margin_small"/>
     </RelativeLayout>
 </android.support.v7.widget.CardView>

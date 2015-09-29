@@ -3,7 +3,6 @@ package tw.skyarrow.ehreader.app.entry;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
@@ -12,7 +11,6 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,6 +40,8 @@ import tw.skyarrow.ehreader.view.RecyclerViewItemClickListener;
 public class WebFragment extends GalleryListFragment implements InfiniteScrollListener.ScrollListener {
     private static final Pattern pGalleryUrl = Pattern.compile("<a href=\"http://(?:g\\.e-|ex)hentai\\.org/g/(\\d+)/(\\w+)/\" onmouseover");
 
+    public static final String BASE_URL = "BASE_URL";
+
     @InjectView(R.id.container)
     SwipeRefreshLayout refreshLayout;
 
@@ -56,9 +56,23 @@ public class WebFragment extends GalleryListFragment implements InfiniteScrollLi
     private Subscription subscription;
     private int currentPage = 0;
     private boolean fragmentCreated = false;
+    private String baseUrl;
+    private boolean loading = false;
+    private boolean noMoreGallery = false;
+    private boolean refreshList = false;
 
     public static WebFragment create() {
-        return new WebFragment();
+        return create("/");
+    }
+
+    public static WebFragment create(String baseUrl){
+        WebFragment fragment = new WebFragment();
+        Bundle args = new Bundle();
+
+        args.putString(BASE_URL, baseUrl);
+        fragment.setArguments(args);
+
+        return fragment;
     }
 
     @Override
@@ -70,6 +84,9 @@ public class WebFragment extends GalleryListFragment implements InfiniteScrollLi
         DaoSession daoSession = dbHelper.open();
         galleryDao = daoSession.getGalleryDao();
         subject = BehaviorSubject.create();
+
+        Bundle args = getArguments();
+        baseUrl = args.getString(BASE_URL);
     }
 
     @Nullable
@@ -79,15 +96,11 @@ public class WebFragment extends GalleryListFragment implements InfiniteScrollLi
         ButterKnife.inject(this, view);
 
         subscription = subject
-                .distinct()
+                .filter(i -> !loading && !noMoreGallery)
                 .flatMap(this::loadGalleryList)
-                .debounce(100, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(g -> {
-                    refreshLayout.setRefreshing(false);
-                    listAdapter.notifyDataSetChanged();
-                }, L::e);
+                .subscribe();
 
         StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         listAdapter = new GalleryListAdapter(getActivity(), galleryList);
@@ -97,7 +110,7 @@ public class WebFragment extends GalleryListFragment implements InfiniteScrollLi
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addOnItemTouchListener(new RecyclerViewItemClickListener(getActivity(), this));
         refreshLayout.setOnRefreshListener(() -> subject.onNext(0));
-        //recyclerView.addOnScrollListener(new InfiniteScrollListener(this));
+        recyclerView.addOnScrollListener(new InfiniteScrollListener(this));
 
         return view;
     }
@@ -106,7 +119,7 @@ public class WebFragment extends GalleryListFragment implements InfiniteScrollLi
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if (!fragmentCreated) {
+        if (!fragmentCreated){
             fragmentCreated = true;
 
             refreshLayout.post(() -> {
@@ -128,10 +141,11 @@ public class WebFragment extends GalleryListFragment implements InfiniteScrollLi
         super.onDestroy();
     }
 
-    private Observable<Gallery> loadGalleryList(int page){
-        L.d("loadGalleryList: %d", page);
+    private Observable loadGalleryList(int page){
+        loading = true;
+        L.d("loadGalleryList: %s - %d", baseUrl, page);
 
-        return api.getIndex(page)
+        return api.getIndex(baseUrl, page)
                 .flatMap(html -> {
                     List<GalleryId> list = new ArrayList<>();
                     Matcher matcher = pGalleryUrl.matcher(html);
@@ -174,17 +188,39 @@ public class WebFragment extends GalleryListFragment implements InfiniteScrollLi
                     gallery.setTags(metaData.getTags());
 
                     galleryDao.insertOrReplaceInTx(gallery);
-                    galleryList.add(gallery);
-
                     return gallery;
                 })
-                .doOnCompleted(() -> currentPage++);
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(g -> {
+                    int index = galleryList.indexOf(g);
+
+                    if (index > -1) {
+                        galleryList.set(index, g);
+                    } else if (refreshList) {
+                        galleryList.add(0, g);
+                    } else {
+                        galleryList.add(g);
+                    }
+                })
+                .doOnCompleted(() -> {
+                    if (!refreshList) currentPage++;
+                    refreshLayout.setRefreshing(false);
+                    listAdapter.notifyDataSetChanged();
+                })
+                .doOnError(L::e)
+                .doOnTerminate(() -> {
+                    loading = false;
+                    refreshList = false;
+                })
+                .count()
+                .doOnNext(count -> {
+                    if (count < 25) noMoreGallery = true;
+                });
     }
 
     @Override
     public void onScrollToEnd() {
-        if (galleryList.isEmpty() || galleryList.size() < 25) return;
-
+        refreshLayout.setRefreshing(true);
         subject.onNext(currentPage);
     }
 }

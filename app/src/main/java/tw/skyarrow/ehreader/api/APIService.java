@@ -5,6 +5,7 @@ import retrofit.http.GET;
 import retrofit.http.POST;
 import retrofit.http.Path;
 import retrofit.http.Query;
+import retrofit.http.Url;
 import rx.Observable;
 import tw.skyarrow.ehreader.model.GalleryDataRequest;
 import tw.skyarrow.ehreader.model.GalleryDataResponse;
@@ -16,8 +17,8 @@ public interface APIService {
     @POST("api.php")
     Observable<GalleryDataResponse> getGalleryData(@Body GalleryDataRequest body);
 
-    @GET("/")
-    Observable<String> getIndex(@Query("page") int page);
+    @GET
+    Observable<String> getIndex(@Url String url, @Query("page") int page);
 
     @GET("g/{id}/{token}")
     Observable<String> getGalleryPage(@Path("id") long galleryId, @Path("token") String galleryToken, @Query("p") int page);

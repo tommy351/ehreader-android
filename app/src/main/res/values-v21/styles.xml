@@ -15,7 +15,7 @@
         <item name="android:windowSharedElementExitTransition">@android:transition/move</item>
     </style>
 
-    <string name="AppTheme.Photo" parent="AppTheme.Photo.Base">
+    <style name="AppTheme.Photo" parent="AppTheme.Photo.Base">
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:windowContentTransitions">true</item>
@@ -23,5 +23,12 @@
         <item name="android:windowAllowReturnTransitionOverlap">true</item>
         <item name="android:windowSharedElementEnterTransition">@android:transition/move</item>
         <item name="android:windowSharedElementExitTransition">@android:transition/move</item>
-    </string>
+    </style>
+
+    <style name="AppTheme.Search" parent="AppTheme.Search.Base">
+        <item name="android:windowAllowEnterTransitionOverlap">true</item>
+        <item name="android:windowAllowReturnTransitionOverlap">true</item>
+        <item name="android:windowSharedElementEnterTransition">@android:transition/move</item>
+        <item name="android:windowSharedElementExitTransition">@android:transition/move</item>
+    </style>
 </resources>

@@ -7,6 +7,7 @@ import java.util.Date;
 
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
+import tw.skyarrow.ehreader.api.API;
 
 /**
  * Created by SkyArrow on 2015/9/24.
@@ -156,6 +157,10 @@ public abstract class GalleryBase {
         }
 
         setTags(arr.toString());
+    }
+
+    public String[] getTagArray(){
+        return API.getGson().fromJson(getTags(), String[].class);
     }
 
     public String getUrl(){

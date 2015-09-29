@@ -18,6 +18,8 @@ import android.support.v8.renderscript.ScriptIntrinsicBlur;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,6 +44,7 @@ import butterknife.OnClick;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.app.comment.CommentActivity;
 import tw.skyarrow.ehreader.app.photo.PhotoActivity;
+import tw.skyarrow.ehreader.app.search.SearchActivity;
 import tw.skyarrow.ehreader.model.DaoSession;
 import tw.skyarrow.ehreader.model.Gallery;
 import tw.skyarrow.ehreader.model.GalleryDao;
@@ -81,6 +84,12 @@ public class GalleryActivity extends AppCompatActivity {
 
     @InjectView(R.id.date)
     TextView dateText;
+
+    @InjectView(R.id.uploader)
+    TextView uploaderText;
+
+    @InjectView(R.id.tags)
+    TextView tagText;
 
     private long galleryId;
     private Gallery gallery;
@@ -199,8 +208,10 @@ public class GalleryActivity extends AppCompatActivity {
 
         Date date = gallery.getCreated();
         dateText.setText(dateFormat.format(date));
+        uploaderText.setText(gallery.getUploader());
 
         loadCoverImage();
+        loadGalleryTags();
     }
 
     private void loadCoverImage(){
@@ -232,6 +243,35 @@ public class GalleryActivity extends AppCompatActivity {
         cover.setController(controller);
     }
 
+    private void loadGalleryTags(){
+        String[] tags = gallery.getTagArray();
+        SpannableString span = new SpannableString(TextUtils.join("", tags));
+        int start = 0;
+
+        for (String tag : tags){
+            int end = start + tag.length();
+            span.setSpan(new TagSpan(tag), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            start = end;
+        }
+
+        tagText.setText(span);
+        tagText.setMovementMethod(LinkMovementMethod.getInstance());
+    }
+
+    private class TagSpan extends ClickableSpan {
+        private final String tag;
+
+        public TagSpan(String tag){
+            this.tag = tag;
+        }
+
+        @Override
+        public void onClick(View widget) {
+            Intent intent = SearchActivity.intent(GalleryActivity.this, tag);
+            startActivity(intent);
+        }
+    }
+
     private void setGalleryStarred(boolean starred){
         int message = starred ? R.string.favorites_added : R.string.favorites_removed;
 
@@ -253,6 +293,12 @@ public class GalleryActivity extends AppCompatActivity {
     private void downloadGallery(){
         Intent intent = GalleryDownloadService.intent(this, galleryId);
         startService(intent);
+
+        if (!gallery.getStarred()){
+            gallery.setStarred(true);
+            galleryDao.updateInTx(gallery);
+        }
+
         Snackbar.make(coordinatorLayout, R.string.download_started, Snackbar.LENGTH_LONG).show();
     }
 
@@ -265,6 +311,12 @@ public class GalleryActivity extends AppCompatActivity {
     @OnClick(R.id.comment_btn)
     void onCommentBtnPressed(){
         Intent intent = CommentActivity.intent(this, galleryId);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.uploader)
+    void onUploaderPressed(){
+        Intent intent = SearchActivity.intent(this, "uploader:" + gallery.getUploader());
         startActivity(intent);
     }
 }

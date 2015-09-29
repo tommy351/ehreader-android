@@ -3,10 +3,12 @@ package tw.skyarrow.ehreader.app.photo;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.SeekBar;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 
@@ -30,6 +33,7 @@ import de.greenrobot.dao.query.QueryBuilder;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+import rx.subjects.BehaviorSubject;
 import rx.subscriptions.CompositeSubscription;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.app.gallery.GalleryActivity;
@@ -43,6 +47,7 @@ import tw.skyarrow.ehreader.util.DatabaseHelper;
 import tw.skyarrow.ehreader.util.FabricHelper;
 import tw.skyarrow.ehreader.util.L;
 import tw.skyarrow.ehreader.util.ToolbarHelper;
+import tw.skyarrow.ehreader.view.RecyclerViewItemClickListener;
 
 /**
  * Created by SkyArrow on 2015/9/26.
@@ -60,6 +65,12 @@ public class PhotoActivity extends AppCompatActivity implements View.OnSystemUiV
     @InjectView(R.id.list)
     RecyclerView recyclerView;
 
+    @InjectView(R.id.appbar)
+    AppBarLayout appBar;
+
+    @InjectView(R.id.seekbar)
+    SeekBar seekBar;
+
     private long galleryId;
     private DatabaseHelper dbHelper;
     private GalleryDao galleryDao;
@@ -71,6 +82,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnSystemUiV
     private Handler systemUIHandler;
     private LinearLayoutManager layoutManager;
     private CompositeSubscription subscriptions;
+    private BehaviorSubject<Integer> progressSubject;
 
     public static Intent intent(Context context, long galleryId){
         Intent intent = new Intent(context, PhotoActivity.class);
@@ -105,50 +117,15 @@ public class PhotoActivity extends AppCompatActivity implements View.OnSystemUiV
         DaoSession daoSession = dbHelper.open();
         galleryDao = daoSession.getGalleryDao();
         photoDao = daoSession.getPhotoDao();
-        gallery = galleryDao.load(galleryId);
-        photoMap = new HashMap<>();
+        progressSubject = BehaviorSubject.create();
 
-        QueryBuilder<Photo> qb = photoDao.queryBuilder();
-        qb.where(PhotoDao.Properties.GalleryId.eq(galleryId));
-        List<Photo> photoList = qb.list();
-
-        for (Photo photo : photoList){
-            photoMap.put(photo.getPage(), photo);
-        }
-
-        Subscription subscription = PhotoFetchService.getBus()
-                .filter(photo -> photo.getGalleryId() == galleryId)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(photo -> {
-                    L.d("Received PhotoFetchService event: %d - %d", photo.getGalleryId(), photo.getPage());
-
-                    photoMap.put(photo.getPage(), photo);
-                    listAdapter.notifyDataSetChanged();
-                }, L::e);
-
-        subscriptions.add(subscription);
-
+        setupPhotoList();
         setupActionBar();
+        setupSeekBar();
+        subscribePhotoFetch();
 
-        layoutManager = new LinearLayoutManager(this);
-        listAdapter = new PhotoListAdapter(this, gallery, photoMap);
-
-        subscription = listAdapter.getEventBus()
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(event -> {
-                    Photo photo = event.photo;
-                    photo.setInvalid(true);
-                    photoDao.updateInTx(photo);
-                    photoMap.put(photo.getPage(), photo);
-                    listAdapter.notifyItemChanged(photo.getPage() - 1);
-                }, L::e);
-
-        subscriptions.add(subscription);
-        recyclerView.setAdapter(listAdapter);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(layoutManager);
+        setListPosition(0);
+        progressSubject.onNext(getListPosition());
     }
 
     @Override
@@ -164,7 +141,8 @@ public class PhotoActivity extends AppCompatActivity implements View.OnSystemUiV
 
     @Override
     protected void onPause() {
-        gallery.setProgress(getProgress());
+        // Save progress to database
+        gallery.setProgress(getListPosition() + 1);
         gallery.setLastread(new Date(System.currentTimeMillis()));
         galleryDao.updateInTx(gallery);
 
@@ -179,19 +157,132 @@ public class PhotoActivity extends AppCompatActivity implements View.OnSystemUiV
     }
 
     private void setupActionBar(){
+        // Set up action bar
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(false);
 
+        // Set system UI visibility listener
         decorView = getWindow().getDecorView();
         decorView.setOnSystemUiVisibilityChangeListener(this);
         systemUIHandler = new SystemUIHandler(this);
+
+        // Subscribe to progress subject
+        Subscription subscription = progressSubject
+                .distinctUntilChanged()
+                .subscribe(progress -> {
+                    updateActionBarTitle(progress);
+                });
+
+        subscriptions.add(subscription);
+    }
+
+    private void setupPhotoList(){
+        // Load gallery
+        gallery = galleryDao.load(galleryId);
+        photoMap = new HashMap<>();
+
+        // Load photos
+        QueryBuilder<Photo> qb = photoDao.queryBuilder();
+        qb.where(PhotoDao.Properties.GalleryId.eq(galleryId));
+        List<Photo> photoList = qb.list();
+
+        for (Photo photo : photoList){
+            photoMap.put(photo.getPage(), photo);
+        }
+
+        // Set up recycler view
+        layoutManager = new LinearLayoutManager(this);
+        listAdapter = new PhotoListAdapter(this, gallery, photoMap);
+        listAdapter.setHasStableIds(true);
+        recyclerView.setAdapter(listAdapter);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(layoutManager);
+
+        // Subscribe to list adapter
+        Subscription subscription = listAdapter.getEventBus()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(event -> {
+                    Photo photo = event.photo;
+                    photo.setInvalid(true);
+                    photoDao.updateInTx(photo);
+                    photoMap.put(photo.getPage(), photo);
+                    listAdapter.notifyItemChanged(photo.getPage() - 1);
+                }, L::e);
+
+        subscriptions.add(subscription);
+
+        // Toggle System UI on item click
+        recyclerView.addOnItemTouchListener(new RecyclerViewItemClickListener(this, new RecyclerViewItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                toggleUIVisibility();
+            }
+
+            @Override
+            public void onItemLongPress(View view, int position) {
+
+            }
+        }));
+
+        // Listen to scroll event
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                progressSubject.onNext(getListPosition());
+            }
+        });
+    }
+
+    private void setupSeekBar(){
+        seekBar.setMax(gallery.getCount() - 1);
+
+        // Listen to change event
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                progressSubject.onNext(progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                setListPosition(seekBar.getProgress());
+            }
+        });
+
+        Subscription subscription = progressSubject
+                .distinctUntilChanged()
+                .subscribe(seekBar::setProgress);
+
+        subscriptions.add(subscription);
+    }
+
+    private void subscribePhotoFetch(){
+        // Update photo after photo is fetched
+        Subscription subscription = PhotoFetchService.getBus()
+                .filter(photo -> photo.getGalleryId() == galleryId)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(photo -> {
+                    L.d("Received PhotoFetchService event: %d - %d", photo.getGalleryId(), photo.getPage());
+
+                    photoMap.put(photo.getPage(), photo);
+                    listAdapter.notifyDataSetChanged();
+                }, L::e);
+
+        subscriptions.add(subscription);
     }
 
     @Override
     public void onSystemUiVisibilityChange(int visibility) {
-
+        appBar.setVisibility(visibility);
+        seekBar.setVisibility(visibility);
     }
 
     @Override
@@ -207,8 +298,6 @@ public class PhotoActivity extends AppCompatActivity implements View.OnSystemUiV
 
     @SuppressLint("NewApi")
     private void hideSystemUI(){
-        cancelHideSystemUI();
-
         int uiOptions = View.SYSTEM_UI_FLAG_LOW_PROFILE;
 
         if (IS_JELLY_BEAN){
@@ -246,7 +335,6 @@ public class PhotoActivity extends AppCompatActivity implements View.OnSystemUiV
         }
 
         decorView.setSystemUiVisibility(uiOptions);
-        delayedHideSystemUI();
     }
 
     private void delayedHideSystemUI(){
@@ -275,8 +363,16 @@ public class PhotoActivity extends AppCompatActivity implements View.OnSystemUiV
         }
     }
 
-    private int getProgress(){
-        return layoutManager.findFirstVisibleItemPosition() + 1;
+    private int getListPosition(){
+        return layoutManager.findFirstVisibleItemPosition();
+    }
+
+    private void setListPosition(int position){
+        layoutManager.scrollToPosition(position);
+    }
+
+    private void updateActionBarTitle(int position){
+        getSupportActionBar().setTitle(String.format("%d / %d", position + 1, gallery.getCount()));
     }
 
     private static class SystemUIHandler extends Handler {

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,47 +66,76 @@ public class PhotoListAdapter extends RecyclerView.Adapter<PhotoListAdapter.View
         Intent intent = PhotoFetchService.intent(context, gallery.getId(), photoPage);
 
         holder.pageNumber.setText(String.format("%d", photoPage));
+        holder.photo.setAspectRatio(1f);
 
         if (photoMap.containsKey(photoPage)){
             final Photo photo = photoMap.get(photoPage);
 
             if (photo.getDownloaded() != null && photo.getDownloaded()){
-                File file = photo.getFile(context);
-                String path = file.getAbsolutePath();
-
-                L.d("Load photo from file: %s", path);
-                holder.photo.setAspectRatio((float) photo.getWidth() / photo.getHeight());
-                holder.photo.setImageURI(Uri.parse("file://" + path));
+                loadPhotoFromFile(holder, photo);
                 return;
             }
 
             if (!photo.shouldReload()){
-                L.d("Photo load started: %s", photo.getSrc());
-
-                ControllerListener listener = new BaseControllerListener<ImageInfo>(){
-                    @Override
-                    public void onFailure(String id, Throwable throwable) {
-                        L.d("Photo load failed: %s", photo.getSrc());
-                        eventBus.send(new ImageLoadEvent(photo, throwable));
-                    }
-                };
-
-                DraweeController controller = Fresco.newDraweeControllerBuilder()
-                        .setUri(Uri.parse(photo.getSrc()))
-                        .setOldController(holder.photo.getController())
-                        .setControllerListener(listener)
-                        .build();
-
-                holder.photo.setAspectRatio((float) photo.getWidth() / photo.getHeight());
-                holder.photo.setController(controller);
+                loadPhotoFromWeb(holder, photo);
                 return;
             }
         }
 
         L.d("Call PhotoFetchService to load photo: %d", photoPage);
-
-        holder.photo.setAspectRatio(1f);
         context.startService(intent);
+    }
+
+    private void loadPhotoFromFile(ViewHolder holder, Photo photo){
+        File file = photo.getFile(context);
+        String path = file.getAbsolutePath();
+        Uri uri = Uri.parse("file://" + path);
+
+        L.d("Load photo from file: %s", path);
+
+        ControllerListener listener = new BaseControllerListener<ImageInfo>(){
+            @Override
+            public void onFailure(String id, Throwable throwable) {
+                L.d("Photo load failed: %s", photo.getSrc());
+                loadPhotoFromWeb(holder, photo);
+            }
+        };
+
+        DraweeController controller = Fresco.newDraweeControllerBuilder()
+                .setUri(uri)
+                .setOldController(holder.photo.getController())
+                .setControllerListener(listener)
+                .build();
+
+        holder.photo.setAspectRatio((float) photo.getWidth() / photo.getHeight());
+        holder.photo.setController(controller);
+    }
+
+    private void loadPhotoFromWeb(ViewHolder holder, Photo photo){
+        Uri uri = Uri.parse(photo.getSrc());
+        L.d("Photo load started: %s", photo.getSrc());
+
+        ControllerListener listener = new BaseControllerListener<ImageInfo>(){
+            @Override
+            public void onFailure(String id, Throwable throwable) {
+                L.d("Photo load failed: %s", photo.getSrc());
+                eventBus.send(new ImageLoadEvent(photo, throwable));
+            }
+        };
+
+        DraweeController controller = Fresco.newDraweeControllerBuilder()
+                .setUri(uri)
+                .setOldController(holder.photo.getController())
+                .setControllerListener(listener)
+                .build();
+
+        holder.photo.setAspectRatio((float) photo.getWidth() / photo.getHeight());
+        holder.photo.setController(controller);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

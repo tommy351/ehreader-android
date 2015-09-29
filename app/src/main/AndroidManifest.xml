@@ -39,7 +39,8 @@
         <activity android:name=".app.photo.PhotoActivity"
             android:parentActivityName=".app.gallery.GalleryActivity"
             android:theme="@style/AppTheme.Photo"
-            android:screenOrientation="landscape">
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".app.gallery.GalleryActivity"/>
@@ -61,7 +62,28 @@
                 android:value=".app.gallery.GalleryActivity"/>
         </activity>
 
-        <activity android:name=".app.login.LoginActivity"/>
+        <activity android:name=".app.search.SearchActivity"
+            android:parentActivityName=".app.entry.EntryActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Search"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".app.entry.EntryActivity"/>
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable"/>
+        </activity>
+
+        <activity android:name=".app.login.LoginActivity"
+            android:parentActivityName=".app.entry.EntryActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".app.entry.EntryActivity"/>
+        </activity>
 
         <service android:name=".service.PhotoFetchService"/>
 
@@ -78,6 +100,10 @@
         </service>
 
         <receiver android:name=".receiver.NetworkStateReceiver"/>
+
+        <provider
+            android:name=".provider.SearchSuggestionProvider"
+            android:authorities="${applicationId}.provider.SearchSuggestionProvider"/>
 
         <meta-data
             android:name="io.fabric.ApiKey"

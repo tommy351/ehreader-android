@@ -1,13 +1,13 @@
 <resources>
     <style name="AppTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
         <item name="selectableItemBackgroundBorderless">?android:attr/selectableItemBackgroundBorderless</item>
-        <item name="android:divider">@color/colorDivider</item>
+        <item name="android:divider">@color/divider</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
     </style>
 
@@ -18,9 +18,9 @@
     <style name="AppTheme.Gallery" parent="AppTheme.Gallery.Base"/>
 
     <style name="AppTheme.Photo.Base" parent="Theme.AppCompat">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
@@ -29,4 +29,15 @@
     </style>
 
     <style name="AppTheme.Photo" parent="AppTheme.Photo.Base"/>
+
+    <style name="AppTheme.Search.Base" parent="Theme.AppCompat.Light">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="selectableItemBackground">?android:attr/selectableItemBackground</item>
+        <item name="selectableItemBackgroundBorderless">?android:attr/selectableItemBackgroundBorderless</item>
+        <item name="android:divider">@color/divider</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+    </style>
+
+    <style name="AppTheme.Search" parent="AppTheme.Search.Base"/>
 </resources>

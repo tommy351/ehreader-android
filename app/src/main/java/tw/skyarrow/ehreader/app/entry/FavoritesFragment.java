@@ -2,7 +2,6 @@ package tw.skyarrow.ehreader.app.entry;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
@@ -64,13 +63,12 @@ public class FavoritesFragment extends GalleryListFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if (savedInstanceState == null) {
-            QueryBuilder<Gallery> qb = galleryDao.queryBuilder();
-            qb.where(GalleryDao.Properties.Starred.eq(true));
-            qb.orderDesc(GalleryDao.Properties.Lastread);
-            galleryList.addAll(qb.list());
-            listAdapter.notifyDataSetChanged();
-        }
+        galleryList.clear();
+        QueryBuilder<Gallery> qb = galleryDao.queryBuilder();
+        qb.where(GalleryDao.Properties.Starred.eq(true));
+        qb.orderDesc(GalleryDao.Properties.Lastread);
+        galleryList.addAll(qb.list());
+        listAdapter.notifyDataSetChanged();
     }
 
     @Override

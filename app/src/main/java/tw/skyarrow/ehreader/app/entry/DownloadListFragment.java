@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,7 +22,6 @@ import tw.skyarrow.ehreader.app.gallery.GalleryActivity;
 import tw.skyarrow.ehreader.model.DaoSession;
 import tw.skyarrow.ehreader.model.Download;
 import tw.skyarrow.ehreader.model.DownloadDao;
-import tw.skyarrow.ehreader.model.Gallery;
 import tw.skyarrow.ehreader.service.GalleryDownloadService;
 import tw.skyarrow.ehreader.util.DatabaseHelper;
 import tw.skyarrow.ehreader.view.RecyclerViewItemClickListener;
@@ -84,12 +82,11 @@ public class DownloadListFragment extends Fragment implements RecyclerViewItemCl
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if (savedInstanceState == null){
-            QueryBuilder<Download> qb = downloadDao.queryBuilder();
-            qb.orderDesc(DownloadDao.Properties.Created);
-            downloadList.addAll(qb.list());
-            listAdapter.notifyDataSetChanged();
-        }
+        downloadList.clear();
+        QueryBuilder<Download> qb = downloadDao.queryBuilder();
+        qb.orderDesc(DownloadDao.Properties.Created);
+        downloadList.addAll(qb.list());
+        listAdapter.notifyDataSetChanged();
     }
 
     @Override

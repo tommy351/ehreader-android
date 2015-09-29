@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -59,6 +60,7 @@ public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.
         holder.category.setText(gallery.getCategoryString());
         holder.category.setTextColor(ContextCompat.getColor(context, gallery.getCategoryColor()));
         holder.count.setText(String.format("%dP", gallery.getCount()));
+        holder.favoriteBadge.setVisibility(gallery.getStarred() ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -84,6 +86,9 @@ public class GalleryListAdapter extends RecyclerView.Adapter<GalleryListAdapter.
 
         @InjectView(R.id.count)
         TextView count;
+
+        @InjectView(R.id.favorite)
+        ImageView favoriteBadge;
 
         public ViewHolder(View itemView) {
             super(itemView);

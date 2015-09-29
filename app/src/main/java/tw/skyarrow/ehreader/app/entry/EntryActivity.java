@@ -3,19 +3,14 @@ package tw.skyarrow.ehreader.app.entry;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -27,6 +22,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.app.pref.PrefActivity;
+import tw.skyarrow.ehreader.app.search.SearchActivity;
 import tw.skyarrow.ehreader.util.FabricHelper;
 
 /**
@@ -101,6 +97,7 @@ public class EntryActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.action_search:
+                showSearch();
                 return true;
 
             case R.id.action_settings:
@@ -109,6 +106,11 @@ public class EntryActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showSearch(){
+        Intent intent = SearchActivity.intent(this, "");
+        startActivity(intent);
     }
 
     private void showSettings(){

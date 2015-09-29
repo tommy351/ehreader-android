@@ -16,7 +16,7 @@ public class InfiniteScrollListener extends RecyclerView.OnScrollListener {
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
         super.onScrolled(recyclerView, dx, dy);
 
-        if (listener != null && recyclerView.canScrollVertically(1)){
+        if (listener != null && !recyclerView.canScrollVertically(1)){
             listener.onScrollToEnd();
         }
     }

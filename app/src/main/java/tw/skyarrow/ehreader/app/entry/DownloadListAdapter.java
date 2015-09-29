@@ -46,18 +46,18 @@ public class DownloadListAdapter extends RecyclerView.Adapter<DownloadListAdapte
     public void onBindViewHolder(ViewHolder holder, int position) {
         Download download = list.get(position);
         Gallery gallery = download.getGallery();
+        int progress = download.getProgress();
+        int total = gallery.getCount();
 
         holder.cover.setImageURI(Uri.parse(gallery.getThumbnail()));
         holder.title.setText(gallery.getTitle());
         holder.progressBar.setIndeterminate(false);
-        holder.progressBar.setMax(0);
-        holder.progressBar.setProgress(0);
+        holder.progressBar.setMax(total);
+        holder.progressBar.setProgress(progress);
 
         switch (download.getStatus()){
             case Download.STATUS_DOWNLOADING:
-                holder.status.setText(R.string.download_in_progress);
-                holder.progressBar.setMax(gallery.getCount());
-                holder.progressBar.setProgress(download.getProgress());
+                holder.status.setText(String.format("Downloading... (%d / %d)", progress, total));
                 break;
 
             case Download.STATUS_PENDING:

@@ -2,7 +2,6 @@ package tw.skyarrow.ehreader.util;
 
 import android.content.Context;
 import android.os.Environment;
-import android.support.v4.content.ContextCompat;
 
 import java.io.File;
 
