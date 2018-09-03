@@ -68,10 +68,6 @@
   public static final android.os.Parcelable$Creator *;
 }
 
-## External JARs
--libraryjars libs/libGoogleAnalyticsServices.jar
--libraryjars libs/GoogleAdMobAdsSdk-6.4.1.jar
-
 ## Butterknife
 -dontwarn butterknife.internal.**
 -keep class **$$ViewInjector { *; }

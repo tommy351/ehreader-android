@@ -13,6 +13,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -30,6 +33,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.net.ssl.HostnameVerifier;
+
 import de.greenrobot.dao.query.QueryBuilder;
 import tw.skyarrow.ehreader.Constant;
 import tw.skyarrow.ehreader.R;
@@ -44,6 +49,8 @@ import tw.skyarrow.ehreader.util.HttpRequestHelper;
 import tw.skyarrow.ehreader.util.L;
 import tw.skyarrow.ehreader.util.LoginHelper;
 
+import static tw.skyarrow.ehreader.Constant.*;
+
 /**
  * Created by SkyArrow on 2014/2/19.
  */
@@ -55,15 +62,11 @@ public class DataLoader {
     private HttpContext httpContext;
     private LoginHelper loginHelper;
 
-    private static final String IPB_MEMBER_ID = "ipb_member_id";
-    private static final String IPB_PASS_HASH = "ipb_pass_hash";
-    private static final String IPB_SESSION_ID = "ipb_session_id";
-
-    public static final Pattern pGalleryUrl = Pattern.compile("http://(g\\.e-|ex)hentai\\.org/g/(\\d+)/(\\w+)");
-    public static final Pattern pPhotoUrl = Pattern.compile("http://(g\\.e-|ex)hentai\\.org/s/(\\w+?)/(\\d+)-(\\d+)");
+    public static final Pattern pGalleryUrl = Pattern.compile("https://(e-|ex)hentai\\.org/g/(\\d+)/(\\w+)");
+    public static final Pattern pPhotoUrl = Pattern.compile("https://(e-|ex)hentai\\.org/s/(\\w+?)/(\\d+)-(\\d+)");
     public static final Pattern pShowkey = Pattern.compile("var showkey.*=.*\"([\\w-]+?)\";");
     public static final Pattern pImageSrc = Pattern.compile("<img id=\"img\" src=\"(.+)/(.+?)\"");
-    public static final Pattern pGalleryURL = Pattern.compile("<a href=\"http://(g\\.e-|ex)hentai\\.org/g/(\\d+)/(\\w+)/\" onmouseover");
+    public static final Pattern pGalleryURL = Pattern.compile("<a href=\"https://(e-|ex)hentai\\.org/g/(\\d+)/(\\w+)/\" onmouseover");
 
     private DataLoader(Context context) {
         this.context = context;
@@ -111,7 +114,7 @@ public class DataLoader {
             super(name, value);
 
             setPath("/");
-            setDomain(loggedIn ? "exhentai.org" : "e-hentai.org");
+            setDomain(loggedIn ? ".exhentai.org" : ".e-hentai.org");
         }
     }
 
@@ -125,7 +128,16 @@ public class DataLoader {
 
     private HttpResponse getHttpResponse(HttpRequestBase httpRequest) throws IOException {
         HttpClient httpClient = new DefaultHttpClient();
-
+        SSLSocketFactory sslsf;
+        try {
+            HostnameVerifier hostnameVerifier = org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
+            sslsf = SSLSocketFactory.getSocketFactory();
+            sslsf.setHostnameVerifier((X509HostnameVerifier) hostnameVerifier);
+        } catch (Exception e) {
+            return null;
+        }
+        Scheme https = new Scheme("https",  sslsf, 443);
+        httpClient.getConnectionManager().getSchemeRegistry().register(https);
         return httpClient.execute(httpRequest, httpContext);
     }
 
