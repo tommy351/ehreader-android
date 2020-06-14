@@ -2,15 +2,15 @@
 
 The best E-Hentai Reader for Android ever!
 
+## No Maintenance
+
+This project is not maintained anymore. Please try [EH Redux](https://github.com/tommy351/eh-redux) instead.
+
 ## Features
 
 - ExHentai login
 - Gallery download
 - Image search
-
-## Download
-
-[![](https://raw.github.com/tommy351/ehreader-android/master/images/qrcode.png)][Download]
 
 ## Screenshots
 
