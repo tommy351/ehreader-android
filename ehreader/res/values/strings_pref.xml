@@ -18,6 +18,7 @@
     <string name="pref_login_memberid" translatable="false">login_memberid</string>
     <string name="pref_login_passhash" translatable="false">login_passhash</string>
     <string name="pref_login_sessionid" translatable="false">login_sessionid</string>
+    <string name="pref_login_igneous" translatable="false">login_igneous</string>
 
     // View
     <string name="pref_view_title">View</string>

@@ -26,6 +26,8 @@ import de.greenrobot.event.EventBus;
 import tw.skyarrow.ehreader.R;
 import tw.skyarrow.ehreader.event.LoginEvent;
 
+import static tw.skyarrow.ehreader.Constant.IGNEOUS;
+
 /**
  * Created by SkyArrow on 2014/3/3.
  */
@@ -46,6 +48,7 @@ public class LoginHelper {
     private String PREF_LOGIN_MEMBERID;
     private String PREF_LOGIN_PASSHASH;
     private String PREF_LOGIN_SESSIONID;
+    private String PREF_LOGIN_IGNEOUS;
 
     private LoginHelper(Context context) {
         this.context = context;
@@ -55,6 +58,7 @@ public class LoginHelper {
         PREF_LOGIN_MEMBERID = context.getString(R.string.pref_login_memberid);
         PREF_LOGIN_PASSHASH = context.getString(R.string.pref_login_passhash);
         PREF_LOGIN_SESSIONID = context.getString(R.string.pref_login_sessionid);
+        PREF_LOGIN_IGNEOUS = "login_igneous";
     }
 
     public static LoginHelper getInstance(Context context) {
@@ -89,6 +93,7 @@ public class LoginHelper {
         String memberId = "";
         String passHash = "";
         String sessionId = "";
+        String igneous = "";
 
         for (Cookie cookie : cookies) {
             L.d("Cookie: {name: %s, value: %s}", cookie.getName(), cookie.getValue());
@@ -99,6 +104,8 @@ public class LoginHelper {
                 passHash = cookie.getValue();
             } else if (cookie.getName().equals(IPB_SESSION_ID)) {
                 sessionId = cookie.getValue();
+            } else if (cookie.getName().equals(IGNEOUS)) {
+                igneous = cookie.getValue();
             }
         }
 
@@ -113,6 +120,7 @@ public class LoginHelper {
         editor.putString(PREF_LOGIN_MEMBERID, memberId);
         editor.putString(PREF_LOGIN_PASSHASH, passHash);
         editor.putString(PREF_LOGIN_SESSIONID, sessionId);
+        editor.putString(PREF_LOGIN_IGNEOUS, igneous);
         editor.commit();
 
         EventBus.getDefault().post(new LoginEvent(LoginEvent.LOGIN));
@@ -125,6 +133,8 @@ public class LoginHelper {
         editor.putBoolean(PREF_LOGGED_IN, false);
         editor.remove(PREF_LOGIN_MEMBERID);
         editor.remove(PREF_LOGIN_PASSHASH);
+        editor.remove(PREF_LOGIN_SESSIONID);
+        editor.remove(PREF_LOGIN_IGNEOUS);
         editor.commit();
 
         EventBus.getDefault().post(new LoginEvent(LoginEvent.LOGOUT));

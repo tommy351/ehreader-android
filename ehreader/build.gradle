@@ -52,7 +52,10 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/DEPENDENCIES'
         exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
         exclude 'META-INF/LICENSE'
+        exclude 'META-INF/maven/commons-io/commons-io/pom.xml'
+        exclude 'META-INF/maven/commons-io/commons-io/pom.properties'
     }
 }
 
@@ -65,7 +68,7 @@ dependencies {
     compile 'org.apache.httpcomponents:httpcore:4.4'
     compile 'org.apache.httpcomponents:httpmime:4.3.6'
     compile 'com.jakewharton:butterknife:6.0.0'
-    compile 'org.apache.commons:commons-io:1.3.2'
+    compile 'commons-io:commons-io:1.3.2'
     compile 'com.edmodo:cropper:1.0.1'
     compile project(':android-stackblur:StackBlur')
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.1'
