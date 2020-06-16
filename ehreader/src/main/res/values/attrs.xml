@@ -1,0 +1,6 @@
+<resources>
+    <declare-styleable name="FixedAspectRatioLayout">
+        <attr name="aspectRatioWidth" format="integer"/>
+        <attr name="aspectRatioHeight" format="integer"/>
+    </declare-styleable>
+</resources>

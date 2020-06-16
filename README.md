@@ -14,9 +14,9 @@ This project is not maintained anymore. Please try [EH Redux](https://github.com
 
 ## Screenshots
 
-<a href="https://raw.github.com/tommy351/ehreader-android/master/images/screenshot-main.png"><img src="https://raw.github.com/tommy351/ehreader-android/master/images/screenshot-main.png" width="360" height="640"></a>
-<a href="https://raw.github.com/tommy351/ehreader-android/master/images/screenshot-gallery.png"><img src="https://raw.github.com/tommy351/ehreader-android/master/images/screenshot-gallery.png" width="360" height="640"></a>
-<a href="https://raw.github.com/tommy351/ehreader-android/master/images/screenshot-photo.png"><img src="https://raw.github.com/tommy351/ehreader-android/master/images/screenshot-photo.png" width="360" height="640"></a>
+![](https://raw.github.com/tommy351/ehreader-android/master/images/screenshot-main.png)
+![](https://raw.github.com/tommy351/ehreader-android/master/images/screenshot-gallery.png)
+![](https://raw.github.com/tommy351/ehreader-android/master/images/screenshot-photo.png)
 
 ## Development
 
@@ -31,16 +31,12 @@ This project is not maintained anymore. Please try [EH Redux](https://github.com
 Run the following commands and open the project in Android Studio.
 
 ``` bash
-$ git clone https://github.com/tommy351/ehreader-android.git
+$ https://github.com/tommy351/ehreader-android.git
 $ cd ehreader-android
 $ git submodule update --init
 $ cd android-stackblur/StackBlur
 $ ndk-build
 ```
-
-### Generating DAO
-
-This app uses [GreenDAO](http://greendao-orm.com/) as ORM. Before you get started or after the DAO is updated, you have to run the gradle task `DaoGenerator:run`.
 
 ## License
 

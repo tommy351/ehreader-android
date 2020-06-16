@@ -1,0 +1,6 @@
+<resources>
+    <dimen name="gallery_background_height">360dp</dimen>
+    <dimen name="gallery_placeholder_height">240dp</dimen>
+    <dimen name="cover_size">120dp</dimen>
+    <dimen name="cover_max_height">180dp</dimen>
+</resources>

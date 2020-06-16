@@ -1,6 +1,0 @@
-<resources>
-    <style name="Theme.Crop" parent="android:Theme.Holo">
-        <item name="android:windowBackground">@android:color/black</item>
-        <item name="android:colorBackground">@android:color/black</item>
-    </style>
-</resources>

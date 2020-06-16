@@ -1,6 +1,0 @@
-<resources>
-    <style name="Theme.About" parent="@android:style/Theme.Wallpaper">
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowFullscreen">true</item>
-    </style>
-</resources>
